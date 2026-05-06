@@ -242,7 +242,7 @@
             renderData(filtered);
         }
 
-   function renderData(data) {
+function renderData(data) {
     const container = document.getElementById('restaurantGrid');
     const countDisplay = document.getElementById('resultCount');
     
@@ -255,45 +255,51 @@
     }
 
     container.innerHTML = data.map(item => {
-        // 將餐廳名稱進行編碼，防止特殊字符導致連結失效
-        const encodedName = encodeURIComponent(item['Restaurant Name'] + " 中山");
-        const xhsUrl = `https://www.xiaohongshu.com/search_result?keyword=${encodedName}`;
-        const douyinUrl = `https://www.douyin.com/search/${encodedName}`;
+        // 2026 優化：使用 rednote.com 網域，並加入「中山 探店」增加精準度
+        const restaurantName = item['Restaurant Name'];
+        const searchQuery = encodeURIComponent(restaurantName + " 中山 探店");
+        
+        // 小紅書 (RedNote) 2026 最新搜尋格式
+        const xhsUrl = `https://www.rednote.com/search_result?keyword=${searchQuery}&source=web`;
+        // 抖音搜尋格式
+        const douyinUrl = `https://www.douyin.com/search/${searchQuery}`;
 
         return `
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between hover:border-orange-200 transition">
             <div>
                 <div class="flex justify-between items-start">
-                    <h2 class="text-base font-bold text-gray-800">${item['Restaurant Name']}</h2>
-                    <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ml-2">${item['District']}</span>
+                    <h2 class="text-base font-bold text-gray-800 leading-tight">${restaurantName}</h2>
+                    <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded-full font-bold whitespace-nowrap ml-2">${item['District']}</span>
                 </div>
                 <div class="mt-2 flex flex-wrap gap-1">
-                    ${item['Category'] ? `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">${item['Category']}</span>` : ''}
-                    ${item['Avg Cost'] ? `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded font-medium">人均: ${item['Avg Cost']}</span>` : ''}
+                    ${item['Category'] ? `<span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-md">${item['Category']}</span>` : ''}
+                    ${item['Avg Cost'] ? `<span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-md font-medium">人均: ${item['Avg Cost']}</span>` : ''}
                 </div>
-                <p class="text-gray-600 text-xs mt-3 leading-relaxed">● ${item['Highlight'] || '暫無描述'}</p>
+                <p class="text-gray-600 text-xs mt-3 leading-relaxed line-clamp-2">● ${item['Highlight'] || '暫無描述'}</p>
             </div>
             
-            <div class="mt-4 pt-3 border-t border-gray-50 flex flex-wrap gap-2 items-center justify-between">
-                <div class="flex gap-2">
-                    <a href="${xhsUrl}" target="_blank" class="flex items-center bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded transition hover:bg-red-100">
+            <div class="mt-5 pt-3 border-t border-gray-50">
+                <p class="text-[9px] text-gray-400 mb-2 font-medium">喺其他平台搜尋評價：</p>
+                <div class="flex gap-2 items-center">
+                    <a href="${xhsUrl}" target="_blank" class="flex-1 flex items-center justify-center bg-[#ff2442] text-white text-[10px] font-bold py-2 rounded-xl transition active:scale-95">
                         <span class="mr-1">📕</span>小紅書
                     </a>
-                    <a href="${douyinUrl}" target="_blank" class="flex items-center bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded transition hover:bg-black">
+                    <a href="${douyinUrl}" target="_blank" class="flex-1 flex items-center justify-center bg-[#161823] text-white text-[10px] font-bold py-2 rounded-xl transition active:scale-95">
                         <span class="mr-1">🎵</span>抖音
                     </a>
+                    
+                    ${item['Amap URL'] ? `
+                        <a href="${item['Amap URL']}" target="_blank" class="w-10 h-10 flex items-center justify-center border border-gray-200 text-orange-600 rounded-xl hover:bg-orange-50 active:scale-95 transition">
+                            📍
+                        </a>
+                    ` : ''}
                 </div>
-
-                ${item['Amap URL'] ? `
-                    <a href="${item['Amap URL']}" target="_blank" class="inline-flex items-center text-orange-600 text-[10px] font-bold px-2 py-1 border border-orange-200 rounded-lg hover:bg-orange-50 transition">
-                        📍 導航
-                    </a>
-                ` : ''}
             </div>
         </div>
         `;
     }).join('');
 }
+
 
 
         init();
