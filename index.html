@@ -242,44 +242,59 @@
             renderData(filtered);
         }
 
-        function renderData(data) {
-            const container = document.getElementById('restaurantGrid');
-            const countDisplay = document.getElementById('resultCount');
-            
-            // 顯示結果數量
-            countDisplay.classList.remove('hidden');
-            countDisplay.innerHTML = `搵到 ${data.length} 間餐廳`;
+   function renderData(data) {
+    const container = document.getElementById('restaurantGrid');
+    const countDisplay = document.getElementById('resultCount');
+    
+    countDisplay.classList.remove('hidden');
+    countDisplay.innerHTML = `搵到 ${data.length} 間餐廳`;
 
-            if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-xl shadow-sm border border-gray-100"><p class="text-lg mb-2">🍽️</p>搵唔到符合條件嘅餐廳<br><button onclick="resetFilters()" class="text-orange-500 underline mt-2">重新搜尋</button></div>`;
-                return;
-            }
+    if (data.length === 0) {
+        container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-xl shadow-sm border border-gray-100"><p class="text-lg mb-2">🍽️</p>搵唔到符合條件嘅餐廳<br><button onclick="resetFilters()" class="text-orange-500 underline mt-2">重新搜尋</button></div>`;
+        return;
+    }
 
-            container.innerHTML = data.map(item => `
-                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h2 class="text-base font-bold text-gray-800">${item['Restaurant Name']}</h2>
-                            <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ml-2">${item['District']}</span>
-                        </div>
-                        <div class="mt-2 flex flex-wrap gap-1">
-                            ${item['Category'] ? `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">${item['Category']}</span>` : ''}
-                            ${item['Avg Cost'] ? `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded font-medium">人均: ${item['Avg Cost']}</span>` : ''}
-                        </div>
-                        <p class="text-gray-600 text-xs mt-3 leading-relaxed">● ${item['Highlight'] || '暫無描述'}</p>
-                    </div>
-                    
-                    ${item['Amap URL'] ? `
-                    <div class="mt-4 pt-3 border-t border-gray-50 text-right">
-                        <a href="${item['Amap URL']}" target="_blank" class="inline-flex items-center justify-center bg-orange-100 hover:bg-orange-200 text-orange-700 text-[10px] font-bold px-3 py-1.5 rounded-full transition">
-                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-                            高德導航
-                        </a>
-                    </div>
-                    ` : ''}
+    container.innerHTML = data.map(item => {
+        // 將餐廳名稱進行編碼，防止特殊字符導致連結失效
+        const encodedName = encodeURIComponent(item['Restaurant Name'] + " 中山");
+        const xhsUrl = `https://www.xiaohongshu.com/search_result?keyword=${encodedName}`;
+        const douyinUrl = `https://www.douyin.com/search/${encodedName}`;
+
+        return `
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start">
+                    <h2 class="text-base font-bold text-gray-800">${item['Restaurant Name']}</h2>
+                    <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded font-bold whitespace-nowrap ml-2">${item['District']}</span>
                 </div>
-            `).join('');
-        }
+                <div class="mt-2 flex flex-wrap gap-1">
+                    ${item['Category'] ? `<span class="bg-gray-100 text-gray-600 text-[10px] px-1.5 py-0.5 rounded">${item['Category']}</span>` : ''}
+                    ${item['Avg Cost'] ? `<span class="bg-blue-50 text-blue-600 text-[10px] px-1.5 py-0.5 rounded font-medium">人均: ${item['Avg Cost']}</span>` : ''}
+                </div>
+                <p class="text-gray-600 text-xs mt-3 leading-relaxed">● ${item['Highlight'] || '暫無描述'}</p>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-gray-50 flex flex-wrap gap-2 items-center justify-between">
+                <div class="flex gap-2">
+                    <a href="${xhsUrl}" target="_blank" class="flex items-center bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded transition hover:bg-red-100">
+                        <span class="mr-1">📕</span>小紅書
+                    </a>
+                    <a href="${douyinUrl}" target="_blank" class="flex items-center bg-gray-900 text-white text-[10px] font-bold px-2 py-1 rounded transition hover:bg-black">
+                        <span class="mr-1">🎵</span>抖音
+                    </a>
+                </div>
+
+                ${item['Amap URL'] ? `
+                    <a href="${item['Amap URL']}" target="_blank" class="inline-flex items-center text-orange-600 text-[10px] font-bold px-2 py-1 border border-orange-200 rounded-lg hover:bg-orange-50 transition">
+                        📍 導航
+                    </a>
+                ` : ''}
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
 
         init();
     </script>
