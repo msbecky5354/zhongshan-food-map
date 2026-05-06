@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中山美食地圖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- 頂部 Header -->
+    <header class="bg-orange-500 text-white p-4 shadow-md sticky top-0 z-20">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">中山美食地圖</h1>
+            <input type="text" id="searchInput" placeholder="搜尋餐廳或美食..." 
+                   class="px-3 py-1 rounded-full text-gray-800 focus:outline-none w-2/5 text-sm">
+        </div>
+    </header>
+
+    <!-- 視覺地圖區 -->
+    <div class="bg-white max-w-4xl mx-auto border-b border-gray-200">
+        <img src="image.png" alt="中山分區地圖" class="w-full h-auto max-h-[300px] object-contain p-2" onerror="this.style.display='none'">
+        <p class="text-center text-xs text-gray-400 pb-2">請在下方滑動選擇地區</p>
+    </div>
+
+    <!-- 25區 選擇欄 (橫向滑動) -->
+    <div class="bg-white shadow-sm sticky top-[60px] z-10">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex space-x-2 overflow-x-auto no-scrollbar" id="district-filters">
+            <!-- 地區按鈕會由自動生成 -->
+            <button class="px-4 py-1 bg-orange-500 text-white rounded-full text-sm font-medium whitespace-nowrap">全部</button>
+        </div>
+    </div>
+
+    <!-- 餐廳列表 -->
+    <main class="max-w-4xl mx-auto p-4">
+        <div id="loader" class="text-center py-10 text-gray-500">正在載入數據...</div>
+        <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 餐廳卡片 -->
+        </div>
+    </main>
+
+    <!-- 頁尾 -->
+    <footer class="text-center py-6 text-gray-400 text-xs">
+        * 兼容所有智能手機及電腦瀏覽器
+    </footer>
+
+    <script>
+        // 已經幫你自動轉換為 CSV 讀取連結
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1pcszjoP4FCSgZq0px4wz5jjbfS2DIuMshvIIlh9HZUY/export?format=csv';
+        
+        let allData = [];
+        let currentDistrict = '全部';
+
+        async function init() {
+            Papa.parse(sheetUrl, {
+                download: true,
+                header: true,
+                complete: function(results) {
+                    allData = results.data.filter(item => item.餐廳名稱 && item.餐廳名稱.trim() !== ''); 
+                    
+                    generateDistrictButtons(allData);
+                    renderData(allData);
+                    document.getElementById('loader').classList.add('hidden');
+                }
+            });
+        }
+
+        function generateDistrictButtons(data) {
+            const filterContainer = document.getElementById('district-filters');
+            const districts = [...new Set(data.map(item => item.地區))].filter(Boolean);
+            
+            let html = `<button onclick="filterByDistrict('全部')" class="district-btn active-btn px-4 py-1 bg-orange-500 text-white rounded-full text-sm font-medium whitespace-nowrap" data-district="全部">全部</button>`;
+            
+            districts.forEach(district => {
+                html += `<button onclick="filterByDistrict('${district}')" class="district-btn px-4 py-1 bg-gray-200 text-gray-700 rounded-full text-sm font-medium whitespace-nowrap" data-district="${district}">${district}</button>`;
+            });
+            
+            filterContainer.innerHTML = html;
+        }
+
+        window.filterByDistrict = function(district) {
+            currentDistrict = district;
+            
+            document.querySelectorAll('.district-btn').forEach(btn => {
+                if(btn.getAttribute('data-district') === district) {
+                    btn.classList.replace('bg-gray-200', 'bg-orange-500');
+                    btn.classList.replace('text-gray-700', 'text-white');
+                } else {
+                    btn.classList.replace('bg-orange-500', 'bg-gray-200');
+                    btn.classList.replace('text-white', 'text-gray-700');
+                }
+            });
+
+            applyFilters();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allData.filter(item => {
+                const matchDistrict = currentDistrict === '全部' || item.地區 === currentDistrict;
+                const matchSearch = item.餐廳名稱.toLowerCase().includes(searchTerm) || 
+                                   (item.推介美食 && item.推介美食.toLowerCase().includes(searchTerm));
+                return matchDistrict && matchSearch;
+            });
+            
+            renderData(filtered);
+        }
+
+        function renderData(data) {
+            const container = document.getElementById('restaurantGrid');
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-10">呢區暫時未有餐廳紀錄</div>`;
+                return;
+            }
+
+            container.innerHTML = data.map(item => `
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col">
+                    <div class="flex justify-between items-start">
+                        <h2 class="text-lg font-bold text-gray-800">${item.餐廳名稱}</h2>
+                        <span class="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded font-bold whitespace-nowrap">
+                            ${item.地區}
+                        </span>
+                    </div>
+                    <span class="text-sm text-gray-500 mt-1">${item.分類 || '美食'}</span>
+                    <p class="text-gray-700 mt-3 text-sm flex-grow"><strong>推介：</strong>${item.推介美食 || '暫無描述'}</p>
+                    <div class="mt-4 pt-3 border-t border-gray-100">
+                        <p class="text-gray-400 text-xs flex items-center">
+                            📍 ${item.地址 || '未提供地址'}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        init();
+    </script>
+</body>
+</html>
