@@ -186,12 +186,7 @@
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
 
         async function init() {
-            // 加入強制更新時間戳
             const finalUrl = sheetUrl + `&t=${new Date().getTime()}`;
-            
-            // 安全機制：3秒必閂 Loader
-            setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 3000);
-
             Papa.parse(finalUrl, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) {
@@ -202,7 +197,8 @@
                         'Avg_Cost': row['Avg_Cost'] || "",
                         'Highlight': row['Highlight'] || "",
                         'Address': row['Address'] || "",
-                        'Amap_URL': row['Amap_URL'] || ""
+                        'Amap_URL': row['Amap_URL'] || "",
+                        'Status': row['status'] || "" // 【新增】讀取 status 欄位
                     })).filter(i => i.Restaurant_Name !== "");
                     const now = new Date();
                     document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
@@ -224,6 +220,9 @@
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
             currentRenderedData = allData.filter(item => {
+                // 【關鍵修復】如果 status 為 "X"，直接過濾掉
+                if (item.Status === "X") return false;
+
                 const userData = getUserData(item.Restaurant_Name);
                 const matchD = filtersState.district === '全部' || item.District === filtersState.district;
                 const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
@@ -245,9 +244,7 @@
             header.classList.remove('hidden');
             document.getElementById('districtTitle').innerText = filtersState.district === '全部' ? (document.getElementById('searchInput').value ? '搜尋結果' : '所有地區') : filtersState.district;
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
-            
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
-            
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
                 const q = encodeURIComponent(item.Restaurant_Name + " " + item.District);
@@ -319,23 +316,17 @@
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); }
         function copyAddress() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => showToast('✅ 地址已複製')); }
         function buildFilterPills(data) {
+            const validData = data.filter(i => i.Status !== "X"); // 標籤只顯示營業中的
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
-            dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(data.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
-            cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(data.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
+            dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(validData.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
+            cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(validData.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
             pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
             updatePillUI();
         }
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95 mb-1 mr-1">${l}</button>`; }
         function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); }
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
-
-        function showBookmarkGuide() {
-            const ua = navigator.userAgent.toLowerCase();
-            const isiOS = /iphone|ipad|ipod/.test(ua);
-            let msg = isiOS ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android/Chrome 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>";
-            showToast(msg, 6000); 
-        }
-
+        function showBookmarkGuide() { const ua = navigator.userAgent.toLowerCase(); const isiOS = /iphone|ipad|ipod/.test(ua); let msg = isiOS ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android/Chrome 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>"; showToast(msg, 6000); }
         window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
         window.shareDetail = function() { if(!activeDetailItem) return; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: activeDetailItem.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
 
