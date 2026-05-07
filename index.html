@@ -38,7 +38,7 @@
 <body class="bg-gray-50 min-h-screen">
 
     <div class="sticky top-0 z-50 shadow-sm flex flex-col bg-white">
-        <header class="px-4 pt-5 pb-3 relative">
+        <header class="px-4 pt-5 pb-3 relative border-b border-gray-50">
             <div class="max-w-6xl mx-auto flex items-center justify-between">
                 <div class="flex items-center cursor-pointer active:opacity-60 transition-opacity" onclick="resetToHome()">
                     <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white flex-shrink-0">
@@ -63,31 +63,30 @@
                 </div>
             </div>
         </header>
-    </div>
 
-    <div id="mainContentView" class="block">
-        <section class="px-4 py-2 bg-gray-50/95 backdrop-blur-md border-b border-gray-100 sticky top-[76px] z-40">
-            <div class="max-w-4xl mx-auto flex gap-2">
+        <section class="px-4 py-2 bg-white backdrop-blur-md">
+            <div class="max-w-4xl mx-auto flex gap-1.5 items-center">
                 <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
                     <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地區..." 
-                           class="w-full pl-11 pr-4 py-3 bg-white text-sm focus:outline-none rounded-2xl">
+                           class="w-full pl-11 pr-4 py-3 bg-gray-50 text-sm focus:outline-none rounded-2xl">
                 </div>
-                <button onclick="toggleFilters()" class="w-11 h-11 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-500 ios-shadow border border-gray-50 active:bg-gray-50 transition-colors">
+                
+                <button onclick="resetAllFilters()" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 ios-shadow active:bg-red-50 transition-colors">
+                    <i class="fa-solid fa-trash-can text-xs"></i>
+                    <span class="text-[7px] mt-0.5 font-bold">重置</span>
+                </button>
+
+                <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 ios-shadow active:bg-gray-50 transition-colors">
                     <i class="fa-solid fa-sliders text-xs"></i>
                     <span class="text-[7px] mt-0.5 font-bold">篩選</span>
                 </button>
             </div>
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
-                
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
-                    <button onclick="resetAllFilters()" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90 transition-transform">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
-                    </button>
-                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-orange-100 active:scale-90 transition-transform">
-                        <i class="fa-solid fa-check text-sm"></i>
-                    </button>
+                    <button onclick="resetAllFilters()" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-orange-100 active:scale-90"><i class="fa-solid fa-check text-sm"></i></button>
                 </div>
 
                 <div class="mb-5">
@@ -113,7 +112,9 @@
                 </div>
             </div>
         </section>
+    </div>
 
+    <div id="mainContentView" class="block">
         <section class="max-w-4xl mx-auto px-4 py-3 mt-2" id="mapSection">
             <div class="bg-white rounded-[2.5rem] p-4 ios-shadow border border-gray-50 overflow-hidden relative text-center text-[0px]">
                 <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
@@ -229,12 +230,13 @@
             window.scrollTo({ top: anchor.offsetTop - 150, behavior: 'smooth' });
         }
 
-        // 全新功能：一鍵重置所有篩選標籤
         window.resetAllFilters = function() {
             filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
             document.getElementById('searchInput').value = '';
             updatePillUI();
             applyFilters();
+            // 順便收起選單，等介面乾淨啲
+            document.getElementById('filterMenu').classList.add('hidden');
         }
 
         function buildFilterPills(data) {
@@ -281,6 +283,8 @@
             const data = getUserData(item['Restaurant Name']);
             document.getElementById('detailBackText').innerText = item['District'] || '返回';
             document.getElementById('detailName').innerText = item['Restaurant Name'];
+            document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-utensils mr-1"></i>${item['Category'] || '美食'}`;
+            document.getElementById('detailPrice').innerHTML = `<i class="fa-solid fa-sack-dollar text-[#d4b068] mr-1"></i>人均 ${item['Avg Cost'] || '--'}`;
             document.getElementById('detailHighlight').innerText = item['Highlight'] || '暫無詳細描述';
             document.getElementById('detailAddress').innerText = item['Address'] || `中山市${item['District']}`;
             document.getElementById('noteInput').value = data.note || '';
@@ -353,7 +357,6 @@
             }
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item['Restaurant Name']);
-                const query = encodeURIComponent(item['Restaurant Name']);
                 return `
                 <div class="bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors p-4 relative">
                     <div class="flex items-center gap-3 cursor-pointer" onclick="openDetail(${index})">
@@ -375,8 +378,8 @@
                     </div>
                     <div class="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-gray-50 pl-[62px]">
                         <a href="${item['Amap URL'] || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#eaddf5] bg-[#faf6fc] text-[#8651c5] text-[10px] font-bold"><i class="fa-solid fa-location-arrow text-[#3b82f6]"></i> 導航</a>
-                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48] text-[10px] font-bold">📕 小紅書</a>
-                        <a href="https://www.douyin.com/search/${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-gray-200 bg-[#f9fafb] text-gray-800 text-[10px] font-bold">🎵 抖音</a>
+                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(item['Restaurant Name'])}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48] text-[10px] font-bold">📕 小紅書</a>
+                        <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded border border-gray-200 bg-[#f9fafb] text-gray-800 text-[10px] font-bold">🎵 抖音</a>
                         <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#bbf7d0] bg-[#f2fdf5] text-[#16a34a] text-[10px] font-bold"><i class="fa-solid fa-paperclip text-gray-400"></i> 分享</button>
                     </div>
                 </div>`;
