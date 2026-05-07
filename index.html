@@ -58,13 +58,20 @@
                         <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新：載入中...</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 ml-2">
-                    <button class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-95" onclick="showUserGuide()">
+                
+                <div class="flex items-center gap-1.5 ml-2">
+                    <button class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()">
                         <i class="fa-solid fa-circle-question text-lg"></i>
                     </button>
-                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95 transition"><i class="fa-brands fa-facebook"></i>群組</a>
-                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1 active:scale-95 transition"><i class="fa-brands fa-youtube"></i></a>
-                    <button class="w-8 h-8 border border-orange-100 rounded-lg flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-95" onclick="showBookmarkGuide()"><i class="fa-solid fa-bookmark"></i></button>
+                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+                        <i class="fa-brands fa-facebook-f text-lg"></i>
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="w-9 h-9 bg-[#FF0000] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+                        <i class="fa-brands fa-youtube text-lg"></i>
+                    </a>
+                    <button class="w-9 h-9 border border-orange-100 rounded-xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 transition-transform" onclick="showBookmarkGuide()">
+                        <i class="fa-solid fa-bookmark text-lg"></i>
+                    </button>
                 </div>
             </div>
         </header>
@@ -187,7 +194,7 @@
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
-        function showToast(msg, dur = 3000) { const t = document.getElementById("customToast"); if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; } }
+        function showToast(msg, dur = 3000) { const t = document.getElementById("customToast"); if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉指南</button></div>`; t.className = "show"; } }
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
@@ -220,14 +227,10 @@
                         };
                     }).filter(i => i.Restaurant_Name !== "");
                     
-                    // 【修正】加入小時同分鐘
                     const now = new Date();
-                    const year = now.getFullYear();
-                    const month = now.getMonth() + 1;
-                    const date = now.getDate();
                     const hours = now.getHours().toString().padStart(2, '0');
                     const minutes = now.getMinutes().toString().padStart(2, '0');
-                    document.getElementById('updateTime').innerText = `最後更新：${year}年${month}月${date}日 ${hours}:${minutes}`;
+                    document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
                     
                     buildFilterPills(allData); applyFilters();
                     document.getElementById('loader').classList.add('hidden');
