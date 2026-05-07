@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>中山美食地圖</title>
-    
     <link rel="icon" type="image/png" href="app-icon-512.png">
-    <link rel="shortcut icon" href="app-icon-512.png">
-
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f97316">
     <link rel="apple-touch-icon" href="app-icon-512.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="中山美食地圖">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -51,10 +47,9 @@
                         <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：載入中...</p>
                     </div>
                 </div>
-                
                 <div class="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                    <a href="https://www.facebook.com/profile.php?id=61570978424962" target="_blank" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform"><i class="fa-brands fa-facebook mr-1"></i>FB群組</a>
-                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform"><i class="fa-brands fa-youtube mr-1"></i>YouTube</a>
+                    <a href="https://www.facebook.com/profile.php?id=61570978424962" target="_blank" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center"><i class="fa-brands fa-facebook mr-1"></i>FB群組</a>
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center"><i class="fa-brands fa-youtube mr-1"></i>YouTube</a>
                     <button class="w-8 h-8 border border-gray-100 rounded-lg flex items-center justify-center text-red-400 bg-white shadow-sm" onclick="setFilterState('myTag', 'favorite'); jumpToResults();"><i class="fa-solid fa-heart"></i></button>
                 </div>
             </div>
@@ -66,9 +61,9 @@
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
                     <input type="text" id="searchInput" oninput="applyFilters()" placeholder="搜尋餐廳、特色、菜式..." class="w-full pl-11 pr-4 py-3 bg-gray-50 text-sm focus:outline-none rounded-2xl">
                 </div>
-                <button onclick="resetAllFilters()" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 ios-shadow active:bg-red-50 transition-colors">
-                    <i class="fa-solid fa-trash-can text-xs"></i>
-                    <span class="text-[7px] mt-0.5 font-bold">重置</span>
+                <button onclick="resetToHome()" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 ios-shadow active:bg-red-50 transition-colors">
+                    <i class="fa-solid fa-house text-xs"></i>
+                    <span class="text-[7px] mt-0.5 font-bold">首頁</span>
                 </button>
                 <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 ios-shadow active:bg-gray-50 transition-colors">
                     <i class="fa-solid fa-sliders text-xs"></i>
@@ -78,8 +73,12 @@
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
-                    <button onclick="resetAllFilters()" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-orange-100 active:scale-90"><i class="fa-solid fa-check text-sm"></i></button>
+                    <button onclick="resetTagsOnly()" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90 transition-transform">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg shadow-orange-100 active:scale-90 transition-transform">
+                        <i class="fa-solid fa-check text-sm"></i>
+                    </button>
                 </div>
                 <div class="mb-5">
                     <h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-bookmark mr-1.5 text-orange-400"></i>我的標記</h4>
@@ -103,7 +102,6 @@
                 <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             </div>
         </section>
-
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="districtHeader" class="hidden text-white px-5 pt-4 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[13px] opacity-90 flex items-center mb-3"><i class="fa-solid fa-angle-left mr-1.5"></i>返回地圖</button>
@@ -122,25 +120,28 @@
 
     <div id="detailView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
         <div class="bg-[#7a8f9a] px-5 pt-4 pb-6 text-white relative z-10">
-            <button onclick="closeDetail()" class="text-[13px] font-medium flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i> <span id="detailBackText">返回</span></button>
+            <button onclick="closeDetail()" class="text-[13px] font-medium flex items-center mb-3"><i class="fa-solid fa-angle-left mr-1.5"></i> <span id="detailBackText">返回</span></button>
             <h2 id="detailName" class="text-[26px] font-normal tracking-wider text-shadow-sm leading-tight">載入中...</h2>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-2">
                 <div class="flex items-center gap-2"><div class="text-[#f5a623] text-xs tracking-wider"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star text-gray-200"></i></div><span class="text-gray-400 text-[10px] font-medium">推薦指數</span></div>
                 <div class="flex gap-1.5">
-                    <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95 transition">去過?</button>
-                    <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95 transition">收藏</button>
-                    <button id="btnWant" onclick="toggleUserStatus('want')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95 transition">想去</button>
+                    <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border border-gray-100 active:scale-95 transition">去過?</button>
+                    <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border border-gray-100 active:scale-95 transition">收藏</button>
+                    <button id="btnWant" onclick="toggleUserStatus('want')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border border-gray-100 active:scale-95 transition">想去</button>
                 </div>
             </div>
             <div id="starRating" class="text-gray-200 text-2xl space-x-1.5 mb-5 cursor-pointer"><i class="fa-solid fa-star" onclick="saveRating(1)"></i><i class="fa-solid fa-star" onclick="saveRating(2)"></i><i class="fa-solid fa-star" onclick="saveRating(3)"></i><i class="fa-solid fa-star" onclick="saveRating(4)"></i><i class="fa-solid fa-star" onclick="saveRating(5)"></i></div>
-            <div class="bg-[#faf9f5] rounded-xl p-4 border border-[#f3eee1] mb-5"><p class="text-[11px] text-gray-500 font-bold mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> 我的備註</p><textarea id="noteInput" oninput="saveNote()" placeholder="點擊加入備註⋯" class="w-full bg-transparent text-[11px] text-gray-700 outline-none h-16 resize-none"></textarea></div>
+            <div class="bg-[#faf9f5] rounded-xl p-4 border border-[#f3eee1] mb-5"><textarea id="noteInput" oninput="saveNote()" placeholder="點擊加入備註⋯" class="w-full bg-transparent text-[11px] text-gray-700 outline-none h-16 resize-none"></textarea></div>
             <div id="detailExtraTags" class="flex flex-wrap gap-2 mb-2"></div>
-            <div class="flex flex-wrap gap-2 mb-5"><span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold border border-[#bbf7d0]"></span><span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200"></span></div>
+            <div class="flex flex-wrap gap-2 mb-5">
+                <span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold border border-[#bbf7d0]"></span>
+                <span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200"></span>
+            </div>
             <div class="bg-[#fcfdfa] rounded-xl p-4 border border-gray-100 shadow-sm mb-5"><h4 class="text-[12px] font-bold text-[#d4b068] mb-2.5 flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> 食客點評</h4><p id="detailHighlight" class="text-[13px] text-gray-700 leading-relaxed font-medium"></p></div>
             <div class="flex items-center justify-between py-3 border-t border-b border-gray-50 mb-6"><p id="detailAddress" class="text-[12px] text-gray-600 flex-1 pr-3"></p><button onclick="copyAddress()" class="bg-gray-50 border border-gray-200 text-gray-500 px-3 py-1.5 rounded-md text-[10px] font-bold active:scale-95 transition">複製</button></div>
-            <div class="grid grid-cols-2 gap-3 pb-12"><a id="btnNav" target="_blank" class="bg-[#1b7ef2] text-white rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-location-arrow text-lg"></i></div><span class="text-[13px] font-medium">導航前往</span></a><button onclick="shareDetail()" class="bg-[#f2fdf5] border border-[#bbf7d0] text-[#16a34a] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-[#16a34a]/10 flex items-center justify-center"><i class="fa-solid fa-paperclip text-lg"></i></div><span class="text-[13px] font-medium">分享餐廳</span></button><a id="btnXhs" target="_blank" class="bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-[#e11d48]/10 flex items-center justify-center"><i class="fa-solid fa-book-open text-lg"></i></div><span class="text-[13px] font-medium">小紅書食評</span></a><a id="btnDy" target="_blank" class="bg-[#f9fafb] border border-gray-200 text-gray-800 rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-gray-200/50 flex items-center justify-center"><i class="fa-brands fa-tiktok text-lg"></i></div><span class="text-[13px] font-medium">抖音食評</span></a></div>
+            <div class="grid grid-cols-2 gap-3 pb-12"><a id="btnNav" target="_blank" class="bg-[#1b7ef2] text-white rounded-2xl py-4 flex flex-col items-center justify-center gap-2"><div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-location-arrow text-lg"></i></div><span class="text-[13px] font-medium">導航前往</span></a><button onclick="shareDetail()" class="bg-[#f2fdf5] border border-[#bbf7d0] text-[#16a34a] rounded-2xl py-4 flex flex-col items-center justify-center gap-2"><div class="w-8 h-8 rounded-full bg-[#16a34a]/10 flex items-center justify-center"><i class="fa-solid fa-paperclip text-lg"></i></div><span class="text-[13px] font-medium">分享餐廳</span></button><a id="btnXhs" target="_blank" class="bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2"><div class="w-8 h-8 rounded-full bg-[#e11d48]/10 flex items-center justify-center"><i class="fa-solid fa-book-open text-lg"></i></div><span class="text-[13px] font-medium">小紅書食評</span></a><a id="btnDy" target="_blank" class="bg-[#f9fafb] border border-gray-200 text-gray-800 rounded-2xl py-4 flex flex-col items-center justify-center gap-2"><div class="w-8 h-8 rounded-full bg-gray-200/50 flex items-center justify-center"><i class="fa-brands fa-tiktok text-lg"></i></div><span class="text-[13px] font-medium">抖音食評</span></a></div>
         </div>
     </div>
 
@@ -203,32 +204,31 @@
             });
         }
 
+        // 首頁「大重置」邏輯：清空並返回地圖
         window.resetToHome = function() {
             closeDetail(); 
-            resetAllFilters(); 
-        }
-
-        window.jumpToResults = function() {
-            document.getElementById('filterMenu').classList.add('hidden');
-            window.scrollTo({ top: document.getElementById('resultsAnchor').offsetTop - 150, behavior: 'smooth' });
-        }
-
-        // 【全新優化】重置所有 Filter 並即時跳回地圖
-        window.resetAllFilters = function() {
-            // 1. 重置狀態
             filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
             document.getElementById('searchInput').value = '';
-            
-            // 2. 更新 UI 與 數據
+            document.getElementById('filterMenu').classList.add('hidden');
             updatePillUI();
             applyFilters();
-            
-            // 3. 收起選單
+            window.history.pushState({}, document.title, window.location.pathname); 
+            window.scrollTo({ top: 0, behavior: 'smooth' }); 
+        }
+
+        // Filter 內部的「局部重置」：只清空標籤，唔好走住
+        window.resetTagsOnly = function() {
+            filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
+            updatePillUI();
+            // 注意：呢度特登唔行 applyFilters() 同埋唔收埋個 Menu，畀用家繼續選標籤
+        }
+
+        // 確定並關閉 Filter
+        window.jumpToResults = function() {
             document.getElementById('filterMenu').classList.add('hidden');
-            
-            // 4. 清除 URL 並滑動回最頂 (地圖版面)
-            window.history.pushState({}, document.title, window.location.pathname);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            applyFilters();
+            const target = document.getElementById('resultsAnchor');
+            window.scrollTo({ top: target.offsetTop - 150, behavior: 'smooth' });
         }
 
         function buildFilterPills(data) {
@@ -246,7 +246,7 @@
         window.setFilterState = function(type, value) {
             filtersState[type] = value;
             updatePillUI();
-            applyFilters();
+            // 標籤切換時唔使收埋 Menu，畀用家揀多幾個
         }
 
         function updatePillUI() {
@@ -268,9 +268,9 @@
             const data = getUserData(item['Restaurant Name']);
             document.getElementById('detailBackText').innerText = item['District'] || '返回';
             document.getElementById('detailName').innerText = item['Restaurant Name'];
-            document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-leaf mr-1"></i>${item['Category'] || '特色美食'}`;
+            document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-utensils mr-1"></i>${item['Category'] || '特色美食'}`;
             document.getElementById('detailPrice').innerHTML = `<i class="fa-solid fa-sack-dollar text-[#d4b068] mr-1"></i>人均 ${item['Avg Cost'] || '--'}`;
-            document.getElementById('detailHighlight').innerText = item['Highlight'] || '暫無詳細描述';
+            document.getElementById('detailHighlight').innerText = item['Highlight'] || '暫無詳細描述，請親自前往體驗！';
             document.getElementById('detailAddress').innerText = item['Address'] || `中山市${item['District']}`;
             document.getElementById('noteInput').value = data.note || '';
             const highlightText = item['Highlight'] || '';
@@ -354,7 +354,7 @@
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
             header.style.background = districtColors[filtersState.district] || districtColors['全部'];
             if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white border border-gray-100 mt-4 rounded-2xl">🍽️ 找不到結果，請嘗試重置過濾條件</div>`;
+                container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white border border-gray-100 mt-4 rounded-2xl">🍽️ 找不到結果</div>`;
                 return;
             }
             container.innerHTML = data.map((item, index) => {
@@ -399,7 +399,7 @@
             const name = currentRenderedData[index]['Restaurant Name'];
             const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(name)}`;
             if (navigator.share) navigator.share({ title: name, url: shareUrl });
-            else { navigator.clipboard.writeText(shareUrl); alert('✅ 連結已複製'); }
+            else { navigator.clipboard.writeText(shareUrl).then(() => alert(`✅ 連結已複製`)); }
         }
 
         init();
