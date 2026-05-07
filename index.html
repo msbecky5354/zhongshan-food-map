@@ -171,8 +171,7 @@
                     <span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 border border-[#bbf7d0]"><i class="fa-solid fa-leaf"></i> 菜式</span>
                     <span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1 border border-gray-200"><i class="fa-solid fa-sack-dollar text-[#d4b068]"></i> 人均 ¥--</span>
                 </div>
-                <div id="detailExtraTags" class="flex flex-wrap gap-2">
-                    </div>
+                <div id="detailExtraTags" class="flex flex-wrap gap-2"></div>
             </div>
             
             <div class="bg-[#fcfdfa] rounded-xl p-4 border border-gray-100 relative overflow-hidden shadow-sm mb-5">
@@ -255,28 +254,14 @@
 
         let filtersState = { district: '全部', category: '全部', price: '全部' };
 
-        const ALL_DISTRICTS = [
-            "石岐區", "東區", "西區", "南區", "五桂山鎮", "火炬開發區", "馬鞍島",
-            "黃圃鎮", "南頭鎮", "東鳳鎮", "阜沙鎮", "小欖鎮", "東升鎮", "古鎮鎮",
-            "橫欄鎮", "三角鎮", "民眾鎮", "南朗鎮", "港口鎮", "大涌鎮", "沙溪鎮",
-            "三鄉鎮", "板芙鎮", "神灣鎮", "坦洲鎮"
-        ];
-
-        const PRICE_RANGES = [
-            { label: '全部', value: '全部' },
-            { label: '¥50以下', value: '0-50' },
-            { label: '¥50-100', value: '51-100' },
-            { label: '¥100以上', value: '101-' }
-        ];
-
         const districtColors = {
             "黃圃鎮": "#d87a41", "南頭鎮": "#85a953", "東鳳鎮": "#b1c953", "小欖鎮": "#5f87d4",
-            "古鎮鎮": "#c85665", "橫欄鎮": "#a33db5", "東升鎮": "#a4a0e1", "阜沙鎮": "#dcb858", // 橫欄鎮修正為紫色配合截圖
+            "古鎮鎮": "#c85665", "橫欄鎮": "#a33db5", "東升鎮": "#a4a0e1", "阜沙鎮": "#dcb858", 
             "三角鎮": "#60dbe4", "民眾鎮": "#9ffb8e", "港口鎮": "#e7a88f", "西區": "#a1f44c",
             "石岐區": "#f7e53f", "東區": "#a5409d", "火炬開發區": "#ab77f7", "馬鞍島": "#a4c7cd",
             "南朗鎮": "#8db7b3", "沙溪鎮": "#e7878d", "大涌鎮": "#df5642", "南區": "#cdcf47",
             "五桂山鎮": "#e98e4f", "板芙鎮": "#ae77f3", "三鄉鎮": "#8f9e51", "神灣鎮": "#a2d861",
-            "坦洲鎮": "#7a8f9a", "全部": "linear-gradient(to right, #f97316, #fb923c)" // 坦洲鎮修正為藍灰配合截圖
+            "坦洲鎮": "#7a8f9a", "全部": "linear-gradient(to right, #f97316, #fb923c)" 
         };
 
         const CATEGORY_ICONS = {
@@ -288,7 +273,6 @@
 
         function getIcon(cat) { return CATEGORY_ICONS[cat?.trim()] || "🍽️"; }
 
-        // 生成假 HashTags 增加真實感
         function generateTags(highlight) {
             const tags = ['#必試', '#人氣推薦'];
             if(highlight.includes('海鮮')) tags.push('#新鮮海產');
@@ -373,7 +357,6 @@
             setTimeout(() => { window.scrollTo({ top: document.getElementById('districtHeader').offsetTop - 140, behavior: 'auto' }); }, 10);
         }
 
-        // ==================== 內頁資料填入 ====================
         window.openDetail = function(index) {
             const item = currentRenderedData[index];
             activeDetailItem = item; 
@@ -385,7 +368,6 @@
             document.getElementById('detailHighlight').innerText = item['Highlight'] || '暫無詳細描述';
             document.getElementById('detailAddress').innerText = item['Address'] || `中山市${item['District']}`;
             
-            // 動態生成 Hashtag 配合截圖
             const tags = generateTags(item['Highlight'] || '');
             document.getElementById('detailExtraTags').innerHTML = tags.map(t => `<span class="bg-[#fff7ed] text-[#f97316] border border-[#ffedd5] px-2.5 py-1 rounded-md text-[10px] font-bold">${t}</span>`).join('');
 
@@ -458,41 +440,49 @@
                 return;
             }
             
-            // 列表卡片 (還原截圖一嘅 Outline 按鈕設計)
             container.innerHTML = data.map((item, index) => {
                 const query = encodeURIComponent(item['Restaurant Name']);
-                const cardColor = districtColors[item['District']] || '#a33db5'; // 默認紫色
+                const cardColor = districtColors[item['District']] || '#a33db5';
 
                 return `
                 <div class="bg-white rounded-none border-b border-gray-100 hover:bg-gray-50 transition-colors p-4">
-                    <div class="flex items-start gap-4 cursor-pointer" onclick="openDetail(${index})">
-                        <div class="w-[50px] h-[50px] rounded-2xl bg-[#f5f0f6] flex items-center justify-center flex-shrink-0 text-2xl">${getIcon(item['Category'])}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex justify-between items-start mb-1">
-                                <h3 class="text-[16px] font-normal text-gray-800 truncate pr-2">${item['Restaurant Name']}</h3>
-                                <button class="text-gray-300 hover:text-red-400 active:scale-95 transition" onclick="event.stopPropagation()"><i class="fa-regular fa-heart"></i></button>
-                            </div>
-                            <p class="text-[12px] text-gray-500 line-clamp-1 mb-2">${item['Highlight'] || '點擊查看詳情...'}</p>
-                            <div class="flex justify-between items-center mb-3">
-                                <span class="border border-[#dca6e0] text-[#a33db5] px-2 py-0.5 rounded-full text-[10px] font-medium bg-white">${item['Category'] || '美食'}</span>
-                                <span class="text-[11px] text-gray-400">人均 ${item['Avg Cost'] || '--'}</span>
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="openDetail(${index})">
+                        <div class="w-[50px] h-[50px] rounded-2xl bg-[#f5f0f6] flex items-center justify-center flex-shrink-0 text-2xl self-start">
+                            ${getIcon(item['Category'])}
+                        </div>
+                        
+                        <div class="flex-1 flex items-center justify-between min-w-0">
+                            <div class="flex-1 min-w-0 pr-2">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="text-[16px] font-normal text-gray-800 truncate pr-2">${item['Restaurant Name']}</h3>
+                                    <button class="text-gray-300 hover:text-red-400 active:scale-95 transition flex-shrink-0" onclick="event.stopPropagation()"><i class="fa-regular fa-heart"></i></button>
+                                </div>
+                                <p class="text-[12px] text-gray-500 line-clamp-1 mb-2">${item['Highlight'] || '點擊查看詳情...'}</p>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="border border-[#dca6e0] text-[#a33db5] px-2 py-0.5 rounded-full text-[10px] font-medium bg-white">${item['Category'] || '美食'}</span>
+                                    <span class="text-[11px] text-gray-400">人均 ${item['Avg Cost'] || '--'}</span>
+                                </div>
                             </div>
                             
-                            <div class="grid grid-cols-4 gap-2">
-                                <a href="${item['Amap URL'] || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#eaddf5] bg-[#faf6fc] text-[#8651c5] text-[10px] font-bold active:scale-95 transition">
-                                    <i class="fa-solid fa-location-arrow text-[#3b82f6]"></i> 導航
-                                </a>
-                                <a href="https://www.xiaohongshu.com/search_result/?keyword=${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48] text-[10px] font-bold active:scale-95 transition">
-                                    <i class="fa-solid fa-book-open"></i> 小紅書
-                                </a>
-                                <a href="https://www.douyin.com/search/${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-gray-200 bg-[#f9fafb] text-gray-800 text-[10px] font-bold active:scale-95 transition">
-                                    <i class="fa-brands fa-tiktok"></i> 抖音
-                                </a>
-                                <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#bbf7d0] bg-[#f2fdf5] text-[#16a34a] text-[10px] font-bold active:scale-95 transition">
-                                    <i class="fa-solid fa-paperclip text-gray-400"></i> 分享
-                                </button>
+                            <div class="flex-shrink-0 text-gray-300 ml-1">
+                                <i class="fa-solid fa-chevron-right opacity-60 text-lg"></i>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-gray-50 pl-[62px]">
+                        <a href="${item['Amap URL'] || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#eaddf5] bg-[#faf6fc] text-[#8651c5] text-[10px] font-bold active:scale-95 transition">
+                            <i class="fa-solid fa-location-arrow text-[#3b82f6]"></i> 導航
+                        </a>
+                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#fecdd3] bg-[#fff1f2] text-[#e11d48] text-[10px] font-bold active:scale-95 transition">
+                            <i class="fa-solid fa-book-open"></i> 小紅書
+                        </a>
+                        <a href="https://www.douyin.com/search/${query}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded border border-gray-200 bg-[#f9fafb] text-gray-800 text-[10px] font-bold active:scale-95 transition">
+                            <i class="fa-brands fa-tiktok"></i> 抖音
+                        </a>
+                        <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded border border-[#bbf7d0] bg-[#f2fdf5] text-[#16a34a] text-[10px] font-bold active:scale-95 transition">
+                            <i class="fa-solid fa-paperclip text-gray-400"></i> 分享
+                        </button>
                     </div>
                 </div>`;
             }).join('');
