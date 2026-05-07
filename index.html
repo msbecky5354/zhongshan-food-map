@@ -40,6 +40,10 @@
         .guide-details summary:after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; transition: 0.3s; }
         .guide-details[open] summary:after { transform: rotate(180deg); }
         .guide-content { padding: 12px 5px; color: #e5e7eb; font-size: 13px; line-height: 1.7; }
+        
+        /* 導航小圖示樣式 */
+        .nav-icon-sm { width: 14px; height: 14px; object-fit: contain; }
+        .nav-icon-lg { width: 22px; height: 22px; object-fit: contain; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -127,7 +131,11 @@
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-2">
-                <div class="flex items-center gap-2"><i class="fa-solid fa-star-half-stroke text-orange-400"></i><span class="text-gray-400 text-[10px]">推薦指數</span><div id="detailStars" class="text-[#f5a623] text-xs ml-1"></div></div>
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-star-half-stroke text-orange-400"></i>
+                    <span class="text-gray-400 text-[10px]">推薦指數</span>
+                    <div id="detailStars" class="text-[#f5a623] text-xs ml-1"></div>
+                </div>
                 <div class="flex gap-1.5">
                     <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95 transition">去過?</button>
                     <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95 transition">收藏</button>
@@ -143,7 +151,9 @@
             
             <div class="grid grid-cols-2 gap-3 pb-6">
                 <a id="btnNav" target="_blank" class="bg-blue-50 border border-blue-100 text-[#1b7ef2] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95 shadow-sm">
-                    <div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center"><i class="fa-solid fa-location-arrow text-lg"></i></div>
+                    <div class="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+                        <img src="image_c3e1d6.png" class="nav-icon-lg" alt="導航">
+                    </div>
                     <span class="text-[13px] font-bold">導航前往</span>
                 </a>
                 <button onclick="shareDetail()" class="bg-green-50 border border-green-100 text-[#16a34a] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95 shadow-sm">
@@ -205,7 +215,7 @@
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
 
         function showUserGuide() {
-            const guide = `<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone (Safari):</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android (Chrome):</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details><details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳 25 個行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「橙色箭頭」確認跳轉。<br><br><b>進階篩選：</b>撳「篩選」可按價位、菜式過濾。</div></details><details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註。</div></details><details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換機或清除緩存紀錄會消失。</div></details><details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開高德地圖。如果有 YouTube 介紹片會顯示紅色掣。撳「分享」可複製連結。</div></details></div>`;
+            const guide = `<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone (Safari):</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android (Chrome):</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details><details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳 25 個行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「橙色箭頭」確認。<br><br><b>進階篩選：</b>撳「篩選」可按價位、菜式過濾。</div></details><details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註。</div></details><details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換機或清除緩存紀錄會消失。</div></details><details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開高德地圖。如果有片會顯示紅色掣。</div></details></div>`;
             showToast(guide);
         }
 
@@ -231,10 +241,12 @@
                             'Youtube': getVal('Youtube')
                         };
                     }).filter(i => i.Restaurant_Name !== "");
+                    
                     const now = new Date();
                     const hours = now.getHours().toString().padStart(2, '0');
                     const minutes = now.getMinutes().toString().padStart(2, '0');
                     document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
+                    
                     buildFilterPills(allData); applyFilters();
                     document.getElementById('loader').classList.add('hidden');
                     refreshMap();
@@ -300,7 +312,9 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-4 gap-2 border-t border-gray-50 pt-3">
-                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition"><i class="fa-solid fa-compass"></i>導航</a>
+                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition">
+                            <img src="image_c3e1d6.png" class="nav-icon-sm" alt="導航">導航
+                        </a>
                         <a href="https://www.xiaohongshu.com/search_result/?keyword=${q}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition"><i class="fa-solid fa-book-open"></i>小紅書</a>
                         <a href="https://www.douyin.com/search/${q}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition"><i class="fa-brands fa-tiktok"></i>抖音</a>
                         <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-green-100 bg-green-50/30 text-green-500 text-[10px] font-bold active:scale-95 transition"><i class="fa-solid fa-share-nodes"></i>分享</button>
