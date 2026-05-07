@@ -176,7 +176,6 @@
 
                     populateCategories(allData);
                     
-                    // 【核心】檢查 URL 有無餐廳參數
                     const urlParams = new URLSearchParams(window.location.search);
                     const targetRest = urlParams.get('r');
                     
@@ -219,17 +218,22 @@
         }
 
         function resetFilters() {
-            window.location.href = window.location.origin + window.location.pathname; // 完全重置 URL
+            window.location.href = window.location.origin + window.location.pathname; 
         }
 
-        // 【全新】分享具體餐廳專屬連結
         window.shareRestaurant = function(index) {
             const item = currentRenderedData[index];
             const name = item['Restaurant Name'];
+            const district = item['District'] || '中山';
+            const category = item['Category'] || '特色美食';
+            const cost = item['Avg Cost'] || '--';
+            const address = item['Address'] || '請點擊導航查看';
+            const highlight = item['Highlight'] || '暫無詳細描述';
             
-            // 生成帶有參數的 URL
             const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(name)}`;
-            const shareText = `🍽️ 我喺【中山美食地圖】發現咗呢間正嘢：${name}\n點擊連結睇詳情同導航：`;
+            
+            // 加入咗地址嘅分享內容
+            const shareText = `🍽️ 推介中山美食：${name}\n📍 地區：${district} (${category})\n🏠 地址：${address}\n💰 人均：${cost}\n✨ 特色：${highlight}\n\n👇 點擊連結睇詳情同導航：`;
 
             if (navigator.share) {
                 navigator.share({
@@ -290,26 +294,38 @@
                 const cardColor = districtColors[item['District']] || '#f97316';
                 const emojis = ['🍲', '🥘', '🍚', '🍜', '🥢', '🥩'];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                // 加入分店資訊 (如果有)
+                const branch = item['Branch'] ? `<span class="text-[10px] text-orange-500 font-medium ml-1.5">${item['Branch']}</span>` : '';
 
                 return `
                 <div class="p-4 bg-white hover:bg-gray-50 transition-colors">
                     <div class="flex items-start gap-3">
                         <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-xl shadow-inner">${randomEmoji}</div>
+                        
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start">
-                                <h3 class="text-[15px] font-bold text-gray-800 truncate pr-2">${item['Restaurant Name']}</h3>
-                                <button class="text-gray-300 hover:text-red-400 active:scale-95 transition"><i class="fa-regular fa-heart"></i></button>
+                                <h3 class="text-[15px] font-bold text-gray-800 truncate pr-2">${item['Restaurant Name']}${branch}</h3>
+                                <button class="text-gray-300 hover:text-red-400 active:scale-95 transition flex-shrink-0"><i class="fa-regular fa-heart"></i></button>
                             </div>
-                            <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">${item['Highlight'] || '暫無描述'}</p>
-                            <div class="flex justify-between items-center mt-2">
-                                <span style="color: ${cardColor}; border-color: ${cardColor}; background-color: ${cardColor}15;" class="border px-2 py-0.5 rounded-full text-[9px] font-bold">${item['Category'] || '美食'}</span>
+                            
+                            <p class="text-[11px] text-gray-600 mt-1 line-clamp-2 leading-relaxed">${item['Highlight'] || '暫無描述'}</p>
+                            
+                            <p class="text-[10px] text-gray-400 mt-1.5 truncate"><i class="fa-solid fa-location-dot mr-1"></i>${item['Address'] || '請查看導航'}</p>
+
+                            <div class="flex justify-between items-center mt-2.5">
+                                <div class="flex gap-1">
+                                    <span class="border px-2 py-0.5 rounded-full text-[9px] font-bold text-gray-500 bg-gray-50 border-gray-200">${item['District']}</span>
+                                    <span style="color: ${cardColor}; border-color: ${cardColor}; background-color: ${cardColor}15;" class="border px-2 py-0.5 rounded-full text-[9px] font-bold">${item['Category'] || '美食'}</span>
+                                </div>
                                 <span class="text-[10px] text-gray-400 font-medium">人均 ${item['Avg Cost'] || '--'}</span>
                             </div>
-                            <div class="grid grid-cols-4 gap-1.5 mt-3">
-                                <a href="${item['Amap URL'] || '#'}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-50 text-blue-500 text-[9px] font-bold"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                                <a href="https://www.xiaohongshu.com/search_result/?keyword=${query}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-red-50 text-red-500 text-[9px] font-bold"><i class="fa-solid fa-book-open"></i> 小紅書</a>
-                                <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-gray-100 text-gray-800 text-[9px] font-bold"><i class="fa-brands fa-tiktok"></i> 抖音</a>
-                                <button onclick="shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-green-50 text-green-600 text-[9px] font-bold"><i class="fa-solid fa-paperclip"></i> 分享</button>
+
+                            <div class="grid grid-cols-4 gap-1.5 mt-3.5">
+                                <a href="${item['Amap URL'] || '#'}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-50 text-blue-500 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
+                                <a href="https://www.xiaohongshu.com/search_result/?keyword=${query}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-red-50 text-red-500 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-book-open"></i> 小紅書</a>
+                                <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-gray-100 text-gray-800 text-[9px] font-bold active:scale-95 transition"><i class="fa-brands fa-tiktok"></i> 抖音</a>
+                                <button onclick="shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-green-50 text-green-600 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-paperclip"></i> 分享</button>
                             </div>
                         </div>
                     </div>
