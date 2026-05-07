@@ -30,26 +30,13 @@
         .star-active { color: #f5a623 !important; }
         
         #customToast {
-            visibility: hidden;
-            min-width: 250px;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            text-align: center;
-            border-radius: 20px;
-            padding: 16px;
-            position: fixed;
-            z-index: 10000;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 14px;
-            line-height: 1.6;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            visibility: hidden; min-width: 250px; background-color: rgba(0, 0, 0, 0.9); color: #fff;
+            text-align: center; border-radius: 20px; padding: 16px; position: fixed; z-index: 10000;
+            left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 14px; line-height: 1.6;
+            backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
-        
         @keyframes pulse-orange {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
             70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
@@ -79,10 +66,7 @@
                 <div class="flex items-center gap-1.5 flex-shrink-0 ml-2">
                     <a href="https://www.facebook.com/profile.php?id=61570978424962" target="_blank" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform"><i class="fa-brands fa-facebook mr-1"></i>FB群組</a>
                     <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform"><i class="fa-brands fa-youtube mr-1"></i>YouTube</a>
-                    
-                    <button class="w-8 h-8 border border-orange-100 rounded-lg flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-95" onclick="showBookmarkGuide()">
-                        <i class="fa-solid fa-bookmark"></i>
-                    </button>
+                    <button class="w-8 h-8 border border-orange-100 rounded-lg flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-95" onclick="showBookmarkGuide()"><i class="fa-solid fa-bookmark"></i></button>
                 </div>
             </div>
         </header>
@@ -102,8 +86,8 @@
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
-                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90"><i class="fa-solid fa-check text-sm"></i></button>
+                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90 transition-transform"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-check text-sm"></i></button>
                 </div>
                 <div class="mb-5"><h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-bookmark mr-1.5 text-orange-400"></i>我的標記</h4><div id="filterGridMyTags" class="flex flex-wrap gap-2 pr-12"><button onclick="setFilterState('myTag', '全部')" data-type="myTag" data-value="全部" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">全部</button><button onclick="setFilterState('myTag', 'visited')" data-type="myTag" data-value="visited" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">✅ 已去過</button><button onclick="setFilterState('myTag', 'favorite')" data-type="myTag" data-value="favorite" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">🔖 已收藏</button><button onclick="setFilterState('myTag', 'want')" data-type="myTag" data-value="want" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">📌 想去食</button></div></div>
                 <div class="mb-5"><h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-map-location-dot mr-1.5 text-blue-400"></i>地區</h4><div id="filterGridDistrict" class="flex flex-wrap gap-2 pr-12"></div></div>
@@ -197,15 +181,9 @@
         function getUserData(name) { return userRecords[name] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(name, data) { userRecords[name] = data; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
 
-        // ==================== 網頁書籤助手教學 ====================
         function showBookmarkGuide() {
-            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            let msg = "";
-            if(isiOS) {
-                msg = "<b>【iPhone 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返「加入主畫面」<br><br>咁就可以隨時喺桌面開地圖喇！";
-            } else {
-                msg = "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」<br><br>方便你下次一開即見！";
-            }
+            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            let msg = isiOS ? "<b>【iPhone 用家】</b><br><br>1. 撳底排「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返「加入主畫面」" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」";
             showToast(msg, 6000); 
         }
 
@@ -223,13 +201,23 @@
                     allData = results.data.filter(item => item['Restaurant Name'] && item['Restaurant Name'].trim() !== '');
                     const now = new Date();
                     document.getElementById('updateTime').innerText = `最後更新時間：${now.getFullYear()}年${String(now.getMonth()+1).padStart(2,'0')}月${String(now.getDate()).padStart(2,'0')}日 ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-                    buildFilterPills(allData);
-                    applyFilters();
+                    buildFilterPills(allData); applyFilters();
                     document.getElementById('loader').classList.add('hidden');
                     const mapImg = document.getElementById('visualMap');
                     if(mapImg.complete) imageMapResize(); else mapImg.onload = () => imageMapResize();
                 }
             });
+        }
+
+        // ==================== 核心修正：統一過濾入口 ====================
+        window.setFilterState = function(type, value) {
+            // 重點：如果正在詳細頁面，強制關閉它並跳回結果區
+            if (!document.getElementById('detailView').classList.contains('hidden')) {
+                closeDetail();
+                setTimeout(jumpToResults, 50);
+            }
+            filtersState[type] = value;
+            updatePillUI(); applyFilters();
         }
 
         window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
@@ -246,7 +234,6 @@
             updatePillUI();
         }
         function createPill(type, value, label) { return `<button onclick="setFilterState('${type}', '${value}')" data-type="${type}" data-value="${value}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95">${label}</button>`; }
-        window.setFilterState = function(type, value) { filtersState[type] = value; updatePillUI(); applyFilters(); }
         function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(pill => { const t = pill.getAttribute('data-type'), v = pill.getAttribute('data-value'); if (filtersState[t] === v) pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm"; else pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm hover:bg-gray-50"; }); }
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
 
