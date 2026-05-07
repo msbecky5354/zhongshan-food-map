@@ -21,8 +21,8 @@
     <header class="bg-white px-4 pt-6 pb-4">
         <div class="max-w-4xl mx-auto flex items-center justify-between">
             <div class="flex items-center">
-                <div class="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-orange-200">
-                    <i class="fa-solid fa-utensils"></i>
+                <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-gray-200 border border-gray-50">
+                    <img src="app-icon-512.png" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div class="ml-3">
                     <h1 class="text-xl font-bold text-gray-800 tracking-tight">中山美食地圖</h1>
@@ -74,7 +74,6 @@
     <section class="max-w-4xl mx-auto px-4 py-2">
         <div class="bg-white rounded-[2.5rem] p-4 ios-shadow border border-gray-50 overflow-hidden relative">
             <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
-            
             <div class="mt-4 map-hint border border-gray-100 rounded-2xl py-2.5 px-4 flex items-center justify-center gap-2 max-w-[90%] mx-auto shadow-sm">
                 <span class="text-lg">🗺️</span>
                 <p class="text-[11px] font-bold text-gray-600">點擊地圖上的地區名稱，探索當地美食</p>
@@ -117,6 +116,10 @@
         <area shape="rect" coords="183,486,234,508" alt="板芙鎮" href="javascript:void(0);" onclick="setDistrict('板芙鎮')">
         <area shape="rect" coords="225,584,277,605" alt="神灣鎮" href="javascript:void(0);" onclick="setDistrict('神灣鎮')">
     </map>
+
+    <footer class="text-center py-8 text-gray-400 text-[10px]">
+        <p>© 2026 中山美食地圖 | 兼容所有手機型號</p>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
