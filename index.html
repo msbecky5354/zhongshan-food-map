@@ -18,9 +18,13 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-    <div class="sticky top-0 z-40 shadow-sm flex flex-col">
+    <div class="sticky top-0 z-40 shadow-sm flex flex-col bg-white">
         
-        <header class="bg-white px-4 pt-5 pb-3 relative z-50">
+        <div class="w-full overflow-hidden border-b border-gray-100">
+            <img src="banner.png" alt="中山美食地圖 Banner" class="w-full h-auto object-cover aspect-[4/1] md:aspect-[5/1]">
+        </div>
+
+        <header class="px-4 pt-4 pb-3 relative z-50">
             <div class="max-w-4xl mx-auto flex items-center justify-between">
                 <div class="flex items-center cursor-pointer active:opacity-60 transition-opacity" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
                     <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white">
@@ -51,7 +55,7 @@
                 <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
                     <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地區..." 
-                           class="w-full pl-11 pr-4 py-3 bg-white text-sm focus:outline-none">
+                           class="w-full pl-11 pr-4 py-3 bg-white text-sm focus:outline-none rounded-2xl">
                 </div>
                 <button onclick="toggleFilters()" class="w-11 h-11 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-400 ios-shadow border border-gray-50 active:bg-gray-50 transition-colors">
                     <i class="fa-solid fa-sliders text-xs"></i>
@@ -75,7 +79,7 @@
         </section>
     </div>
 
-    <section class="max-w-4xl mx-auto px-4 py-3">
+    <section class="max-w-4xl mx-auto px-4 py-3 mt-2">
         <div class="bg-white rounded-[2.5rem] p-4 ios-shadow border border-gray-50 overflow-hidden relative">
             <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             <div class="mt-4 map-hint border border-gray-100 rounded-2xl py-2.5 px-4 flex items-center justify-center gap-2 max-w-[90%] mx-auto shadow-sm">
@@ -163,8 +167,8 @@
         window.setDistrict = function(d) {
             currentDistrict = d;
             applyFilters();
-            // 自動滾動到餐廳列表，並預留頂部 Header 嘅空間
-            window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 140, behavior: 'smooth' });
+            // 由於 Banner 增加咗 Sticky 高度，將自動滾動偏移量調整為 -250 (手機板 Banner + Stuck Header 約 250px)
+            window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 250, behavior: 'smooth' });
         }
 
         function resetFilters() {
@@ -206,39 +210,4 @@
             countDisplay.innerHTML = `找到了 ${data.length} 個美食結果`;
             
             if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-2xl border border-gray-100"><p class="text-lg mb-2">🍽️</p>搵唔到符合條件嘅餐廳</div>`;
-                return;
-            }
-            
-            container.innerHTML = data.map(item => {
-                const query = encodeURIComponent(item['Restaurant Name'] + " 中山 探店");
-                return `
-                <div class="bg-white p-5 rounded-[2rem] ios-shadow border border-gray-50 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h2 class="text-base font-bold text-gray-800 leading-tight">${item['Restaurant Name']}</h2>
-                            <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2 whitespace-nowrap">${item['District']}</span>
-                        </div>
-                        <div class="mt-2 flex gap-1">
-                            <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-lg">${item['Category'] || '美食'}</span>
-                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-lg font-bold">人均: ${item['Avg Cost'] || '--'}</span>
-                        </div>
-                        <p class="text-gray-500 text-xs mt-4 leading-relaxed font-medium">● ${item['Highlight'] || '暫無描述'}</p>
-                    </div>
-                    <div class="mt-6 flex gap-2">
-                        <a href="https://www.rednote.com/search_result?keyword=${query}" target="_blank" class="flex-1 bg-[#ff2442] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-red-100 active:scale-95 transition-transform">📕 小紅書</a>
-                        <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex-1 bg-[#161823] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-gray-200 active:scale-95 transition-transform">🎵 抖音</a>
-                        ${item['Amap URL'] ? `<a href="${item['Amap URL']}" target="_blank" class="w-11 h-11 flex items-center justify-center border border-gray-100 rounded-2xl text-orange-500 bg-white ios-shadow active:scale-95 transition-transform">📍</a>` : ''}
-                    </div>
-                </div>
-                `;
-            }).join('');
-        }
-
-        document.getElementById('searchInput').addEventListener('input', applyFilters);
-        document.getElementById('filterCategory').addEventListener('change', applyFilters);
-        document.getElementById('filterPrice').addEventListener('change', applyFilters);
-        init();
-    </script>
-</body>
-</html>
+                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-2xl border border-gray-100"><p class
