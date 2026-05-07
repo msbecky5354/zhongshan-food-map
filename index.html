@@ -24,8 +24,10 @@
         .map-hint { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); }
         area { outline: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
         .text-shadow-sm { text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-        /* 隱藏滾動條但保留功能 */
         ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* 標籤按鈕過渡動畫 */
+        .filter-pill { transition: all 0.2s ease-in-out; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -66,24 +68,32 @@
                     <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地區..." 
                            class="w-full pl-11 pr-4 py-3 bg-white text-sm focus:outline-none rounded-2xl">
                 </div>
-                <button onclick="toggleFilters()" class="w-11 h-11 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-400 ios-shadow border border-gray-50 active:bg-gray-50 transition-colors">
+                <button onclick="toggleFilters()" class="w-11 h-11 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-500 ios-shadow border border-gray-50 active:bg-gray-50 transition-colors">
                     <i class="fa-solid fa-sliders text-xs"></i>
                     <span class="text-[7px] mt-0.5 font-bold">篩選</span>
                 </button>
             </div>
             
-            <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-2.5 flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                <select id="filterCategory" class="bg-white border border-gray-100 shadow-sm rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-orange-300">
-                    <option value="全部">所有菜式</option>
-                </select>
-                <select id="filterPrice" class="bg-white border border-gray-100 shadow-sm rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-orange-300">
-                    <option value="全部">所有人均</option>
-                    <option value="0-50">¥50或以下</option>
-                    <option value="51-100">¥51-¥100</option>
-                    <option value="101-200">¥101-¥200</option>
-                    <option value="201-">¥200以上</option>
-                </select>
-                <button onclick="resetFilters()" class="bg-orange-50 text-orange-600 px-4 py-2 rounded-xl text-xs font-bold active:bg-orange-100 transition-colors border border-orange-100">重設</button>
+            <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100">
+                
+                <div class="mb-5">
+                    <h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-map-location-dot mr-1.5"></i>地區</h4>
+                    <div id="filterGridDistrict" class="flex flex-wrap gap-2">
+                        </div>
+                </div>
+
+                <div class="mb-5">
+                    <h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-utensils mr-1.5"></i>菜式</h4>
+                    <div id="filterGridCategory" class="flex flex-wrap gap-2">
+                        </div>
+                </div>
+
+                <div class="mb-2">
+                    <h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-sack-dollar mr-1.5"></i>人均價位</h4>
+                    <div id="filterGridPrice" class="flex flex-wrap gap-2">
+                        </div>
+                </div>
+
             </div>
         </section>
 
@@ -120,7 +130,6 @@
     </div>
 
     <div id="detailView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
-        
         <div class="bg-[#788a96] px-5 py-4 text-white shadow-md relative z-10">
             <button onclick="closeDetail()" class="text-[13px] font-medium flex items-center opacity-90 hover:opacity-100 active:scale-95 transition mb-2">
                 <i class="fa-solid fa-angle-left mr-1.5"></i> <span id="detailBackText">返回地區</span>
@@ -234,10 +243,31 @@
         }
 
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtli5qEDucHqpfVOHASkAfbxHIeC7_krqoVPnrRA1b83VfdqaAnlHNPmLKkwJyLpPC1O7AHr5wFQg7/pub?output=csv';
+        
         let allData = [];
-        let currentDistrict = '全部';
         let currentRenderedData = [];
-        let activeDetailItem = null; // 記錄當前打開緊嘅餐廳
+        let activeDetailItem = null; 
+
+        // 狀態管理 (替代以往的 Select Value)
+        let filtersState = {
+            district: '全部',
+            category: '全部',
+            price: '全部'
+        };
+
+        const ALL_DISTRICTS = [
+            "石岐區", "東區", "西區", "南區", "五桂山鎮", "火炬開發區", "馬鞍島",
+            "黃圃鎮", "南頭鎮", "東鳳鎮", "阜沙鎮", "小欖鎮", "東升鎮", "古鎮鎮",
+            "橫欄鎮", "三角鎮", "民眾鎮", "南朗鎮", "港口鎮", "大涌鎮", "沙溪鎮",
+            "三鄉鎮", "板芙鎮", "神灣鎮", "坦洲鎮"
+        ];
+
+        const PRICE_RANGES = [
+            { label: '全部', value: '全部' },
+            { label: '¥50以下', value: '0-50' },
+            { label: '¥50-100', value: '51-100' },
+            { label: '¥100以上', value: '101-' }
+        ];
 
         const districtColors = {
             "黃圃鎮": "#d87a41", "南頭鎮": "#85a953", "東鳳鎮": "#b1c953", "小欖鎮": "#5f87d4",
@@ -260,16 +290,15 @@
                     const timeStr = `${now.getFullYear()}年${String(now.getMonth() + 1).padStart(2, '0')}月${String(now.getDate()).padStart(2, '0')}日 ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
                     document.getElementById('updateTime').innerText = `最後同步：${timeStr}`;
 
-                    populateCategories(allData);
+                    // 初始化生成所有的過濾標籤 (Pills)
+                    buildFilterPills(allData);
                     
-                    // 處理 Deep Link
                     const urlParams = new URLSearchParams(window.location.search);
                     const targetRest = urlParams.get('r');
                     
                     if (targetRest) {
                         document.getElementById('searchInput').value = targetRest;
                         applyFilters();
-                        // 如果搜尋結果得 1 間，直接打開內頁
                         setTimeout(() => {
                             if (currentRenderedData.length === 1) {
                                 openDetail(0);
@@ -287,65 +316,103 @@
             });
         }
 
-        function populateCategories(data) {
-            const catSelect = document.getElementById('filterCategory');
+        // ==================== 構建標籤選單 ====================
+        function buildFilterPills(data) {
+            // 1. 地區
+            const distGrid = document.getElementById('filterGridDistrict');
+            let distHtml = createPill('district', '全部', '全部');
+            ALL_DISTRICTS.forEach(d => distHtml += createPill('district', d, d));
+            distGrid.innerHTML = distHtml;
+
+            // 2. 菜式
+            const catGrid = document.getElementById('filterGridCategory');
             const categories = [...new Set(data.map(item => item['Category']?.trim()))].filter(Boolean).sort();
-            categories.forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c; opt.innerHTML = c;
-                catSelect.appendChild(opt);
+            let catHtml = createPill('category', '全部', '全部');
+            categories.forEach(c => catHtml += createPill('category', c, c));
+            catGrid.innerHTML = catHtml;
+
+            // 3. 價錢
+            const priceGrid = document.getElementById('filterGridPrice');
+            let priceHtml = '';
+            PRICE_RANGES.forEach(p => priceHtml += createPill('price', p.value, p.label));
+            priceGrid.innerHTML = priceHtml;
+
+            updatePillUI();
+        }
+
+        function createPill(type, value, label) {
+            // 基礎樣式：白色底，灰色字，灰色框
+            return `<button onclick="setFilterState('${type}', '${value}')" 
+                    data-type="${type}" data-value="${value}" 
+                    class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm active:scale-95">
+                    ${label}
+                    </button>`;
+        }
+
+        // 當撳標籤時更新狀態
+        window.setFilterState = function(type, value) {
+            filtersState[type] = value;
+            updatePillUI();
+            applyFilters();
+        }
+
+        // 更新標籤的 Active / Inactive 樣式
+        function updatePillUI() {
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                const type = pill.getAttribute('data-type');
+                const val = pill.getAttribute('data-value');
+                
+                if (filtersState[type] === val) {
+                    // Active (橙色底，白色字)
+                    pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm active:scale-95";
+                } else {
+                    // Inactive (白色底，灰色字)
+                    pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm active:scale-95 hover:bg-gray-50";
+                }
             });
         }
+        // ======================================================
 
         function toggleFilters() {
             document.getElementById('filterMenu').classList.toggle('hidden');
         }
 
-        // 返回主頁 (點擊 Logo)
         window.resetToHome = function() {
-            closeDetail(); // 確保閂埋內頁
+            closeDetail(); 
             window.location.href = window.location.origin + window.location.pathname; 
         }
 
+        // 從地圖點擊時觸發
         window.setDistrict = function(d) {
             closeDetail();
-            currentDistrict = d;
+            setFilterState('district', d); // 使用新的狀態函數
             setTimeout(() => {
-                applyFilters();
                 window.scrollTo({ top: document.getElementById('districtHeader').offsetTop - 140, behavior: 'auto' });
             }, 10);
-        }
-
-        function resetFilters() {
-            resetToHome();
         }
 
         // ==================== 內頁專用函數 ====================
 
         window.openDetail = function(index) {
             const item = currentRenderedData[index];
-            activeDetailItem = item; // 記錄當前顯示
+            activeDetailItem = item; 
 
-            // 填入資料
-            document.getElementById('detailBackText').innerText = currentDistrict === '全部' ? '返回列表' : currentDistrict;
+            document.getElementById('detailBackText').innerText = filtersState.district === '全部' ? '返回列表' : filtersState.district;
             document.getElementById('detailName').innerText = item['Restaurant Name'];
             document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-leaf mr-1"></i>${item['Category'] || '特色美食'}`;
             document.getElementById('detailPrice').innerHTML = `<i class="fa-solid fa-sack-dollar mr-1"></i>人均 ${item['Avg Cost'] || '--'}`;
             document.getElementById('detailHighlight').innerText = item['Highlight'] || '暫無詳細描述，快啲去親自試下啦！';
             
-            // 地址處理 (如果 Excel 無 Address 欄位，就用預設字眼)
             const addressText = item['Address'] && item['Address'].trim() !== '' ? item['Address'] : `中山市${item['District']} (點擊導航前往)`;
             document.getElementById('detailAddress').innerText = addressText;
 
-            // 設定連結
             const query = encodeURIComponent(item['Restaurant Name']);
             document.getElementById('btnNav').href = item['Amap URL'] || '#';
-            document.getElementById('btnNav').style.opacity = item['Amap URL'] ? '1' : '0.5'; // 無導航就半透明
+            document.getElementById('btnNav').style.opacity = item['Amap URL'] ? '1' : '0.5'; 
             
             document.getElementById('btnXhs').href = `https://www.xiaohongshu.com/search_result/?keyword=${query}`;
             document.getElementById('btnDy').href = `https://www.douyin.com/search/${query}`;
 
-            // 切換視圖
             document.getElementById('mainContentView').classList.add('hidden');
             document.getElementById('detailView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'auto' });
@@ -355,7 +422,6 @@
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('mainContentView').classList.remove('hidden');
             activeDetailItem = null;
-            // 滑動返去列表頂部
             window.scrollTo({ top: document.getElementById('districtHeader').offsetTop - 140, behavior: 'auto' });
         }
 
@@ -390,11 +456,12 @@
 
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase();
-            const cat = document.getElementById('filterCategory').value;
-            const price = document.getElementById('filterPrice').value;
+            const cat = filtersState.category;
+            const price = filtersState.price;
+            const currentDist = filtersState.district;
 
             const filtered = allData.filter(item => {
-                const matchD = currentDistrict === '全部' || item['District'] === currentDistrict;
+                const matchD = currentDist === '全部' || item['District'] === currentDist;
                 const matchC = cat === '全部' || item['Category'] === cat;
                 const matchS = item['Restaurant Name'].toLowerCase().includes(term) || (item['Highlight'] && item['Highlight'].toLowerCase().includes(term));
                 
@@ -415,12 +482,13 @@
             currentRenderedData = data;
             const container = document.getElementById('restaurantGrid');
             const header = document.getElementById('districtHeader');
+            const currentDist = filtersState.district;
             
             header.classList.remove('hidden');
-            document.getElementById('districtTitle').innerText = currentDistrict === '全部' ? '搜尋結果' : currentDistrict;
+            document.getElementById('districtTitle').innerText = currentDist === '全部' ? '搜尋結果' : currentDist;
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
             
-            const targetColor = districtColors[currentDistrict] || districtColors['全部'];
+            const targetColor = districtColors[currentDist] || districtColors['全部'];
             header.style.background = targetColor;
 
             if (data.length === 0) {
@@ -428,7 +496,6 @@
                 return;
             }
             
-            // 列表卡片保留基本操作，但點擊主體會進入 Detail 內頁
             container.innerHTML = data.map((item, index) => {
                 const query = encodeURIComponent(item['Restaurant Name']);
                 const cardColor = districtColors[item['District']] || '#f97316';
@@ -465,8 +532,6 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', applyFilters);
-        document.getElementById('filterCategory').addEventListener('change', applyFilters);
-        document.getElementById('filterPrice').addEventListener('change', applyFilters);
         init();
     </script>
 </body>
