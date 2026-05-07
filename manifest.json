@@ -1,6 +1,6 @@
 {
   "name": "中山美食地圖",
-  "short_name": "中山美食",
+  "short_name": "中山美食地圖",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
