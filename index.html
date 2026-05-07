@@ -18,60 +18,64 @@
 </head>
 <body class="bg-gray-50 min-h-screen">
 
-    <header class="bg-white px-4 pt-6 pb-4">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
-            <div class="flex items-center">
-                <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-lg shadow-gray-200 border border-gray-50">
-                    <img src="app-icon-512.png" alt="Logo" class="w-full h-full object-cover">
+    <div class="sticky top-0 z-40 shadow-sm flex flex-col">
+        
+        <header class="bg-white px-4 pt-5 pb-3 relative z-50">
+            <div class="max-w-4xl mx-auto flex items-center justify-between">
+                <div class="flex items-center cursor-pointer active:opacity-60 transition-opacity" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                    <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white">
+                        <img src="app-icon-512.png" alt="Logo" class="w-full h-full object-cover">
+                    </div>
+                    <div class="ml-2.5">
+                        <h1 class="text-lg font-bold text-gray-800 tracking-tight leading-tight">中山美食地圖</h1>
+                        <p class="text-[9px] text-gray-400 font-medium mt-0.5">最後更新：2026年05月07日</p>
+                    </div>
                 </div>
-                <div class="ml-3">
-                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">中山美食地圖</h1>
-                    <p class="text-[10px] text-gray-400 font-medium">最後更新：2026年05月07日</p>
+                
+                <div class="flex items-center gap-1.5">
+                    <a href="https://www.facebook.com/profile.php?id=61570978424962" target="_blank" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform">
+                        <i class="fa-brands fa-facebook mr-1"></i>FB群組
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center active:scale-95 transition-transform">
+                        <i class="fa-brands fa-youtube mr-1"></i>YouTube
+                    </a>
+                    <button class="w-8 h-8 border border-gray-100 rounded-lg flex items-center justify-center text-red-400 bg-white active:bg-gray-50 transition-colors">
+                        <i class="fa-regular fa-heart"></i>
+                    </button>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <a href="#" class="bg-[#1877F2] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center">
-                    <i class="fa-brands fa-facebook mr-1"></i>FB群組
-                </a>
-                <a href="#" class="bg-[#FF0000] text-white px-2 py-1.5 rounded-lg text-[10px] font-bold flex items-center">
-                    <i class="fa-brands fa-youtube mr-1"></i>YouTube
-                </a>
-                <button class="w-9 h-9 border border-gray-100 rounded-lg flex items-center justify-center text-red-400 bg-white ios-shadow">
-                    <i class="fa-regular fa-heart"></i>
+        </header>
+
+        <section class="px-4 py-2 bg-gray-50/95 backdrop-blur-md border-b border-gray-100 relative z-40">
+            <div class="max-w-4xl mx-auto flex gap-2">
+                <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
+                    <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地區..." 
+                           class="w-full pl-11 pr-4 py-3 bg-white text-sm focus:outline-none">
+                </div>
+                <button onclick="toggleFilters()" class="w-11 h-11 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-400 ios-shadow border border-gray-50 active:bg-gray-50 transition-colors">
+                    <i class="fa-solid fa-sliders text-xs"></i>
+                    <span class="text-[7px] mt-0.5 font-bold">篩選</span>
                 </button>
             </div>
-        </div>
-    </header>
-
-    <section class="px-4 py-2 sticky top-0 z-30 bg-gray-50/80 backdrop-blur-md">
-        <div class="max-w-4xl mx-auto flex gap-2">
-            <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地區..." 
-                       class="w-full pl-11 pr-4 py-3.5 bg-white text-sm focus:outline-none">
+            
+            <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-2.5 flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <select id="filterCategory" class="bg-white border border-gray-100 shadow-sm rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-orange-300">
+                    <option value="全部">所有菜式</option>
+                </select>
+                <select id="filterPrice" class="bg-white border border-gray-100 shadow-sm rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:outline-none focus:border-orange-300">
+                    <option value="全部">所有人均</option>
+                    <option value="0-50">¥50或以下</option>
+                    <option value="51-100">¥51-¥100</option>
+                    <option value="101-200">¥101-¥200</option>
+                    <option value="201-">¥200以上</option>
+                </select>
+                <button onclick="resetFilters()" class="bg-orange-50 text-orange-600 px-4 py-2 rounded-xl text-xs font-bold active:bg-orange-100 transition-colors border border-orange-100">重設</button>
             </div>
-            <button onclick="toggleFilters()" class="w-12 h-12 bg-white rounded-2xl flex flex-col items-center justify-center text-gray-400 ios-shadow border border-gray-50">
-                <i class="fa-solid fa-sliders text-xs"></i>
-                <span class="text-[8px] mt-0.5 font-bold">篩選</span>
-            </button>
-        </div>
-        
-        <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 flex gap-2 overflow-x-auto no-scrollbar pb-2">
-            <select id="filterCategory" class="bg-white border-none ios-shadow rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:ring-2 focus:ring-orange-200">
-                <option value="全部">所有菜式</option>
-            </select>
-            <select id="filterPrice" class="bg-white border-none ios-shadow rounded-xl px-3 py-2 text-xs font-bold text-gray-600 focus:ring-2 focus:ring-orange-200">
-                <option value="全部">所有人均</option>
-                <option value="0-50">¥50或以下</option>
-                <option value="51-100">¥51-¥100</option>
-                <option value="101-200">¥101-¥200</option>
-                <option value="201-">¥200以上</option>
-            </select>
-            <button onclick="resetFilters()" class="bg-orange-100 text-orange-600 px-4 py-2 rounded-xl text-xs font-bold">重設</button>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <section class="max-w-4xl mx-auto px-4 py-2">
+    <section class="max-w-4xl mx-auto px-4 py-3">
         <div class="bg-white rounded-[2.5rem] p-4 ios-shadow border border-gray-50 overflow-hidden relative">
             <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             <div class="mt-4 map-hint border border-gray-100 rounded-2xl py-2.5 px-4 flex items-center justify-center gap-2 max-w-[90%] mx-auto shadow-sm">
@@ -81,11 +85,11 @@
         </div>
     </section>
 
-    <main class="max-w-4xl mx-auto p-4">
+    <main class="max-w-4xl mx-auto p-4 pt-0">
         <div id="loader" class="text-center py-10">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
         </div>
-        <div id="resultCount" class="text-[11px] font-bold text-gray-400 mb-3 ml-2 uppercase tracking-widest"></div>
+        <div id="resultCount" class="text-[11px] font-bold text-gray-400 mb-3 ml-2 uppercase tracking-widest hidden"></div>
         <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
     </main>
 
@@ -159,7 +163,8 @@
         window.setDistrict = function(d) {
             currentDistrict = d;
             applyFilters();
-            window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 100, behavior: 'smooth' });
+            // 自動滾動到餐廳列表，並預留頂部 Header 嘅空間
+            window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 140, behavior: 'smooth' });
         }
 
         function resetFilters() {
@@ -195,7 +200,15 @@
 
         function renderData(data) {
             const container = document.getElementById('restaurantGrid');
-            document.getElementById('resultCount').innerHTML = `找到了 ${data.length} 個美食結果`;
+            const countDisplay = document.getElementById('resultCount');
+            
+            countDisplay.classList.remove('hidden');
+            countDisplay.innerHTML = `找到了 ${data.length} 個美食結果`;
+            
+            if (data.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-2xl border border-gray-100"><p class="text-lg mb-2">🍽️</p>搵唔到符合條件嘅餐廳</div>`;
+                return;
+            }
             
             container.innerHTML = data.map(item => {
                 const query = encodeURIComponent(item['Restaurant Name'] + " 中山 探店");
@@ -208,14 +221,14 @@
                         </div>
                         <div class="mt-2 flex gap-1">
                             <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-lg">${item['Category'] || '美食'}</span>
-                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-lg font-bold">人均: ${item['Avg Cost']}</span>
+                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-lg font-bold">人均: ${item['Avg Cost'] || '--'}</span>
                         </div>
                         <p class="text-gray-500 text-xs mt-4 leading-relaxed font-medium">● ${item['Highlight'] || '暫無描述'}</p>
                     </div>
                     <div class="mt-6 flex gap-2">
-                        <a href="https://www.rednote.com/search_result?keyword=${query}" target="_blank" class="flex-1 bg-[#ff2442] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-lg shadow-red-100 active:scale-95 transition">📕 小紅書</a>
-                        <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex-1 bg-[#161823] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-lg shadow-gray-200 active:scale-95 transition">🎵 抖音</a>
-                        ${item['Amap URL'] ? `<a href="${item['Amap URL']}" target="_blank" class="w-11 h-11 flex items-center justify-center border border-gray-100 rounded-2xl text-orange-500 bg-white ios-shadow active:scale-95 transition">📍</a>` : ''}
+                        <a href="https://www.rednote.com/search_result?keyword=${query}" target="_blank" class="flex-1 bg-[#ff2442] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-red-100 active:scale-95 transition-transform">📕 小紅書</a>
+                        <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex-1 bg-[#161823] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-gray-200 active:scale-95 transition-transform">🎵 抖音</a>
+                        ${item['Amap URL'] ? `<a href="${item['Amap URL']}" target="_blank" class="w-11 h-11 flex items-center justify-center border border-gray-100 rounded-2xl text-orange-500 bg-white ios-shadow active:scale-95 transition-transform">📍</a>` : ''}
                     </div>
                 </div>
                 `;
