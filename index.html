@@ -23,6 +23,9 @@
         .ios-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .map-hint { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); }
         area { outline: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+        
+        /* 加入文字陰影，確保白色字喺黃色/淺色背景上依然清晰可見 */
+        .text-shadow-sm { text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -96,12 +99,12 @@
 
     <main class="max-w-4xl mx-auto px-4 pb-10 mt-2">
         
-        <div id="districtHeader" class="hidden bg-gradient-to-r from-[#9c27b0] to-[#ab47bc] text-white p-4 rounded-t-2xl flex justify-between items-center ios-shadow relative z-10">
+        <div id="districtHeader" class="hidden text-white p-4 rounded-t-2xl flex justify-between items-center ios-shadow relative z-10 text-shadow-sm transition-colors duration-300" style="background: linear-gradient(to right, #f97316, #fb923c);">
             <div class="flex items-baseline gap-2">
                 <h2 id="districtTitle" class="text-[1.35rem] font-bold tracking-wide">所有地區</h2>
                 <span id="districtCount" class="text-xs font-medium opacity-90">共 0 間</span>
             </div>
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[10px] bg-white/20 hover:bg-white/30 px-2.5 py-1.5 rounded-lg font-bold flex items-center transition-colors active:scale-95">
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[10px] bg-black/10 hover:bg-black/20 px-2.5 py-1.5 rounded-lg font-bold flex items-center transition-colors active:scale-95 border border-white/20">
                 <i class="fa-solid fa-angle-left mr-1"></i>返回地圖
             </button>
         </div>
@@ -157,6 +160,36 @@
         let allData = [];
         let currentDistrict = '全部';
 
+        // 地圖顏色對應表 (精準取色)
+        const districtColors = {
+            "黃圃鎮": "#d87a41",
+            "南頭鎮": "#85a953",
+            "東鳳鎮": "#b1c953",
+            "小欖鎮": "#5f87d4",
+            "古鎮鎮": "#c85665",
+            "橫欄鎮": "#6fded5",
+            "東升鎮": "#a4a0e1",
+            "阜沙鎮": "#dcb858",
+            "三角鎮": "#60dbe4",
+            "民眾鎮": "#9ffb8e",
+            "港口鎮": "#e7a88f",
+            "西區": "#a1f44c",
+            "石岐區": "#f7e53f",
+            "東區": "#a5409d",
+            "火炬開發區": "#ab77f7",
+            "馬鞍島": "#a4c7cd",
+            "南朗鎮": "#8db7b3",
+            "沙溪鎮": "#e7878d",
+            "大涌鎮": "#df5642",
+            "南區": "#cdcf47",
+            "五桂山鎮": "#e98e4f",
+            "板芙鎮": "#ae77f3",
+            "三鄉鎮": "#8f9e51",
+            "神灣鎮": "#a2d861",
+            "坦洲鎮": "#ef6fc3",
+            "全部": "linear-gradient(to right, #f97316, #fb923c)" // 預設中山美食品牌橙色
+        };
+
         async function init() {
             Papa.parse(sheetUrl, {
                 download: true,
@@ -199,7 +232,6 @@
             currentDistrict = d;
             setTimeout(() => {
                 applyFilters();
-                // 跳轉到 Header 位置
                 window.scrollTo({ top: document.getElementById('districtHeader').offsetTop - 140, behavior: 'auto' });
             }, 10);
         }
@@ -212,7 +244,6 @@
             applyFilters();
         }
 
-        // 分享功能 (調用手機原生分享)
         window.shareRestaurant = function(name) {
             if (navigator.share) {
                 navigator.share({
@@ -254,25 +285,30 @@
             const title = document.getElementById('districtTitle');
             const count = document.getElementById('districtCount');
             
-            // 更新並顯示紫色 Header
+            // 【核心變色邏輯】
             header.classList.remove('hidden');
             title.innerText = currentDistrict === '全部' ? '所有地區' : currentDistrict;
             count.innerText = `共 ${data.length} 間`;
+            
+            // 從對應表攞色，改變 Header 背景
+            const targetColor = districtColors[currentDistrict] || districtColors['全部'];
+            header.style.background = targetColor;
 
             if (data.length === 0) {
                 container.innerHTML = `<div class="p-10 text-center text-gray-400 bg-white"><p class="text-xl mb-2">🍽️</p>此地區暫未有符合嘅餐廳</div>`;
                 return;
             }
             
-            // 仿照截圖的 List View 樣式
             container.innerHTML = data.map(item => {
                 const query = encodeURIComponent(item['Restaurant Name']);
                 const xhsUrl = `https://www.xiaohongshu.com/search_result/?keyword=${query}`;
                 const douyinUrl = `https://www.douyin.com/search/${query}`;
                 
-                // 隨機選一個食物 Emoji 做頭像，如果有真實圖片連結可以替換
                 const emojis = ['🍲', '🥘', '🍚', '🍜', '🥢', '🥩'];
                 const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
+                // 獲取當前卡片專屬的地區顏色 (用於標籤)
+                const cardColor = districtColors[item['District']] || '#f97316';
 
                 return `
                 <div class="p-4 bg-white hover:bg-gray-50 transition-colors">
@@ -292,7 +328,7 @@
                             <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">${item['Highlight'] || '暫無描述'}</p>
 
                             <div class="flex justify-between items-center mt-2">
-                                <span class="border border-[#ab47bc] text-[#ab47bc] px-2 py-0.5 rounded-full text-[9px] font-medium bg-purple-50">
+                                <span style="color: ${cardColor}; border-color: ${cardColor}; background-color: ${cardColor}15;" class="border px-2 py-0.5 rounded-full text-[9px] font-bold">
                                     ${item['Category'] || '特色美食'}
                                 </span>
                                 <span class="text-[10px] text-gray-400 font-medium">
