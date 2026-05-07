@@ -35,6 +35,7 @@
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
 
+        /* 使用指南摺疊樣式 */
         .guide-details summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; color: #fb923c; }
         .guide-details summary::-webkit-details-marker { display: none; }
         .guide-details summary:after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; transition: 0.3s; }
@@ -60,16 +61,16 @@
                 </div>
                 
                 <div class="flex items-center gap-1.5 ml-2">
-                    <button class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()">
+                    <button class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()" title="用戶操作手冊">
                         <i class="fa-solid fa-circle-question text-lg"></i>
                     </button>
-                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm" title="中山美食地圖群組">
                         <i class="fa-brands fa-facebook-f text-lg"></i>
                     </a>
-                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="w-9 h-9 bg-[#FF0000] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm">
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="w-9 h-9 bg-[#FF0000] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm" title="中山美食地圖頻道">
                         <i class="fa-brands fa-youtube text-lg"></i>
                     </a>
-                    <button class="w-9 h-9 border border-orange-100 rounded-xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 transition-transform" onclick="showBookmarkGuide()">
+                    <button class="w-9 h-9 border border-orange-100 rounded-xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 transition-transform" onclick="showBookmarkGuide()" title="加到主畫面">
                         <i class="fa-solid fa-bookmark text-lg"></i>
                     </button>
                 </div>
@@ -194,13 +195,21 @@
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
-        function showToast(msg, dur = 3000) { const t = document.getElementById("customToast"); if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉指南</button></div>`; t.className = "show"; } }
+        function showToast(msg, dur = 3000) { const t = document.getElementById("customToast"); if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; } }
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
 
         function showUserGuide() {
-            const guide = `<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 使用指南</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone (Safari):</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android (Chrome):</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details><details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳 25 個行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「橙色箭頭」確認。<br><br><b>進階篩選：</b>撳「篩選」可按價位、菜式過濾。</div></details><details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註。</div></details><details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換機或清除緩存紀錄會消失。</div></details><details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開高德地圖。如果有片會顯示紅色掣。</div></details></div>`;
+            const guide = `
+                <div class="space-y-2">
+                    <p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p>
+                    <details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone (Safari):</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android (Chrome):</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details>
+                    <details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳 25 個行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「橙色箭頭」確認跳轉。<br><br><b>進階篩選：</b>撳「篩選」可按價位、菜式過濾。</div></details>
+                    <details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註。</div></details>
+                    <details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換機或清除緩存紀錄會消失。</div></details>
+                    <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開高德地圖。如果有 YouTube 介紹片會顯示紅色掣。撳「分享餐廳」可複製連結。</div></details>
+                </div>`;
             showToast(guide);
         }
 
@@ -226,12 +235,10 @@
                             'Youtube': getVal('Youtube')
                         };
                     }).filter(i => i.Restaurant_Name !== "");
-                    
                     const now = new Date();
                     const hours = now.getHours().toString().padStart(2, '0');
                     const minutes = now.getMinutes().toString().padStart(2, '0');
                     document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
-                    
                     buildFilterPills(allData); applyFilters();
                     document.getElementById('loader').classList.add('hidden');
                     refreshMap();
