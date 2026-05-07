@@ -84,7 +84,7 @@
         </section>
     </div>
 
-    <section class="max-w-4xl mx-auto px-4 py-3 mt-2">
+    <section class="max-w-4xl mx-auto px-4 py-3 mt-2" id="mapSection">
         <div class="bg-white rounded-[2.5rem] p-4 ios-shadow border border-gray-50 overflow-hidden relative">
             <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             <div class="mt-4 map-hint border border-gray-100 rounded-2xl py-2.5 px-4 flex items-center justify-center gap-2 max-w-[90%] mx-auto shadow-sm">
@@ -94,12 +94,27 @@
         </div>
     </section>
 
-    <main class="max-w-4xl mx-auto p-4 pt-0">
+    <main class="max-w-4xl mx-auto px-4 pb-10 mt-2">
+        
+        <div id="districtHeader" class="hidden bg-gradient-to-r from-[#9c27b0] to-[#ab47bc] text-white p-4 rounded-t-2xl flex justify-between items-center ios-shadow relative z-10">
+            <div class="flex items-baseline gap-2">
+                <h2 id="districtTitle" class="text-[1.35rem] font-bold tracking-wide">所有地區</h2>
+                <span id="districtCount" class="text-xs font-medium opacity-90">共 0 間</span>
+            </div>
+            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[10px] bg-white/20 hover:bg-white/30 px-2.5 py-1.5 rounded-lg font-bold flex items-center transition-colors active:scale-95">
+                <i class="fa-solid fa-angle-left mr-1"></i>返回地圖
+            </button>
+        </div>
+
         <div id="loader" class="text-center py-10">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div>
         </div>
-        <div id="resultCount" class="text-[11px] font-bold text-gray-400 mb-3 ml-2 uppercase tracking-widest hidden"></div>
-        <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        
+        <div id="restaurantGrid" class="bg-white rounded-b-2xl ios-shadow border border-gray-100 divide-y divide-gray-100 overflow-hidden"></div>
+        
+        <div class="text-center mt-6 mb-4">
+            <p class="text-[10px] text-gray-300 font-medium tracking-wider">資料來源: 中山美食地圖 • 本地食客推薦</p>
+        </div>
     </main>
 
     <map name="image-map">
@@ -129,10 +144,6 @@
         <area shape="rect" coords="72,304,153,343" alt="橫欄鎮" onclick="setDistrict('橫欄鎮')">
         <area shape="rect" coords="291,150,367,193" alt="三角鎮" onclick="setDistrict('三角鎮')">
     </map>
-
-    <footer class="text-center py-8 text-gray-400 text-[10px]">
-        <p>© 2026 中山美食地圖 | 兼容所有手機型號</p>
-    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
@@ -188,7 +199,8 @@
             currentDistrict = d;
             setTimeout(() => {
                 applyFilters();
-                window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 140, behavior: 'auto' });
+                // 跳轉到 Header 位置
+                window.scrollTo({ top: document.getElementById('districtHeader').offsetTop - 140, behavior: 'auto' });
             }, 10);
         }
 
@@ -198,6 +210,19 @@
             document.getElementById('filterPrice').value = '全部';
             document.getElementById('searchInput').value = '';
             applyFilters();
+        }
+
+        // 分享功能 (調用手機原生分享)
+        window.shareRestaurant = function(name) {
+            if (navigator.share) {
+                navigator.share({
+                    title: '中山美食地圖推薦',
+                    text: `快啲睇下呢間餐廳：${name}！`,
+                    url: window.location.href
+                }).catch(console.error);
+            } else {
+                alert(`已複製餐廳名稱：${name}`);
+            }
         }
 
         function applyFilters() {
@@ -225,35 +250,78 @@
 
         function renderData(data) {
             const container = document.getElementById('restaurantGrid');
-            const countDisplay = document.getElementById('resultCount');
+            const header = document.getElementById('districtHeader');
+            const title = document.getElementById('districtTitle');
+            const count = document.getElementById('districtCount');
             
-            countDisplay.classList.remove('hidden');
-            countDisplay.innerHTML = `找到了 ${data.length} 個美食結果`;
-            
+            // 更新並顯示紫色 Header
+            header.classList.remove('hidden');
+            title.innerText = currentDistrict === '全部' ? '所有地區' : currentDistrict;
+            count.innerText = `共 ${data.length} 間`;
+
             if (data.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-400 py-12 bg-white rounded-2xl border border-gray-100"><p class="text-lg mb-2">🍽️</p>搵唔到符合條件嘅餐廳</div>`;
+                container.innerHTML = `<div class="p-10 text-center text-gray-400 bg-white"><p class="text-xl mb-2">🍽️</p>此地區暫未有符合嘅餐廳</div>`;
                 return;
             }
             
+            // 仿照截圖的 List View 樣式
             container.innerHTML = data.map(item => {
-                const query = encodeURIComponent(item['Restaurant Name'] + " 中山 探店");
+                const query = encodeURIComponent(item['Restaurant Name']);
+                const xhsUrl = `https://www.xiaohongshu.com/search_result/?keyword=${query}`;
+                const douyinUrl = `https://www.douyin.com/search/${query}`;
+                
+                // 隨機選一個食物 Emoji 做頭像，如果有真實圖片連結可以替換
+                const emojis = ['🍲', '🥘', '🍚', '🍜', '🥢', '🥩'];
+                const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+
                 return `
-                <div class="bg-white p-5 rounded-[2rem] ios-shadow border border-gray-50 flex flex-col justify-between hover:shadow-md transition">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <h2 class="text-base font-bold text-gray-800 leading-tight">${item['Restaurant Name']}</h2>
-                            <span class="bg-orange-50 text-orange-600 text-[10px] px-2 py-0.5 rounded-full font-bold ml-2 whitespace-nowrap">${item['District']}</span>
+                <div class="p-4 bg-white hover:bg-gray-50 transition-colors">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-xl shadow-inner">
+                            ${randomEmoji}
                         </div>
-                        <div class="mt-2 flex gap-1">
-                            <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-lg">${item['Category'] || '美食'}</span>
-                            <span class="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded-lg font-bold">人均: ${item['Avg Cost'] || '--'}</span>
+
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-[15px] font-bold text-gray-800 truncate pr-2">${item['Restaurant Name']}</h3>
+                                <button class="text-gray-300 hover:text-red-400 active:scale-95 transition">
+                                    <i class="fa-regular fa-heart"></i>
+                                </button>
+                            </div>
+                            
+                            <p class="text-[11px] text-gray-500 mt-1 line-clamp-1">${item['Highlight'] || '暫無描述'}</p>
+
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="border border-[#ab47bc] text-[#ab47bc] px-2 py-0.5 rounded-full text-[9px] font-medium bg-purple-50">
+                                    ${item['Category'] || '特色美食'}
+                                </span>
+                                <span class="text-[10px] text-gray-400 font-medium">
+                                    人均 ${item['Avg Cost'] || '--'}
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-4 gap-1.5 mt-3">
+                                ${item['Amap URL'] ? `
+                                <a href="${item['Amap URL']}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-50 text-blue-500 text-[9px] font-bold active:scale-95 transition">
+                                    <i class="fa-solid fa-location-arrow"></i> 導航
+                                </a>` : `
+                                <div class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-gray-50 text-gray-300 text-[9px] font-bold">
+                                    無導航
+                                </div>`}
+                                
+                                <a href="${xhsUrl}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-red-50 text-red-500 text-[9px] font-bold active:scale-95 transition">
+                                    <i class="fa-solid fa-book-open"></i> 小紅書
+                                </a>
+                                
+                                <a href="${douyinUrl}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-gray-100 text-gray-800 text-[9px] font-bold active:scale-95 transition">
+                                    <i class="fa-brands fa-tiktok"></i> 抖音
+                                </a>
+                                
+                                <button onclick="shareRestaurant('${item['Restaurant Name']}')" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-green-50 text-green-600 text-[9px] font-bold active:scale-95 transition">
+                                    <i class="fa-solid fa-paperclip"></i> 分享
+                                </button>
+                            </div>
                         </div>
-                        <p class="text-gray-500 text-xs mt-4 leading-relaxed font-medium">● ${item['Highlight'] || '暫無描述'}</p>
-                    </div>
-                    <div class="mt-6 flex gap-2">
-                        <a href="https://www.xiaohongshu.com/search_result?keyword=${query}" target="_blank" class="flex-1 bg-[#ff2442] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-red-100 active:scale-95 transition-transform">📕 小紅書</a>
-                        <a href="https://www.douyin.com/search/${query}" target="_blank" class="flex-1 bg-[#161823] text-white text-[10px] font-bold py-3 rounded-2xl text-center shadow-md shadow-gray-200 active:scale-95 transition-transform">🎵 抖音</a>
-                        ${item['Amap URL'] ? `<a href="${item['Amap URL']}" target="_blank" class="w-11 h-11 flex items-center justify-center border border-gray-100 rounded-2xl text-orange-500 bg-white ios-shadow active:scale-95 transition-transform">📍</a>` : ''}
                     </div>
                 </div>
                 `;
