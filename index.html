@@ -41,7 +41,6 @@
         .guide-details[open] summary:after { transform: rotate(180deg); }
         .guide-content { padding: 12px 5px; color: #e5e7eb; font-size: 13px; line-height: 1.7; }
         
-        /* 圖標尺寸統一樣式 */
         .btn-img-sm { width: 14px; height: 14px; object-fit: contain; margin-right: 4px; }
         .btn-img-lg { width: 22px; height: 22px; object-fit: contain; }
     </style>
@@ -63,10 +62,10 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 ml-2">
-                    <button class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()" title="用戶操作手冊"><i class="fa-solid fa-circle-question text-lg"></i></button>
-                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm" title="中山美食地圖群組"><i class="fa-brands fa-facebook-f text-lg"></i></a>
-                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="w-9 h-9 bg-[#FF0000] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm" title="中山美食地圖頻道"><i class="fa-brands fa-youtube text-lg"></i></a>
-                    <button class="w-9 h-9 border border-orange-100 rounded-xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 transition-transform" onclick="showBookmarkGuide()" title="加到主畫面"><i class="fa-solid fa-bookmark text-lg"></i></button>
+                    <button class="w-9 h-9 rounded-xl flex items-center justify-center text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()"><i class="fa-solid fa-circle-question text-lg"></i></button>
+                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="w-9 h-9 bg-[#1877F2] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm"><i class="fa-brands fa-facebook-f text-lg"></i></a>
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="w-9 h-9 bg-[#FF0000] text-white rounded-xl flex items-center justify-center active:scale-90 transition-transform shadow-sm"><i class="fa-brands fa-youtube text-lg"></i></a>
+                    <button class="w-9 h-9 border border-orange-100 rounded-xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 transition-transform" onclick="showBookmarkGuide()"><i class="fa-solid fa-bookmark text-lg"></i></button>
                 </div>
             </div>
         </header>
@@ -81,7 +80,6 @@
                 <button onclick="resetAllFilters(true)" class="w-10 h-10 bg-white border border-red-50 rounded-2xl flex items-center justify-center text-red-500 active:bg-red-50"><i class="fa-solid fa-trash-can text-sm"></i></button>
                 <button onclick="toggleFilters()" class="w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-500 active:bg-gray-50"><i class="fa-solid fa-sliders text-sm"></i></button>
             </div>
-            
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
                     <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
@@ -101,10 +99,9 @@
                 <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             </div>
         </section>
-        
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
-            <div id="districtHeader" class="hidden bg-[#7a8f9a] text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300">
+            <div id="districtHeader" class="hidden bg-[#7a8f9a] text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
                     <div class="flex items-baseline gap-2"><h2 id="districtTitle" class="text-[22px] font-normal">--</h2><span id="districtCount" class="text-[12px] opacity-70">共 0 間</span></div>
@@ -113,7 +110,6 @@
             </div>
             <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div></div>
             <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200 border-x border-b border-gray-200 rounded-b-2xl overflow-hidden"></div>
-            
             <footer class="mt-8 text-center text-[10px] text-gray-400 py-6">資料來源: Trip.com • TripAdvisor • 本地食客推薦</footer>
         </main>
     </div>
@@ -148,10 +144,10 @@
                     <div class="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center"><i class="fa-solid fa-share-nodes text-lg"></i></div>
                     <span class="text-[13px] font-bold">分享餐廳</span>
                 </button>
-                <a id="btnXhs" target="_blank" class="bg-red-50 border border-red-100 text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95 shadow-sm">
+                <button onclick="handleXhsClick(activeDetailItem?.Restaurant_Name, activeDetailItem?.District)" class="bg-red-50 border border-red-100 text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95 shadow-sm">
                     <div class="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center"><img src="image_c3d70c.png" class="btn-img-lg" alt="小紅書"></div>
                     <span class="text-[13px] font-bold">小紅書食評</span>
-                </a>
+                </button>
                 <a id="btnDy" target="_blank" class="bg-gray-50 border border-gray-200 text-gray-800 rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95 shadow-sm">
                     <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center"><img src="image_c3d676.png" class="btn-img-lg" alt="抖音"></div>
                     <span class="text-[13px] font-bold">抖音食評</span>
@@ -161,7 +157,7 @@
         </div>
     </div>
 
-    <map name="image-map">
+    <map name="image-map" id="mapCoordinates">
         <area shape="rect" coords="227,110,302,144" alt="黃圃鎮" onclick="setDistrict('黃圃鎮')">
         <area shape="rect" coords="278,531,377,574" alt="三鄉鎮" onclick="setDistrict('三鄉鎮')">
         <area shape="rect" coords="125,394,188,423" alt="大涌鎮" onclick="setDistrict('大涌鎮')">
@@ -197,14 +193,36 @@
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
-        function showToast(msg, dur = 3000) { const t = document.getElementById("customToast"); if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; } }
+        function showToast(msg, dur = 3000) { 
+            const t = document.getElementById("customToast"); 
+            if(t) { 
+                t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; 
+                t.className = "show"; 
+                if(dur > 0) setTimeout(() => t.className = "", dur);
+            } 
+        }
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
 
+        // 【新增】判斷是否為手機版
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        // 【新增】小紅書點擊處理邏輯
+        window.handleXhsClick = function(name, district) {
+            if (isMobileDevice()) {
+                showToast("⚠️ 手機版不能用小紅書搜索，請用電腦版。", 5000);
+            } else {
+                const q = encodeURIComponent(name + " " + district);
+                window.open(`https://www.xiaohongshu.com/search_result/?keyword=${q}`, '_blank');
+            }
+        };
+
         function showUserGuide() {
             const guide = `<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone (Safari):</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android (Chrome):</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details><details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳 25 個行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「橙色箭頭」確認跳轉。<br><br><b>進階篩選：</b>撳「篩選」可按價位、菜式過濾。</div></details><details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註。</div></details><details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換機或清除緩存紀錄會消失。</div></details><details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開高德地圖。如果有片會顯示紅色掣。</div></details></div>`;
-            showToast(guide);
+            showToast(guide, 0);
         }
 
         async function init() {
@@ -276,7 +294,6 @@
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
-                const q = encodeURIComponent(item.Restaurant_Name + " " + item.District);
                 const hasYoutube = item.Youtube && item.Youtube.startsWith('http');
                 return `
                 <div class="bg-white p-4 relative border-b border-gray-100">
@@ -301,10 +318,10 @@
                         <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition">
                             <img src="image_c3e1d6.png" class="btn-img-sm" alt="導航">導航
                         </a>
-                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${q}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition">
+                        <button onclick="event.stopPropagation(); handleXhsClick('${item.Restaurant_Name.replace(/'/g, "\\'")}', '${item.District}')" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition">
                             <img src="image_c3d70c.png" class="btn-img-sm" alt="小紅書">小紅書
-                        </a>
-                        <a href="https://www.douyin.com/search/${q}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition">
+                        </button>
+                        <a href="https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition">
                             <img src="image_c3d676.png" class="btn-img-sm" alt="抖音">抖音
                         </a>
                         <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-green-100 bg-green-50/30 text-green-500 text-[10px] font-bold active:scale-95 transition">
@@ -329,10 +346,8 @@
             const ytSection = document.getElementById('youtubeSection'), ytBtn = document.getElementById('btnYoutubeDetail');
             if(item.Youtube && item.Youtube.startsWith('http')) { ytSection.classList.remove('hidden'); ytBtn.href = item.Youtube; } else { ytSection.classList.add('hidden'); }
             updateDetailUI(data);
-            const q = encodeURIComponent(item.Restaurant_Name + " " + item.District);
             document.getElementById('btnNav').href = item.Amap_URL || '#';
-            document.getElementById('btnXhs').href = `https://www.xiaohongshu.com/search_result/?keyword=${q}`;
-            document.getElementById('btnDy').href = `https://www.douyin.com/search/${q}`;
+            document.getElementById('btnDy').href = `https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}`;
             document.getElementById('mainContentView').classList.add('hidden');
             document.getElementById('detailView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'auto' });
@@ -366,7 +381,7 @@
             const ua = navigator.userAgent.toLowerCase();
             const isiOS = /iphone|ipad|ipod/.test(ua);
             let msg = isiOS ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>";
-            showToast(msg); 
+            showToast(msg, 6000); 
         }
         window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); } }
         window.shareDetail = function() { if(!activeDetailItem) return; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: activeDetailItem.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); } }
