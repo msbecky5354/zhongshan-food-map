@@ -98,8 +98,8 @@
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
                     <div class="flex items-baseline gap-2">
-                        <h2 id="districtTitle" class="text-[22px] font-normal">坦洲鎮</h2>
-                        <span id="districtCount" class="text-[12px] opacity-70">共 2 間</span>
+                        <h2 id="districtTitle" class="text-[22px] font-normal">--</h2>
+                        <span id="districtCount" class="text-[12px] opacity-70">共 0 間</span>
                     </div>
                     <button onclick="toggleFilters()" class="bg-white/20 px-3 py-1 rounded text-[11px] font-bold">篩選 ▾</button>
                 </div>
@@ -186,7 +186,13 @@
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
 
         async function init() {
-            Papa.parse(sheetUrl, {
+            // 加入強制更新時間戳
+            const finalUrl = sheetUrl + `&t=${new Date().getTime()}`;
+            
+            // 安全機制：3秒必閂 Loader
+            setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 3000);
+
+            Papa.parse(finalUrl, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) {
                     allData = results.data.map(row => ({
@@ -233,7 +239,6 @@
             renderData(currentRenderedData);
         }
 
-        // ==================== 改良：根據圖片樣式渲染列表 ====================
         function renderData(data) {
             const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
             if(!container) return;
@@ -262,7 +267,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="grid grid-cols-4 gap-2 border-t border-gray-50 pt-3">
                         <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition">
                             <i class="fa-solid fa-compass"></i>導航
