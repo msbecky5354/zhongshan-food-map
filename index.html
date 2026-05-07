@@ -22,6 +22,8 @@
         img[usemap] { max-width: 100%; height: auto; }
         .ios-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .map-hint { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(4px); }
+        /* 取消地圖點擊時的預設藍色高光，令反應更接近原生 App */
+        area { outline: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -102,36 +104,39 @@
     </main>
 
     <map name="image-map">
-        <area shape="rect" coords="206,296,249,312" alt="西區" href="javascript:void(0);" onclick="setDistrict('西區')">
-        <area shape="rect" coords="249,319,302,336" alt="石岐區" href="javascript:void(0);" onclick="setDistrict('石岐區')">
-        <area shape="rect" coords="328,321,411,337" alt="火炬開發區" href="javascript:void(0);" onclick="setDistrict('火炬開發區')">
-        <area shape="rect" coords="264,359,318,381" alt="東區" href="javascript:void(0);" onclick="setDistrict('東區')">
-        <area shape="rect" coords="213,402,260,425" alt="南區" href="javascript:void(0);" onclick="setDistrict('南區')">
-        <area shape="rect" coords="394,381,443,395" alt="南朗鎮" href="javascript:void(0);" onclick="setDistrict('南朗鎮')">
-        <area shape="rect" coords="169,354,222,373" alt="沙溪鎮" href="javascript:void(0);" onclick="setDistrict('沙溪鎮')">
-        <area shape="rect" coords="94,198,141,217" alt="小欖鎮" href="javascript:void(0);" onclick="setDistrict('小欖鎮')">
-        <area shape="rect" coords="310,161,358,178" alt="三角鎮" href="javascript:void(0);" onclick="setDistrict('三角鎮')">
-        <area shape="rect" coords="297,546,352,562" alt="三鄉鎮" href="javascript:void(0);" onclick="setDistrict('三鄉鎮')">
-        <area shape="rect" coords="260,263,307,276" alt="港口鎮" href="javascript:void(0);" onclick="setDistrict('港口鎮')">
-        <area shape="rect" coords="240,123,290,133" alt="黃圃鎮" href="javascript:void(0);" onclick="setDistrict('黃圃鎮')">
-        <area shape="rect" coords="131,158,179,174" alt="東鳳鎮" href="javascript:void(0);" onclick="setDistrict('東鳳鎮')">
-        <area shape="rect" coords="291,466,351,478" alt="五桂山鎮" href="javascript:void(0);" onclick="setDistrict('五桂山鎮')">
-        <area shape="rect" coords="151,124,193,135" alt="南頭鎮" href="javascript:void(0);" onclick="setDistrict('南頭鎮')">
-        <area shape="rect" coords="299,632,352,650" alt="坦洲鎮" href="javascript:void(0);" onclick="setDistrict('坦洲鎮')">
-        <area shape="rect" coords="165,251,215,267" alt="東升鎮" href="javascript:void(0);" onclick="setDistrict('東升鎮')">
-        <area shape="rect" coords="48,238,93,250" alt="古鎮鎮" href="javascript:void(0);" onclick="setDistrict('古鎮鎮')">
-        <area shape="rect" coords="86,317,137,332" alt="橫欄鎮" href="javascript:void(0);" onclick="setDistrict('橫欄鎮')">
-        <area shape="rect" coords="218,185,266,203" alt="阜沙鎮" href="javascript:void(0);" onclick="setDistrict('阜沙鎮')">
-        <area shape="rect" coords="379,227,425,245" alt="民眾鎮" href="javascript:void(0);" onclick="setDistrict('民眾鎮')">
-        <area shape="rect" coords="486,292,533,311" alt="馬鞍島" href="javascript:void(0);" onclick="setDistrict('馬鞍島')">
-        <area shape="rect" coords="138,403,187,419" alt="大涌鎮" href="javascript:void(0);" onclick="setDistrict('大涌鎮')">
-        <area shape="rect" coords="183,486,234,508" alt="板芙鎮" href="javascript:void(0);" onclick="setDistrict('板芙鎮')">
-        <area shape="rect" coords="225,584,277,605" alt="神灣鎮" href="javascript:void(0);" onclick="setDistrict('神灣鎮')">
+        <area shape="rect" coords="206,296,249,312" alt="西區" onclick="setDistrict('西區')">
+        <area shape="rect" coords="249,319,302,336" alt="石岐區" onclick="setDistrict('石岐區')">
+        <area shape="rect" coords="328,321,411,337" alt="火炬開發區" onclick="setDistrict('火炬開發區')">
+        <area shape="rect" coords="264,359,318,381" alt="東區" onclick="setDistrict('東區')">
+        <area shape="rect" coords="213,402,260,425" alt="南區" onclick="setDistrict('南區')">
+        <area shape="rect" coords="394,381,443,395" alt="南朗鎮" onclick="setDistrict('南朗鎮')">
+        <area shape="rect" coords="169,354,222,373" alt="沙溪鎮" onclick="setDistrict('沙溪鎮')">
+        <area shape="rect" coords="94,198,141,217" alt="小欖鎮" onclick="setDistrict('小欖鎮')">
+        <area shape="rect" coords="310,161,358,178" alt="三角鎮" onclick="setDistrict('三角鎮')">
+        <area shape="rect" coords="297,546,352,562" alt="三鄉鎮" onclick="setDistrict('三鄉鎮')">
+        <area shape="rect" coords="260,263,307,276" alt="港口鎮" onclick="setDistrict('港口鎮')">
+        <area shape="rect" coords="240,123,290,133" alt="黃圃鎮" onclick="setDistrict('黃圃鎮')">
+        <area shape="rect" coords="131,158,179,174" alt="東鳳鎮" onclick="setDistrict('東鳳鎮')">
+        <area shape="rect" coords="291,466,351,478" alt="五桂山鎮" onclick="setDistrict('五桂山鎮')">
+        <area shape="rect" coords="151,124,193,135" alt="南頭鎮" onclick="setDistrict('南頭鎮')">
+        <area shape="rect" coords="299,632,352,650" alt="坦洲鎮" onclick="setDistrict('坦洲鎮')">
+        <area shape="rect" coords="165,251,215,267" alt="東升鎮" onclick="setDistrict('東升鎮')">
+        <area shape="rect" coords="48,238,93,250" alt="古鎮鎮" onclick="setDistrict('古鎮鎮')">
+        <area shape="rect" coords="86,317,137,332" alt="橫欄鎮" onclick="setDistrict('橫欄鎮')">
+        <area shape="rect" coords="218,185,266,203" alt="阜沙鎮" onclick="setDistrict('阜沙鎮')">
+        <area shape="rect" coords="379,227,425,245" alt="民眾鎮" onclick="setDistrict('民眾鎮')">
+        <area shape="rect" coords="486,292,533,311" alt="馬鞍島" onclick="setDistrict('馬鞍島')">
+        <area shape="rect" coords="138,403,187,419" alt="大涌鎮" onclick="setDistrict('大涌鎮')">
+        <area shape="rect" coords="183,486,234,508" alt="板芙鎮" onclick="setDistrict('板芙鎮')">
+        <area shape="rect" coords="225,584,277,605" alt="神灣鎮" onclick="setDistrict('神灣鎮')">
     </map>
+
+    <footer class="text-center py-8 text-gray-400 text-[10px]">
+        <p>© 2026 中山美食地圖 | 兼容所有手機型號</p>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
-        // 註冊 Service Worker (PWA 必備)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Error:', err));
@@ -171,10 +176,16 @@
             menu.classList.toggle('hidden');
         }
 
+        // 核心優化：將點擊處理拆分
         window.setDistrict = function(d) {
             currentDistrict = d;
-            applyFilters();
-            window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 140, behavior: 'smooth' });
+            
+            // 延遲 10 毫秒執行過濾同捲動，等手機 CPU 處理完個點擊 Event 先
+            setTimeout(() => {
+                applyFilters();
+                // 將 behavior 改為 'auto' (即時跳轉)，取消慢慢滑動嘅粘滯感
+                window.scrollTo({ top: document.getElementById('restaurantGrid').offsetTop - 140, behavior: 'auto' });
+            }, 10);
         }
 
         function resetFilters() {
