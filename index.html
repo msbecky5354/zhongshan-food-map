@@ -26,14 +26,14 @@
         .star-active { color: #f5a623 !important; }
         
         #customToast {
-            visibility: hidden; min-width: 220px; background-color: rgba(0, 0, 0, 0.9); color: #fff;
-            text-align: center; border-radius: 50px; padding: 14px 28px; position: fixed; z-index: 10000;
-            left: 50%; bottom: 60px; transform: translateX(-50%); font-size: 14px; font-weight: bold;
-            backdrop-filter: blur(10px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); pointer-events: none;
+            visibility: hidden; min-width: 250px; background-color: rgba(0, 0, 0, 0.9); color: #fff;
+            text-align: center; border-radius: 20px; padding: 16px; position: fixed; z-index: 10000;
+            left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 14px; line-height: 1.6;
+            backdrop-filter: blur(10px); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        #customToast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
-        @keyframes fadein { from {bottom: 20px; opacity: 0;} to {bottom: 60px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 60px; opacity: 1;} to {bottom: 20px; opacity: 0;} }
+        #customToast.show { visibility: visible; animation: fadein 0.3s; }
+        @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
+        .btn-press:active { transform: scale(0.92); opacity: 0.9; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -41,7 +41,7 @@
     <div id="customToast" onclick="this.className=''"></div>
 
     <div class="sticky top-0 z-50 shadow-sm flex flex-col bg-white">
-        <header class="px-4 pt-5 pb-3 relative border-b border-gray-50">
+        <header class="px-4 pt-5 pb-3 relative border-b border-gray-100">
             <div class="max-w-6xl mx-auto flex items-center justify-between">
                 <div class="flex items-center cursor-pointer active:opacity-60 transition-opacity" onclick="resetToHome()">
                     <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-sm border border-gray-100 bg-white flex-shrink-0">
@@ -49,7 +49,7 @@
                     </div>
                     <div class="ml-2.5 flex flex-col justify-center">
                         <img src="banner.png" alt="中山美食地圖" class="h-6 w-auto object-contain object-left">
-                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：載入中...</p>
+                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：讀取中...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 ml-2">
@@ -71,8 +71,8 @@
                            class="w-full pl-11 pr-[80px] py-3 bg-transparent text-sm focus:outline-none">
                     <button onclick="triggerSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-orange-500 text-white rounded-xl active:scale-90 transition shadow-sm font-bold text-[11px]">搜索</button>
                 </div>
-                <button onclick="resetAllFilters(true)" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 active:bg-red-50"><i class="fa-solid fa-trash-can text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">重置</span></button>
-                <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 active:bg-gray-50"><i class="fa-solid fa-sliders text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">篩選</span></button>
+                <button onclick="resetAllFilters(true)" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 active:bg-red-50 transition-colors"><i class="fa-solid fa-trash-can text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">重置</span></button>
+                <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 active:bg-gray-50 transition-colors"><i class="fa-solid fa-sliders text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">篩選</span></button>
             </div>
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
@@ -111,32 +111,27 @@
             <div class="flex items-center gap-2"><h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2><span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold"></span></div>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
-            <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-2">
                 <div class="flex items-center gap-2"><div id="detailStars" class="text-[#f5a623] text-xs"></div><span class="text-gray-400 text-[10px]">推薦指數</span></div>
                 <div class="flex gap-1.5">
-                    <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100">去過?</button>
-                    <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100">收藏</button>
-                    <button id="btnWant" onclick="toggleUserStatus('want')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100">想去</button>
+                    <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95">去過?</button>
+                    <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95">收藏</button>
+                    <button id="btnWant" onclick="toggleUserStatus('want')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95">想去</button>
                 </div>
             </div>
-            <div id="starRating" class="text-gray-200 text-2xl space-x-1.5 mb-2 cursor-pointer flex"><i class="fa-solid fa-star" onclick="saveRating(1)"></i><i class="fa-solid fa-star" onclick="saveRating(2)"></i><i class="fa-solid fa-star" onclick="saveRating(3)"></i><i class="fa-solid fa-star" onclick="saveRating(4)"></i><i class="fa-solid fa-star" onclick="saveRating(5)"></i></div>
-            <div class="bg-[#faf9f5] rounded-xl p-4 border border-[#f3eee1]"><p class="text-[11px] text-gray-500 font-bold mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> 我的備註</p><textarea id="noteInput" oninput="saveNote()" placeholder="點擊加入備註⋯" class="w-full bg-transparent text-[11px] text-gray-700 outline-none h-16 resize-none"></textarea></div>
-            <div id="detailExtraTags" class="flex flex-wrap gap-2"></div>
-            <div class="flex flex-wrap gap-2 mb-2"><span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold border border-[#bbf7d0]"></span><span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200"></span></div>
-            <div class="bg-[#fcfdfa] rounded-xl p-4 border border-gray-100 shadow-sm"><h4 class="text-[12px] font-bold text-[#d4b068] mb-2.5 flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> 食客點評</h4><p id="detailHighlight" class="text-[13px] text-gray-700 leading-relaxed"></p></div>
-            <div class="flex items-center justify-between py-3 border-t border-b border-gray-50">
+            <div id="starRating" class="text-gray-200 text-2xl space-x-1.5 mb-5 cursor-pointer flex"><i class="fa-solid fa-star" onclick="saveRating(1)"></i><i class="fa-solid fa-star" onclick="saveRating(2)"></i><i class="fa-solid fa-star" onclick="saveRating(3)"></i><i class="fa-solid fa-star" onclick="saveRating(4)"></i><i class="fa-solid fa-star" onclick="saveRating(5)"></i></div>
+            <div class="bg-[#faf9f5] rounded-xl p-4 border border-[#f3eee1] mb-5"><p class="text-[11px] text-gray-500 font-bold mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> 我的備註</p><textarea id="noteInput" oninput="saveNote()" placeholder="點擊加入備註⋯" class="w-full bg-transparent text-[11px] text-gray-700 outline-none h-16 resize-none"></textarea></div>
+            <div id="detailExtraTags" class="flex flex-wrap gap-2 mb-2"></div>
+            <div class="flex flex-wrap gap-2 mb-5"><span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold border border-[#bbf7d0]"></span><span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200"></span></div>
+            <div class="bg-[#fcfdfa] rounded-xl p-4 border border-gray-100 shadow-sm mb-5"><h4 class="text-[12px] font-bold text-[#d4b068] mb-2.5 flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> 食客點評</h4><p id="detailHighlight" class="text-[13px] text-gray-700 leading-relaxed"></p></div>
+            <div class="flex items-center justify-between py-3 border-t border-b border-gray-50 mb-6">
                 <div class="flex items-start flex-1 min-w-0 pr-3">
                     <i class="fa-solid fa-location-dot text-gray-400 mt-0.5 mr-2"></i>
                     <p id="detailAddress" class="text-[12px] text-gray-600 leading-snug"></p>
                 </div>
                 <button onclick="copyAddress()" class="bg-gray-50 border border-gray-200 text-gray-500 px-3 py-1.5 rounded-md text-[10px] font-bold active:scale-95 transition">複製</button>
             </div>
-            <div class="grid grid-cols-2 gap-3 pb-12">
-                <a id="btnNav" target="_blank" class="bg-[#1b7ef2] text-white rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-location-arrow text-lg"></i><span class="text-[13px]">導航前往</span></a>
-                <button onclick="shareDetail()" class="bg-[#f2fdf5] border border-[#bbf7d0] text-[#16a34a] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-paperclip text-lg"></i><span class="text-[13px]">分享餐廳</span></button>
-                <a id="btnXhs" target="_blank" class="bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><i class="fa-solid fa-book-open text-lg"></i><span class="text-[13px]">小紅書</span></a>
-                <a id="btnDy" target="_blank" class="bg-[#f9fafb] border border-gray-200 text-gray-800 rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><i class="fa-brands fa-tiktok text-lg"></i><span class="text-[13px]">抖音</span></a>
-            </div>
+            <div class="grid grid-cols-2 gap-3 pb-12"><a id="btnNav" target="_blank" class="bg-[#1b7ef2] text-white rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center"><i class="fa-solid fa-location-arrow text-lg"></i></div><span class="text-[13px] font-medium">導航前往</span></a><button onclick="shareDetail()" class="bg-[#f2fdf5] border border-[#bbf7d0] text-[#16a34a] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-[#16a34a]/10 flex items-center justify-center"><i class="fa-solid fa-paperclip text-lg"></i></div><span class="text-[13px] font-medium">分享餐廳</span></button><a id="btnXhs" target="_blank" class="bg-[#fff1f2] border border-[#fecdd3] text-[#e11d48] rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-[#e11d48]/10 flex items-center justify-center"><i class="fa-solid fa-book-open text-lg"></i></div><span class="text-[13px] font-medium">小紅書食評</span></a><a id="btnDy" target="_blank" class="bg-[#f9fafb] border border-gray-200 text-gray-800 rounded-2xl py-4 flex flex-col items-center justify-center gap-2 active:scale-95"><div class="w-8 h-8 rounded-full bg-gray-200/50 flex items-center justify-center"><i class="fa-brands fa-tiktok text-lg"></i></div><span class="text-[13px] font-medium">抖音食評</span></a></div>
         </div>
     </div>
 
@@ -204,26 +199,28 @@
             });
         }
 
-        // 【重點修復】 handleLiveSearch 加入關閉詳細頁邏輯
+        // 【最終修復：導航聯動邏輯】
         window.handleLiveSearch = function() {
-            const detailView = document.getElementById('detailView');
-            if(!detailView.classList.contains('hidden')) {
-                closeDetail(); // 如果詳細頁開緊，即刻閂咗佢
+            // 只要一打字，先熄咗詳細內頁，主地圖/列表先會露返出嚟
+            if(!document.getElementById('detailView').classList.contains('hidden')) {
+                closeDetail();
             }
             applyFilters();
         }
 
-        window.triggerSearch = function() { 
-            closeDetail(); 
-            applyFilters(); 
+        window.triggerSearch = function() {
+            closeDetail(); // 確保詳情熄咗
+            applyFilters();
             document.activeElement.blur(); 
-            jumpToResults(); 
+            // 等 100 毫秒畀瀏覽器畫返個主頁出嚟，先跳落去結果區
+            setTimeout(jumpToResults, 100); 
         }
 
-        window.jumpToResults = function() { 
-            document.getElementById('filterMenu').classList.add('hidden'); 
-            const t = document.getElementById('resultsAnchor'); 
-            window.scrollTo({ top: t.offsetTop, behavior: 'smooth' }); 
+        window.jumpToResults = function() {
+            document.getElementById('filterMenu').classList.add('hidden');
+            document.getElementById('mainContentView').classList.remove('hidden'); // 強制確保顯示
+            const t = document.getElementById('resultsAnchor');
+            if(t) window.scrollTo({ top: t.offsetTop, behavior: 'smooth' });
         }
 
         window.resetToHome = function() { closeDetail(); resetAllFilters(true); window.history.pushState({}, '', window.location.pathname); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -267,7 +264,7 @@
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-10 text-center text-gray-400 bg-white border border-gray-100 mt-4 rounded-2xl">找不到結果。</div>`; return; }
             container.innerHTML = data.map((item, index) => {
                 const distColor = districtColors[item.District] || '#f97316';
-                return `<div class="bg-white border-b border-gray-100 p-4 relative transition-colors active:bg-gray-50" onclick="openDetail(${index})">
+                return `<div class="bg-white border-b border-gray-100 p-4 relative active:bg-gray-50" onclick="openDetail(${index})">
                     <div class="flex items-center gap-3 cursor-pointer">
                         <div class="w-[50px] h-[50px] rounded-2xl bg-[#f5f0f6] flex items-center justify-center flex-shrink-0 text-2xl">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
                         <div class="flex-1 min-w-0">
@@ -301,7 +298,10 @@
             document.getElementById('detailView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
-        window.closeDetail = function() { document.getElementById('detailView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); }
+        window.closeDetail = function() { 
+            document.getElementById('detailView').classList.add('hidden'); 
+            document.getElementById('mainContentView').classList.remove('hidden'); 
+        }
         function updateDetailUI(data) {
             const setBtn = (id, active, activeClass) => { const btn = document.getElementById(id); if(btn) btn.className = `px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border ${active ? activeClass : 'bg-white border-gray-200 text-gray-500'}`; };
             setBtn('btnVisited', data.visited, 'bg-gray-500 border-gray-500 text-white');
@@ -326,7 +326,7 @@
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95 mb-1 mr-1">${l}</button>`; }
         function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); }
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
-        function showBookmarkGuide() { const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent); let msg = isiOS ? "<b>【iPhone 用家】</b><br><br>1. 撳底排「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返「加入主畫面」" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」"; showToast(msg, 6000); }
+        function showBookmarkGuide() { const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent); let msg = isiOS ? "【iPhone 用家】<br>1. 撳底排「分享」掣<br>2. 搵返「加入主畫面」" : "【Android 用家】<br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」"; showToast(msg, 6000); }
         window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
         document.addEventListener('DOMContentLoaded', init);
     </script>
