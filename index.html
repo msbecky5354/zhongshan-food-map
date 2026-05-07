@@ -207,11 +207,26 @@
         }
 
         const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtli5qEDucHqpfVOHASkAfbxHIeC7_krqoVPnrRA1b83VfdqaAnlHNPmLKkwJyLpPC1O7AHr5wFQg7/pub?output=csv';
+        
         let allData = [];
         let currentRenderedData = [];
         let activeDetailItem = null; 
 
         let filtersState = { district: '全部', category: '全部', price: '全部' };
+
+        const ALL_DISTRICTS = [
+            "石岐區", "東區", "西區", "南區", "五桂山鎮", "火炬開發區", "馬鞍島",
+            "黃圃鎮", "南頭鎮", "東鳳鎮", "阜沙鎮", "小欖鎮", "東升鎮", "古鎮鎮",
+            "橫欄鎮", "三角鎮", "民眾鎮", "南朗鎮", "港口鎮", "大涌鎮", "沙溪鎮",
+            "三鄉鎮", "板芙鎮", "神灣鎮", "坦洲鎮"
+        ];
+
+        const PRICE_RANGES = [
+            { label: '全部', value: '全部' },
+            { label: '¥50以下', value: '0-50' },
+            { label: '¥50-100', value: '51-100' },
+            { label: '¥100以上', value: '101-' }
+        ];
 
         const districtColors = {
             "黃圃鎮": "#d87a41", "南頭鎮": "#85a953", "東鳳鎮": "#b1c953", "小欖鎮": "#5f87d4",
@@ -340,6 +355,21 @@
             else { navigator.clipboard.writeText(shareUrl); alert('✅ 連結已複製'); }
         }
 
+        window.shareRestaurant = function(index) {
+            const item = currentRenderedData[index];
+            const name = item['Restaurant Name'];
+            const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(name)}`;
+            const shareText = `🍽️ 我喺【中山美食地圖】發現咗呢間正嘢：${name}\n點擊連結睇詳情同導航：`;
+
+            if (navigator.share) {
+                navigator.share({ title: name, text: shareText, url: shareUrl }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+                    alert(`✅ 已複製「${name}」嘅專屬連結！\n你可以去分享畀朋友。`);
+                });
+            }
+        }
+
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase();
             const filtered = allData.filter(item => {
@@ -392,9 +422,10 @@
                     </div>
                     <div class="grid grid-cols-4 gap-1.5 mt-4 pt-3 border-t border-gray-50">
                         <a href="${item['Amap URL'] || '#'}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-50 text-blue-500 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-location-arrow"></i> 導航</a>
-                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(item['Restaurant Name'])}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-red-50 text-red-500 text-[9px] font-bold active:scale-95 transition">📕 小紅書</a>
+                        <a href="https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(item['Restaurant Name'])}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-red-50 text-red-500 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-book-open"></i> 小紅書</a>
                         <a href="https://www.douyin.com/search/${encodeURIComponent(item['Restaurant Name'])}" target="_blank" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-gray-100 text-gray-800 text-[9px] font-bold active:scale-95 transition"><i class="fa-brands fa-tiktok"></i> 抖音</a>
-                        <button onclick="openDetail(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-orange-50 text-orange-500 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-info-circle"></i> 詳情</button>
+                        
+                        <button onclick="shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg bg-green-50 text-green-600 text-[9px] font-bold active:scale-95 transition"><i class="fa-solid fa-paperclip"></i> 分享</button>
                     </div>
                 </div>`;
             }).join('');
