@@ -49,7 +49,7 @@
                     </div>
                     <div class="ml-2.5 flex flex-col justify-center">
                         <img src="banner.png" alt="中山美食地圖" class="h-6 w-auto object-contain object-left">
-                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：正在載入...</p>
+                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：讀取中...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-1.5 ml-2">
@@ -62,22 +62,18 @@
 
         <section class="px-4 py-2 bg-white shadow-sm">
             <div class="max-w-4xl mx-auto flex gap-1.5 items-center">
-                <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden flex bg-gray-50 border border-gray-100 focus-within:border-orange-200 transition-colors">
+                <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden flex bg-gray-50 border border-gray-100 focus-within:border-orange-200">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" id="searchInput" 
-                           oninput="handleLiveSearch()" 
-                           onkeydown="if(event.key==='Enter') triggerSearch()" 
-                           placeholder="搜尋餐廳、特色..." 
-                           class="w-full pl-11 pr-[80px] py-3 bg-transparent text-sm focus:outline-none">
+                    <input type="text" id="searchInput" oninput="handleLiveSearch()" onkeydown="if(event.key==='Enter') triggerSearch()" placeholder="搜尋餐廳、特色..." class="w-full pl-11 pr-[80px] py-3 bg-transparent text-sm focus:outline-none">
                     <button onclick="triggerSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 px-3 bg-orange-500 text-white rounded-xl active:scale-90 transition shadow-sm font-bold text-[11px]">搜索</button>
                 </div>
-                <button onclick="resetAllFilters(true)" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 active:bg-red-50"><i class="fa-solid fa-trash-can text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">重置</span></button>
-                <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 active:bg-gray-50"><i class="fa-solid fa-sliders text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">篩選</span></button>
+                <button onclick="resetAllFilters(true)" class="w-11 h-11 bg-white border border-red-100 rounded-2xl flex flex-col items-center justify-center text-red-500 active:bg-red-50 transition-colors"><i class="fa-solid fa-trash-can text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">重置</span></button>
+                <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-500 active:bg-gray-50 transition-colors"><i class="fa-solid fa-sliders text-xs"></i><span class="text-[7px] mt-0.5 font-bold uppercase">篩選</span></button>
             </div>
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
-                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
                     <button onclick="jumpToResults()" class="w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90"><i class="fa-solid fa-check text-sm"></i></button>
                 </div>
                 <div class="mb-5"><h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-bookmark mr-1.5 text-orange-400"></i>我的標記</h4><div id="filterGridMyTags" class="flex flex-wrap gap-2 pr-12"><button onclick="setFilterState('myTag', '全部')" data-type="myTag" data-value="全部" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">全部</button><button onclick="setFilterState('myTag', 'visited')" data-type="myTag" data-value="visited" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">✅ 已去過</button><button onclick="setFilterState('myTag', 'favorite')" data-type="myTag" data-value="favorite" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">🔖 已收藏</button><button onclick="setFilterState('myTag', 'want')" data-type="myTag" data-value="want" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">📌 想去食</button></div></div>
@@ -96,8 +92,8 @@
         </section>
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
-            <div id="districtHeader" class="hidden text-white px-5 pt-4 pb-4 rounded-t-2xl relative z-10">
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[13px] opacity-90 flex items-center mb-3"><i class="fa-solid fa-angle-left mr-1.5"></i>返回地圖</button>
+            <div id="districtHeader" class="hidden text-white px-5 pt-4 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[13px] opacity-90 flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i>返回地圖</button>
                 <div class="flex items-baseline gap-2"><h2 id="districtTitle" class="text-[24px] font-normal text-white">所有地區</h2><span id="districtCount" class="text-[12px] opacity-80 text-white">共 0 間</span></div>
             </div>
             <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent"></div></div>
@@ -121,7 +117,7 @@
             </div>
             <div id="starRating" class="text-gray-200 text-2xl space-x-1.5 mb-5 cursor-pointer flex"><i class="fa-solid fa-star" onclick="saveRating(1)"></i><i class="fa-solid fa-star" onclick="saveRating(2)"></i><i class="fa-solid fa-star" onclick="saveRating(3)"></i><i class="fa-solid fa-star" onclick="saveRating(4)"></i><i class="fa-solid fa-star" onclick="saveRating(5)"></i></div>
             <div class="bg-[#faf9f5] rounded-xl p-4 border border-[#f3eee1] mb-5"><p class="text-[11px] text-gray-500 font-bold mb-1.5 flex items-center gap-1.5"><i class="fa-solid fa-pen-to-square"></i> 我的備註</p><textarea id="noteInput" oninput="saveNote()" placeholder="點擊加入備註⋯" class="w-full bg-transparent text-[11px] text-gray-700 outline-none h-16 resize-none"></textarea></div>
-            <div id="detailExtraTags" class="flex flex-wrap gap-2 mb-2"></div>
+            <div id="detailExtraTags" class="flex flex-wrap gap-2 mb-5"></div>
             <div class="flex flex-wrap gap-2 mb-5"><span id="detailCategory" class="bg-[#f2fdf5] text-[#16a34a] px-3 py-1 rounded-full text-[11px] font-bold border border-[#bbf7d0]"></span><span id="detailPrice" class="bg-gray-50 text-gray-600 px-3 py-1 rounded-full text-[11px] font-bold border border-gray-200"></span></div>
             <div class="bg-[#fcfdfa] rounded-xl p-4 border border-gray-100 shadow-sm mb-5"><h4 class="text-[12px] font-bold text-[#d4b068] mb-2.5 flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> 食客點評</h4><p id="detailHighlight" class="text-[13px] text-gray-700 leading-relaxed"></p></div>
             <div class="flex items-center justify-between py-3 border-t border-b border-gray-50 mb-6"><div class="flex items-start flex-1 min-w-0 pr-3"><i class="fa-solid fa-location-dot text-gray-400 mt-0.5 mr-2"></i><p id="detailAddress" class="text-[12px] text-gray-600 leading-snug"></p></div><button onclick="copyAddress()" class="bg-gray-50 border border-gray-200 text-gray-500 px-3 py-1.5 rounded-md text-[10px] font-bold active:scale-95 transition">複製</button></div>
@@ -171,7 +167,6 @@
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
 
         async function init() {
-            setTimeout(() => { document.getElementById('loader').classList.add('hidden'); }, 3000);
             Papa.parse(sheetUrl, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) {
@@ -193,43 +188,24 @@
             });
         }
 
-        // 【新邏輯】只要有任何搜尋/過濾動作，就一定要叫 closeDetail() 確保詳細頁消失
-        window.handleLiveSearch = function() { 
-            closeDetail(); // 無論點，先閂詳細頁
-            applyFilters(); 
+        // ==================== 關鍵修復：所有標籤點擊都要強制跳轉 ====================
+        window.setFilterState = function(t, v) {
+            filtersState[t] = v;
+            updatePillUI();
+            applyFilters();
+            
+            // 只要一撳標籤，無論宜家喺邊，都要帶佢返去睇結果
+            if (!document.getElementById('detailView').classList.contains('hidden')) {
+                closeDetail();
+                setTimeout(jumpToResults, 50);
+            }
         }
 
-        window.triggerSearch = function() { 
-            closeDetail(); 
-            applyFilters(); 
-            document.activeElement.blur(); 
-            setTimeout(jumpToResults, 100); 
-        }
-
-        window.jumpToResults = function() { 
-            document.getElementById('filterMenu').classList.add('hidden'); 
-            const t = document.getElementById('resultsAnchor'); 
-            window.scrollTo({ top: t.offsetTop, behavior: 'smooth' }); 
-        }
-
+        window.handleLiveSearch = function() { closeDetail(); applyFilters(); }
+        window.triggerSearch = function() { closeDetail(); applyFilters(); document.activeElement.blur(); setTimeout(jumpToResults, 100); }
+        window.jumpToResults = function() { document.getElementById('filterMenu').classList.add('hidden'); const t = document.getElementById('resultsAnchor'); window.scrollTo({ top: t.offsetTop, behavior: 'smooth' }); }
         window.resetToHome = function() { closeDetail(); resetAllFilters(true); window.history.pushState({}, '', window.location.pathname); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        
-        window.resetAllFilters = function(full) {
-            if(full) closeDetail();
-            filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
-            document.getElementById('searchInput').value = '';
-            updatePillUI(); applyFilters();
-            if(full) { document.getElementById('filterMenu').classList.add('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        }
-
-        // 過濾器點擊
-        window.setFilterState = function(t, v) { 
-            closeDetail(); // 點標籤都一樣先閂詳細頁
-            filtersState[t] = v; 
-            updatePillUI(); 
-            applyFilters(); 
-        }
-
+        window.resetAllFilters = function(full) { if(full) closeDetail(); filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' }; document.getElementById('searchInput').value = ''; updatePillUI(); applyFilters(); if(full) { document.getElementById('filterMenu').classList.add('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
         window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
 
         function applyFilters() {
@@ -260,7 +236,7 @@
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-10 text-center text-gray-400 bg-white border border-gray-100 mt-4 rounded-2xl">找不到結果。</div>`; return; }
             container.innerHTML = data.map((item, index) => {
                 const distColor = districtColors[item.District] || '#f97316';
-                return `<div class="bg-white border-b border-gray-100 p-4 relative transition-colors active:bg-gray-50" onclick="openDetail(${index})">
+                return `<div class="bg-white border-b border-gray-100 p-4 relative active:bg-gray-50" onclick="openDetail(${index})">
                     <div class="flex items-center gap-3 cursor-pointer">
                         <div class="w-[50px] h-[50px] rounded-2xl bg-[#f5f0f6] flex items-center justify-center flex-shrink-0 text-2xl">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
                         <div class="flex-1 min-w-0">
@@ -290,18 +266,11 @@
             document.getElementById('btnNav').href = item.Amap_URL || '#';
             document.getElementById('btnXhs').href = `https://www.xiaohongshu.com/search_result/?keyword=${q}`;
             document.getElementById('btnDy').href = `https://www.douyin.com/search/${q}`;
-            
-            // 關鍵切換
             document.getElementById('mainContentView').classList.add('hidden');
             document.getElementById('detailView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
-
-        window.closeDetail = function() { 
-            document.getElementById('detailView').classList.add('hidden'); 
-            document.getElementById('mainContentView').classList.remove('hidden'); 
-        }
-
+        window.closeDetail = function() { document.getElementById('detailView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); }
         function updateDetailUI(data) {
             const setBtn = (id, active, activeClass) => { const btn = document.getElementById(id); if(btn) btn.className = `px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border ${active ? activeClass : 'bg-white border-gray-200 text-gray-500'}`; };
             setBtn('btnVisited', data.visited, 'bg-gray-500 border-gray-500 text-white');
@@ -317,7 +286,6 @@
         window.shareDetail = function() { const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: activeDetailItem.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
         function buildFilterPills(data) {
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
-            if(!dG || !cG || !pG) return;
             dG.innerHTML = createPill('district', '全部', '全部') + Object.keys(districtColors).filter(k=>k!=='全部').map(d => createPill('district', d, d)).join('');
             const cats = [...new Set(data.map(i => i.Category?.trim()))].filter(Boolean).sort();
             cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + cats.map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
