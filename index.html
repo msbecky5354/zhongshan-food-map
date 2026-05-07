@@ -24,10 +24,16 @@
         img[usemap] { max-width: 100%; height: auto; touch-action: manipulation; }
         .ios-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         area { outline: none; cursor: pointer; }
-        .text-shadow-sm { text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         .filter-pill { transition: all 0.2s ease-in-out; }
         .star-active { color: #f5a623 !important; }
+        @keyframes pulse-orange {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+        }
+        .btn-search-trigger { animation: pulse-orange 2s infinite; }
+        .btn-press:active { transform: scale(0.92); opacity: 0.9; }
         
         #customToast {
             visibility: hidden; min-width: 250px; background-color: rgba(0, 0, 0, 0.9); color: #fff;
@@ -37,13 +43,6 @@
         }
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
-        @keyframes pulse-orange {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
-        }
-        .btn-search-trigger { animation: pulse-orange 2s infinite; }
-        .btn-press:active { transform: scale(0.92); opacity: 0.9; }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -86,8 +85,8 @@
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
                 <div class="absolute top-3 right-3 flex flex-col gap-2 z-50">
-                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90 transition-transform"><i class="fa-solid fa-trash-can text-sm"></i></button>
-                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform"><i class="fa-solid fa-check text-sm"></i></button>
+                    <button onclick="resetAllFilters(false)" class="w-10 h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center border border-red-100 shadow-sm active:scale-90"><i class="fa-solid fa-trash-can text-sm"></i></button>
+                    <button onclick="jumpToResults()" class="btn-search-trigger w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90"><i class="fa-solid fa-check text-sm"></i></button>
                 </div>
                 <div class="mb-5"><h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-bookmark mr-1.5 text-orange-400"></i>我的標記</h4><div id="filterGridMyTags" class="flex flex-wrap gap-2 pr-12"><button onclick="setFilterState('myTag', '全部')" data-type="myTag" data-value="全部" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">全部</button><button onclick="setFilterState('myTag', 'visited')" data-type="myTag" data-value="visited" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">✅ 已去過</button><button onclick="setFilterState('myTag', 'favorite')" data-type="myTag" data-value="favorite" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">🔖 已收藏</button><button onclick="setFilterState('myTag', 'want')" data-type="myTag" data-value="want" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white">📌 想去食</button></div></div>
                 <div class="mb-5"><h4 class="text-xs text-gray-400 font-bold mb-2.5 flex items-center"><i class="fa-solid fa-map-location-dot mr-1.5 text-blue-400"></i>地區</h4><div id="filterGridDistrict" class="flex flex-wrap gap-2 pr-12"></div></div>
@@ -177,22 +176,9 @@
         const districtColors = { "黃圃鎮": "#d87a41", "南頭鎮": "#85a953", "東鳳鎮": "#b1c953", "小欖鎮": "#5f87d4", "古鎮鎮": "#c85665", "橫欄鎮": "#a33db5", "東升鎮": "#a4a0e1", "阜沙鎮": "#dcb858", "三角鎮": "#60dbe4", "民眾鎮": "#9ffb8e", "港口鎮": "#e7a88f", "西區": "#a1f44c", "石岐區": "#f7e53f", "東區": "#a5409d", "火炬開發區": "#ab77f7", "馬鞍島": "#a4c7cd", "南朗鎮": "#8db7b3", "沙溪鎮": "#e7878d", "大涌鎮": "#df5642", "南區": "#cdcf47", "五桂山鎮": "#e98e4f", "板芙鎮": "#ae77f3", "三鄉鎮": "#8f9e51", "神灣鎮": "#a2d861", "坦洲鎮": "#7a8f9a", "全部": "linear-gradient(to right, #f97316, #fb923c)" };
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
-        function getIcon(cat) { return CATEGORY_ICONS[cat?.trim()] || "🍽️"; }
+        function showToast(msg, duration = 3000) { const toast = document.getElementById("customToast"); toast.innerHTML = msg; toast.className = "show"; setTimeout(() => { toast.className = ""; }, duration); }
         function getUserData(name) { return userRecords[name] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(name, data) { userRecords[name] = data; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
-
-        function showBookmarkGuide() {
-            const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            let msg = isiOS ? "<b>【iPhone 用家】</b><br><br>1. 撳底排「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返「加入主畫面」" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」";
-            showToast(msg, 6000); 
-        }
-
-        function showToast(msg, duration = 3000) {
-            const toast = document.getElementById("customToast");
-            toast.innerHTML = msg + "<br><br><span style='font-size:10px; opacity:0.6;'>(點擊關閉)</span>";
-            toast.className = "show";
-            setTimeout(() => { toast.className = ""; }, duration);
-        }
 
         async function init() {
             Papa.parse(sheetUrl, {
@@ -209,40 +195,71 @@
             });
         }
 
-        // ==================== 核心修正：統一過濾入口 ====================
+        // ==================== 改良：核心過濾邏輯 ====================
         window.setFilterState = function(type, value) {
-            // 重點：如果正在詳細頁面，強制關閉它並跳回結果區
-            if (!document.getElementById('detailView').classList.contains('hidden')) {
-                closeDetail();
-                setTimeout(jumpToResults, 50);
-            }
+            // 重點：喺揀標籤嗰陣，只更新狀態同背景過濾，唔好跳走住
             filtersState[type] = value;
-            updatePillUI(); applyFilters();
+            updatePillUI();
+            applyFilters();
+            
+            // 如果宜家冇睇緊詳細頁，咁就自動跳落去結果區
+            if (document.getElementById('detailView').classList.contains('hidden')) {
+                // 如果係地圖點擊，維持原有機制跳轉；如果係撳藥丸仔，唔郁畫面住。
+            }
         }
 
-        window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
-        window.triggerSearch = function() { closeDetail(); applyFilters(); document.activeElement.blur(); setTimeout(jumpToResults, 50); }
-        window.jumpToResults = function() { document.getElementById('filterMenu').classList.add('hidden'); const target = document.getElementById('resultsAnchor'); window.scrollTo({ top: target.offsetTop, behavior: 'smooth' }); }
+        // 地圖點擊：維持即時跳轉
+        window.setDistrict = function(d) {
+            closeDetail();
+            filtersState.district = d;
+            updatePillUI(); applyFilters();
+            jumpToResults();
+        }
+
+        // 搜索按鈕點擊：執行跳轉
+        window.triggerSearch = function() {
+            closeDetail();
+            applyFilters();
+            document.activeElement.blur();
+            setTimeout(jumpToResults, 100);
+        }
+
+        window.jumpToResults = function() {
+            document.getElementById('filterMenu').classList.add('hidden');
+            const target = document.getElementById('resultsAnchor');
+            window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+        }
+
         window.resetToHome = function() { closeDetail(); resetAllFilters(true); window.history.pushState({}, document.title, window.location.pathname); window.scrollTo({ top: 0, behavior: 'smooth' }); }
-        window.resetAllFilters = function(hideMenu = true) { filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' }; document.getElementById('searchInput').value = ''; updatePillUI(); applyFilters(); if(hideMenu) document.getElementById('filterMenu').classList.add('hidden'); }
+        
+        window.resetAllFilters = function(isFullReset = true) {
+            if(isFullReset) closeDetail();
+            filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
+            document.getElementById('searchInput').value = '';
+            updatePillUI(); applyFilters();
+            if(isFullReset) {
+                document.getElementById('filterMenu').classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
 
         function buildFilterPills(data) {
             document.getElementById('filterGridDistrict').innerHTML = createPill('district', '全部', '全部') + Object.keys(districtColors).filter(k=>k!=='全部').map(d => createPill('district', d, d)).join('');
             const categories = [...new Set(data.map(item => item['Category']?.trim()))].filter(Boolean).sort();
-            document.getElementById('filterGridCategory').innerHTML = createPill('category', '全部', '🍽️ 全部') + categories.map(c => createPill('category', c, `${getIcon(c)} ${c}`)).join('');
+            document.getElementById('filterGridCategory').innerHTML = createPill('category', '全部', '🍽️ 全部') + categories.map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
             document.getElementById('filterGridPrice').innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
             updatePillUI();
         }
         function createPill(type, value, label) { return `<button onclick="setFilterState('${type}', '${value}')" data-type="${type}" data-value="${value}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95">${label}</button>`; }
         function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(pill => { const t = pill.getAttribute('data-type'), v = pill.getAttribute('data-value'); if (filtersState[t] === v) pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm"; else pill.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm hover:bg-gray-50"; }); }
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
+        function showBookmarkGuide() { const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent); let msg = isiOS ? "<b>【iPhone 用家】</b><br><br>1. 撳底排「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返「加入主畫面」" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<br>2. 搵返「加到主螢幕」"; showToast(msg, 6000); }
 
         window.openDetail = function(index) {
             const item = currentRenderedData[index];
             if(!item) return;
             activeDetailItem = item;
             const data = getUserData(item['Restaurant Name']);
-            document.getElementById('detailBackText').innerText = item['District'] || '返回';
             document.getElementById('detailName').innerText = item['Restaurant Name'];
             document.getElementById('detailDistrictBadge').innerText = item['District'];
             document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-utensils mr-1"></i>${item['Category'] || '特色美食'}`;
@@ -251,9 +268,6 @@
             document.getElementById('detailAddress').innerText = item['Address'] || `中山市${item['District']}`;
             document.getElementById('noteInput').value = data.note || '';
             document.getElementById('detailHeaderColor').style.backgroundColor = districtColors[item['District']] || '#7a8f9a';
-            const tags = ['#必試', '#人氣推薦'];
-            if(item['Highlight']?.includes('農家')) tags.push('#農莊體驗','#靚景');
-            document.getElementById('detailExtraTags').innerHTML = tags.map(t => `<span class="bg-[#fff7ed] text-[#f97316] border border-[#ffedd5] px-2.5 py-1 rounded-md text-[10px] font-bold">${t}</span>`).join('');
             updateDetailUI(data);
             const q = encodeURIComponent(item['Restaurant Name'] + " " + item['District']);
             document.getElementById('btnNav').href = item['Amap URL'] || '#';
