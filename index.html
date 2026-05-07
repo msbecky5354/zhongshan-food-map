@@ -49,7 +49,7 @@
                     </div>
                     <div class="ml-2.5 flex flex-col justify-center">
                         <img src="banner.png" alt="中山美食地圖" class="h-6 w-auto object-contain object-left">
-                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：正在讀取...</p>
+                        <p id="updateTime" class="text-[9px] text-gray-400 font-medium mt-1">最後更新時間：載入中...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 ml-2">
@@ -65,7 +65,7 @@
                 <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden flex bg-gray-50 border border-gray-100">
                     <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" id="searchInput" oninput="handleLiveSearch()" onkeydown="if(event.key==='Enter') triggerSearch()" placeholder="搜尋餐廳..." class="w-full pl-11 pr-[80px] py-3 bg-transparent text-sm focus:outline-none">
-                    <button onclick="triggerSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-orange-500 text-white rounded-xl active:scale-90 transition font-bold text-[11px]">搜索</button>
+                    <button onclick="triggerSearch()" class="absolute right-1.5 top-1.5 bottom-1.5 px-4 bg-orange-500 text-white rounded-xl font-bold text-[11px] active:scale-90 transition shadow-sm">搜索</button>
                 </div>
                 <button onclick="resetAllFilters(true)" class="w-11 h-11 bg-white border border-red-50 rounded-2xl flex items-center justify-center text-red-500"><i class="fa-solid fa-trash-can text-sm"></i></button>
                 <button onclick="toggleFilters()" class="w-11 h-11 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-500"><i class="fa-solid fa-sliders text-sm"></i></button>
@@ -93,25 +93,25 @@
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
             <div id="districtHeader" class="hidden text-white px-5 pt-4 pb-4 rounded-t-2xl relative z-10">
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[13px] opacity-90 flex items-center mb-3 active:scale-95"><i class="fa-solid fa-angle-left mr-1.5"></i>返回地圖</button>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[13px] opacity-90 flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i>返回地圖</button>
                 <div class="flex items-baseline gap-2"><h2 id="districtTitle" class="text-[24px] font-normal text-white">所有地區</h2><span id="districtCount" class="text-[12px] opacity-80 text-white">共 0 間</span></div>
             </div>
-            <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent"></div><p class="mt-4 text-gray-400 text-sm">正在載入...</p></div>
+            <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-orange-500 border-t-transparent"></div></div>
             <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2"></div>
         </main>
     </div>
 
     <div id="detailView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
-        <div id="detailHeaderColor" class="px-5 pt-4 pb-6 text-white relative z-10">
+        <div id="detailHeaderColor" class="px-5 pt-4 pb-6 text-white relative z-10 bg-[#7a8f9a]">
             <button onclick="closeDetail()" class="text-[13px] font-medium flex items-center mb-3 active:scale-95"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回</button>
             <div class="flex items-center gap-2"><h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2><span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold"></span></div>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
-                <div class="flex items-center gap-2">
-                    <i class="fa-solid fa-star-half-stroke text-orange-400"></i>
-                    <span class="text-gray-400 text-[10px]">推薦指數</span>
-                    <div id="detailStars" class="text-[#f5a623] text-xs ml-1"></div>
+                <div class="flex items-center gap-1">
+                    <i class="fa-solid fa-medal text-orange-400 text-sm"></i>
+                    <span class="text-gray-400 text-[10px] font-bold">推薦指數</span>
+                    <div id="detailStars" class="text-[#f5a623] text-xs ml-1 flex"></div>
                 </div>
                 <div class="flex gap-1.5">
                     <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-bold border border-gray-100 active:scale-95">去過?</button>
@@ -129,7 +129,7 @@
         </div>
     </div>
 
-    <map name="image-map" id="mapCoordinates">
+    <map name="image-map">
         <area shape="rect" coords="227,110,302,144" alt="黃圃鎮" onclick="setDistrict('黃圃鎮')">
         <area shape="rect" coords="278,531,377,574" alt="三鄉鎮" onclick="setDistrict('三鄉鎮')">
         <area shape="rect" coords="125,394,188,423" alt="大涌鎮" onclick="setDistrict('大涌鎮')">
@@ -170,10 +170,14 @@
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
 
-        // 【核心修正：強化地圖對位】
+        // 【核心修正：地圖強制重新對位】
         function refreshMap() { 
-            setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 300);
-            setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 800); // 雙重檢查
+            setTimeout(() => { 
+                if(window.imageMapResize) {
+                    imageMapResize();
+                    console.log("地圖坐標已刷新");
+                } 
+            }, 500); 
         }
 
         async function init() {
@@ -258,7 +262,7 @@
             document.getElementById('detailAddress').innerText = item.Address || `中山市${item.District}`;
             document.getElementById('noteInput').value = data.note || '';
             document.getElementById('detailHeaderColor').style.backgroundColor = districtColors[item.District] || '#7a8f9a';
-            document.getElementById('detailStars').innerHTML = '<i class="fa-solid fa-star"></i>'.repeat(4) + '<i class="fa-solid fa-star text-gray-200"></i>';
+            
             updateDetailUI(data);
             const q = encodeURIComponent(item.Restaurant_Name + " " + item.District);
             document.getElementById('btnNav').href = item.Amap_URL || '#';
@@ -268,20 +272,32 @@
             document.getElementById('detailView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
-        window.closeDetail = function() { document.getElementById('detailView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); refreshMap(); }
+        
+        window.closeDetail = function() { 
+            document.getElementById('detailView').classList.add('hidden'); 
+            document.getElementById('mainContentView').classList.remove('hidden'); 
+            refreshMap(); 
+        }
+
         function updateDetailUI(data) {
             const setBtn = (id, active, activeClass) => { const btn = document.getElementById(id); if(btn) btn.className = `px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border ${active ? activeClass : 'bg-white border-gray-200 text-gray-500'}`; };
             setBtn('btnVisited', data.visited, 'bg-gray-500 border-gray-500 text-white');
             setBtn('btnFav', data.favorite, 'bg-white border-orange-200 text-orange-500');
             setBtn('btnWant', data.want, 'bg-white border-red-200 text-red-500');
+            
             const stars = document.querySelectorAll('#starRating i');
             stars.forEach((s, i) => { if(i < data.rating) s.classList.add('star-active'); else s.classList.remove('star-active'); });
+            
+            // 同步顯示推薦指數
+            document.getElementById('detailStars').innerHTML = '<i class="fa-solid fa-star"></i>'.repeat(data.rating || 4) + (data.rating < 5 ? '<i class="fa-solid fa-star text-gray-100"></i>' : '');
         }
+
         window.toggleUserStatus = function(type) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data[type] = !data[type]; saveUserData(name, data); updateDetailUI(data); }
         window.saveRating = function(val) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.rating = val; saveUserData(name, data); updateDetailUI(data); }
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); }
         function copyAddress() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => showToast('✅ 地址已複製')); }
         window.shareDetail = function() { const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: activeDetailItem.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
+        
         function buildFilterPills(data) {
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
             dG.innerHTML = createPill('district', '全部', '全部') + Object.keys(districtColors).filter(k=>k!=='全部').map(d => createPill('district', d, d)).join('');
@@ -294,23 +310,23 @@
         function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); }
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
 
-        // 【核心修正：智能書籤助手】
+        // 【核心修正：更準確的 iPhone/Android 偵測】
         function showBookmarkGuide() {
-            const ua = navigator.userAgent.toLowerCase();
-            const isiOS = /iphone|ipad|ipod/.test(ua);
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            const isiOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
             let msg = "";
             
             if(isiOS) {
-                msg = "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b><br><br>咁就可以隨時喺桌面開地圖喇！";
+                msg = "<i class='fa-solid fa-apple-whole text-2xl mb-2'></i><br><b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b><br><br>咁就搞掂喇！";
             } else {
-                msg = "<b>【Android/Chrome 用家】</b><br><br>1. 撳右上角或右下角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>或「安裝應用程式」<br><br>下次一撳即開！";
+                msg = "<i class='fa-brands fa-android text-green-500 text-2xl mb-2'></i><br><b>【Android/Chrome 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b><br><br>方便下次即開即睇！";
             }
             showToast(msg, 7000); 
         }
 
         window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); } }
         document.addEventListener('DOMContentLoaded', init);
-        window.addEventListener('resize', refreshMap); // 視窗縮放也要重新對位
+        window.addEventListener('resize', refreshMap);
     </script>
 </body>
 </html>
