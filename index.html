@@ -35,14 +35,12 @@
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
 
-        /* 使用指南摺疊樣式 */
         .guide-details summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; color: #fb923c; }
         .guide-details summary::-webkit-details-marker { display: none; }
         .guide-details summary:after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; transition: 0.3s; }
         .guide-details[open] summary:after { transform: rotate(180deg); }
         .guide-content { padding: 12px 5px; color: #e5e7eb; font-size: 13px; line-height: 1.7; }
         
-        /* 圖片圖標统一樣式 */
         .btn-img-sm { width: 14px; height: 14px; object-fit: contain; margin-right: 4px; }
         .btn-img-lg { width: 22px; height: 22px; object-fit: contain; }
     </style>
@@ -115,13 +113,33 @@
         
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
-            <div id="districtHeader" class="hidden bg-[#7a8f9a] text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300">
+            
+            <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300" style="background-color: #f97316;">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
                     <div class="flex items-baseline gap-2"><h2 id="districtTitle" class="text-[22px] font-normal">--</h2><span id="districtCount" class="text-[12px] opacity-70">共 0 間</span></div>
-                    <button onclick="toggleFilters()" class="bg-white/20 px-3 py-1 rounded text-[11px] font-bold">篩選 ▾</button>
+                    <button id="inlineFilterBtn" onclick="toggleInlineFilters()" class="bg-white/20 px-3 py-1 rounded text-[11px] font-bold transition-all">篩選 ▾</button>
                 </div>
             </div>
+
+            <div id="inlineFilterSection" class="hidden bg-white px-4 py-3 border-x border-b border-gray-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="text-[13px] text-gray-400 w-14 flex items-center gap-1.5 font-medium"><i class="fa-solid fa-utensils"></i> 類別</div>
+                    <select id="inlineCategoryFilter" onchange="setFilterState('category', this.value)" class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-[13px] text-gray-700 outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:8px_8px] bg-[right_12px_center] bg-no-repeat shadow-sm">
+                        <option value="全部">🍽️ 全部類別</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="text-[13px] text-gray-400 w-14 flex items-center gap-1.5 font-medium"><i class="fa-solid fa-sack-dollar text-[#d4b068]"></i> 價位</div>
+                    <select id="inlinePriceFilter" onchange="setFilterState('price', this.value)" class="flex-1 bg-white border border-gray-200 rounded-lg px-3 py-2 text-[13px] text-gray-700 outline-none appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%239ca3af%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:8px_8px] bg-[right_12px_center] bg-no-repeat shadow-sm">
+                        <option value="全部">💰 全部價位</option>
+                        <option value="0-50">¥50以下</option>
+                        <option value="51-100">¥50-100</option>
+                        <option value="101-">¥100以上</option>
+                    </select>
+                </div>
+            </div>
+
             <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div></div>
             <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200 border-x border-b border-gray-200 rounded-b-2xl overflow-hidden"></div>
             <footer class="mt-8 text-center text-[10px] text-gray-400 py-6">資料來源: Trip.com • TripAdvisor • 本地食客推薦</footer>
@@ -207,6 +225,17 @@
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
+        // 【新增】動態背景色設定
+        const districtColors = { 
+            "東區": "#ef4444",    // 紅色
+            "坦洲鎮": "#7a8f9a",  // 灰藍色
+            "石岐區": "#f59e0b",  // 橙黃色
+            "西區": "#3b82f6",    // 藍色
+            "南區": "#10b981",    // 綠色
+            "小欖鎮": "#8b5cf6",   // 紫色
+            "全部": "#f97316"     // 預設橙色
+        };
+
         function showToast(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
             if(t) { 
@@ -225,6 +254,19 @@
             else { window.open(`https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(name + " " + district)}`, '_blank'); }
         };
 
+        // 【新增】內嵌過濾器切換邏輯
+        window.toggleInlineFilters = function() {
+            const sec = document.getElementById('inlineFilterSection');
+            const btn = document.getElementById('inlineFilterBtn');
+            if (sec.classList.contains('hidden')) {
+                sec.classList.remove('hidden');
+                btn.innerHTML = '篩選 ▴';
+            } else {
+                sec.classList.add('hidden');
+                btn.innerHTML = '篩選 ▾';
+            }
+        };
+
         function showUserGuide() {
             const guide = `
                 <div class="space-y-2">
@@ -233,7 +275,7 @@
                     <details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「確認箭頭」跳轉。</div></details>
                     <details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註（如必點菜色）。</div></details>
                     <details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換瀏覽器、換手機或清除緩存紀錄會消失。</div></details>
-                    <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有片會顯示紅色掣。撳「分享」可複製連結。</div></details>
+                    <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有 YouTube 片會顯示紅色掣。撳「分享」可複製連結。</div></details>
                 </div>`;
             showToast(guide, 0);
         }
@@ -279,7 +321,19 @@
         window.setFilterState = function(t, v) { filtersState[t] = v; updatePillUI(); applyFilters(); }
         window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
         window.resetToHome = function() { closeDetail(); resetAllFilters(true); window.history.pushState({}, '', window.location.pathname); window.scrollTo({ top: 0, behavior: 'smooth' }); refreshMap(); }
-        window.resetAllFilters = function(full) { if(full) closeDetail(); filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' }; document.getElementById('searchInput').value = ''; updatePillUI(); applyFilters(); if(full) { document.getElementById('filterMenu').classList.add('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
+        window.resetAllFilters = function(full) { 
+            if(full) closeDetail(); 
+            filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' }; 
+            document.getElementById('searchInput').value = ''; 
+            updatePillUI(); 
+            applyFilters(); 
+            if(full) { 
+                document.getElementById('filterMenu').classList.add('hidden'); 
+                document.getElementById('inlineFilterSection').classList.add('hidden');
+                document.getElementById('inlineFilterBtn').innerHTML = '篩選 ▾';
+                window.scrollTo({ top: 0, behavior: 'smooth' }); 
+            } 
+        }
 
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -301,11 +355,17 @@
         }
 
         function renderData(data) {
-            const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
+            const container = document.getElementById('restaurantGrid');
+            const header = document.getElementById('districtHeader');
             if(!container) return;
+            
+            // 【修改】設定動態背景色
+            header.style.backgroundColor = districtColors[filtersState.district] || "#f97316";
             header.classList.remove('hidden');
+            
             document.getElementById('districtTitle').innerText = filtersState.district === '全部' ? (document.getElementById('searchInput').value ? '搜尋結果' : '所有地區') : filtersState.district;
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
+            
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
@@ -323,7 +383,6 @@
                                 <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
                             </div>
                             <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5 leading-tight">${item.Highlight || '點擊查看詳情'}</p>
-                            
                             <div class="flex justify-between items-center mt-2">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold border border-gray-200">${item.District}</span>
@@ -382,6 +441,7 @@
         window.saveRating = function(val) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.rating = val; saveUserData(name, data); updateDetailUI(data); }
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); }
         function copyAddress() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { showToast('✅ 地址已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); }); }
+        
         function buildFilterPills(data) {
             const validData = data.filter(i => !(i.Status && i.Status.toUpperCase() === "X"));
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
@@ -389,15 +449,37 @@
             dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(validData.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
             cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(validData.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
             pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
+            
+            // 【新增】動態生成內嵌下拉選單的選項
+            const inlineCat = document.getElementById('inlineCategoryFilter');
+            if (inlineCat) {
+                inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + 
+                    [...new Set(validData.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
+            }
+            
             updatePillUI();
         }
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95 mb-1 mr-1">${l}</button>`; }
-        function updatePillUI() { document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); }
+        
+        function updatePillUI() { 
+            document.querySelectorAll('.filter-pill').forEach(p => { 
+                const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); 
+                if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; 
+                else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; 
+            }); 
+            
+            // 【新增】同步更新內嵌下拉選單的數值
+            const inlineCat = document.getElementById('inlineCategoryFilter');
+            if (inlineCat) inlineCat.value = filtersState.category;
+            const inlinePrice = document.getElementById('inlinePriceFilter');
+            if (inlinePrice) inlinePrice.value = filtersState.price;
+        }
+        
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
         function showBookmarkGuide() { 
             const ua = navigator.userAgent.toLowerCase();
             const isiOS = /iphone|ipad|ipod/.test(ua);
-            let msg = isiOS ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>";
+            let msg = isiOS ? "<b>【iPhone 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>";
             showToast(msg); 
         }
         window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); } }
