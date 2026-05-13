@@ -11,7 +11,7 @@
     <meta name="theme-color" content="#f97316">
     <link rel="apple-touch-icon" href="app-icon-512.png">
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8256903623772163" crossorigin="anonymous"></script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCGDM1JK5W"></script>
     <script>
@@ -353,7 +353,7 @@
             Papa.parse(finalUrl, {
                 download: true, header: true, skipEmptyLines: true,
                 complete: function(results) {
-                    allData = results.data.map(row => {
+                    allData = results.data.map((row, index) => { 
                         const getVal = (key) => {
                             const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
                             return (row[foundKey] || "").trim();
@@ -367,7 +367,9 @@
                             'Address': getVal('Address'),
                             'Amap_URL': getVal('Amap_URL'),
                             'Status': getVal('status'),
-                            'Youtube': getVal('Youtube')
+                            'Youtube': getVal('Youtube'),
+                            'Date': getVal('Date') || getVal('日期') || getVal('Timestamp') || '',
+                            '_index': index
                         };
                     }).filter(i => i.Restaurant_Name !== "");
                     
@@ -439,6 +441,18 @@
                     if (filtersState.price === '0-50') matchP = pVal <= 50; else if (filtersState.price === '51-100') matchP = pVal > 50 && pVal <= 100; else matchP = pVal > 100;
                 }
                 return matchD && matchC && matchS && matchTag && matchP;
+            }).sort((a, b) => {
+                const aHasYt = a.Youtube && a.Youtube.startsWith('http') ? 1 : 0;
+                const bHasYt = b.Youtube && b.Youtube.startsWith('http') ? 1 : 0;
+                if (aHasYt !== bHasYt) return bHasYt - aHasYt;
+
+                const dateA = Date.parse(a.Date);
+                const dateB = Date.parse(b.Date);
+                if (!isNaN(dateA) && !isNaN(dateB) && dateA !== dateB) {
+                    return dateB - dateA;
+                }
+
+                return b._index - a._index;
             });
             renderData(currentRenderedData);
         }
@@ -576,6 +590,7 @@
             showToast(msg); 
         }
         
+        // 分享連結功能
         window.shareRestaurant = function(idx) { 
             const item = currentRenderedData[idx]; 
             const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; 
