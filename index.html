@@ -23,7 +23,6 @@
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
@@ -274,7 +273,9 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
-        const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTtli5qEDucHqpfVOHASkAfbxHIeC7_krqoVPnrRA1b83VfdqaAnlHNPmLKkwJyLpPC1O7AHr5wFQg7/pub?output=csv';
+        // 對接你的私密 Google Apps Script API
+        const apiUrl = 'https://script.google.com/macros/s/AKfycbz3ndkfrGdmioPbbBoM1qgw11G7eDs1Wvv9fR0zwPYadkc0pbJuv90KmQ9CnoleSgub3A/exec';
+        
         let allData = [], currentRenderedData = [], activeDetailItem = null;
         let filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
@@ -349,53 +350,56 @@
         }
 
         async function init() {
-            const finalUrl = sheetUrl + `&t=${new Date().getTime()}`;
-            Papa.parse(finalUrl, {
-                download: true, header: true, skipEmptyLines: true,
-                complete: function(results) {
-                    allData = results.data.map((row, index) => { 
-                        const getVal = (key) => {
-                            const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
-                            return (row[foundKey] || "").trim();
-                        };
-                        return {
-                            'Restaurant_Name': getVal('Restaurant_Name'),
-                            'District': getVal('District'),
-                            'Category': getVal('Category'),
-                            'Avg_Cost': getVal('Avg_Cost'),
-                            'Highlight': getVal('Highlight'),
-                            'Address': getVal('Address'),
-                            'Amap_URL': getVal('Amap_URL'),
-                            'Status': getVal('status'),
-                            'Youtube': getVal('Youtube'),
-                            'Date': getVal('Date') || getVal('日期') || getVal('Timestamp') || '',
-                            '_index': index
-                        };
-                    }).filter(i => i.Restaurant_Name !== "");
-                    
-                    const now = new Date();
-                    const hours = now.getHours().toString().padStart(2, '0');
-                    const minutes = now.getMinutes().toString().padStart(2, '0');
-                    document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
-                    
-                    buildFilterPills(allData); 
-                    applyFilters();
+            try {
+                // 直接讀取 Apps Script 吐出嚟嘅 JSON
+                const response = await fetch(apiUrl);
+                const results = await response.json();
+                
+                allData = results.map((row, index) => { 
+                    const getVal = (key) => {
+                        const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
+                        return foundKey ? (row[foundKey] || "").toString().trim() : "";
+                    };
+                    return {
+                        'Restaurant_Name': getVal('Restaurant_Name'),
+                        'District': getVal('District'),
+                        'Category': getVal('Category'),
+                        'Avg_Cost': getVal('Avg_Cost'),
+                        'Highlight': getVal('Highlight'),
+                        'Address': getVal('Address'),
+                        'Amap_URL': getVal('Amap_URL'),
+                        'Status': getVal('status'),
+                        'Youtube': getVal('Youtube'),
+                        'Date': getVal('Date') || getVal('日期') || getVal('Timestamp') || '',
+                        '_index': index
+                    };
+                }).filter(i => i.Restaurant_Name !== "");
+                
+                const now = new Date();
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
+                
+                buildFilterPills(allData); 
+                applyFilters();
 
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const sharedRestaurant = urlParams.get('r');
-                    if (sharedRestaurant) {
-                        const targetIdx = currentRenderedData.findIndex(item => item.Restaurant_Name === sharedRestaurant);
-                        if (targetIdx !== -1) {
-                            setTimeout(() => { openDetail(targetIdx); }, 100);
-                        } else {
-                            showToast('找不到指定的餐廳，可能已結業或名稱已更改。');
-                        }
+                const urlParams = new URLSearchParams(window.location.search);
+                const sharedRestaurant = urlParams.get('r');
+                if (sharedRestaurant) {
+                    const targetIdx = currentRenderedData.findIndex(item => item.Restaurant_Name === sharedRestaurant);
+                    if (targetIdx !== -1) {
+                        setTimeout(() => { openDetail(targetIdx); }, 100);
+                    } else {
+                        showToast('找不到指定的餐廳，可能已結業或名稱已更改。');
                     }
-
-                    document.getElementById('loader').classList.add('hidden');
-                    refreshMap();
                 }
-            });
+
+                document.getElementById('loader').classList.add('hidden');
+                refreshMap();
+            } catch (error) {
+                console.error("載入資料失敗:", error);
+                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入資料失敗，請重新整理頁面。</div>';
+            }
         }
 
         window.handleLiveSearch = function() { applyFilters(); }
