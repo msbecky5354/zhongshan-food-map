@@ -11,6 +11,8 @@
     <meta name="theme-color" content="#f97316">
     <link rel="apple-touch-icon" href="app-icon-512.png">
 
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -36,6 +38,7 @@
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
 
         .guide-details summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; color: #fb923c; }
+        .guide-details summary::-webkit-details-marker { display: none; }
         .guide-details summary:after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; transition: 0.3s; }
         .guide-details[open] summary:after { transform: rotate(180deg); }
         .guide-content { padding: 12px 5px; color: #e5e7eb; font-size: 13px; line-height: 1.7; }
@@ -141,7 +144,21 @@
 
             <div id="loader" class="text-center py-20"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-orange-500 border-t-transparent"></div></div>
             <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200 border-x border-b border-gray-200 rounded-b-2xl overflow-hidden"></div>
-            <footer class="mt-8 text-center text-[10px] text-gray-400 py-6">資料來源: Trip.com • TripAdvisor • 本地食客推薦</footer>
+            
+            <footer class="mt-8 pb-8 pt-4 border-t border-gray-200">
+                <div class="text-center text-[10px] text-gray-400 mb-4">
+                    資料來源: Trip.com • TripAdvisor • 本地食客推薦
+                </div>
+                <div class="flex flex-wrap justify-center gap-3 text-[11px] text-blue-500/90 font-medium">
+                    <a href="#" onclick="event.preventDefault(); openPolicy('about')" class="hover:underline">關於我們</a>
+                    <span class="text-gray-300">|</span>
+                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="hover:underline">聯絡我們</a>
+                    <span class="text-gray-300">|</span>
+                    <a href="#" onclick="event.preventDefault(); openPolicy('privacy')" class="hover:underline">隱私權政策</a>
+                    <span class="text-gray-300">|</span>
+                    <a href="#" onclick="event.preventDefault(); openPolicy('terms')" class="hover:underline">服務條款</a>
+                </div>
+            </footer>
         </main>
     </div>
 
@@ -185,6 +202,36 @@
                 </a>
             </div>
             <div id="youtubeSection" class="hidden pb-12"><a id="btnYoutubeDetail" target="_blank" class="bg-[#FF0000] text-white rounded-2xl py-4 flex items-center justify-center gap-3 active:scale-95 shadow-md"><i class="fa-brands fa-youtube text-2xl"></i><span class="text-[15px] font-bold">查看 YouTube 介紹影片</span></a></div>
+        </div>
+    </div>
+
+    <div id="policyView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
+        <div class="px-5 pt-4 pb-6 text-white relative z-10 bg-[#7a8f9a]">
+            <button onclick="closePolicy()" class="text-[13px] font-medium flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回</button>
+            <h2 id="policyTitle" class="text-[22px] font-normal leading-tight"></h2>
+        </div>
+        <div class="p-6 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen text-[13px] text-gray-700 leading-relaxed" id="policyContent">
+        </div>
+    </div>
+
+    <div id="staticPolicies" class="hidden">
+        <div id="contentAboutUs">
+            <p class="mb-3">「中山美食地圖」致力於提供最全面的中山飲食資訊，方便大眾及北上旅客發掘城中美味。</p>
+            <p>本平台彙整了各大旅遊網站的真實評價，配合便捷的地圖導航與個人化標記功能，打造專屬的美食清單。</p>
+        </div>
+        <div id="contentPrivacy">
+            <ul class="list-disc pl-4 space-y-2">
+                <li><b>數據儲存：</b>本網站的收藏及備註紀錄，均僅儲存於您的設備本地端 (Local Storage)。我們不會收集或將這些數據上傳至伺服器。</li>
+                <li><b>第三方服務：</b>本網站包含指向第三方網站（如 高德地圖、小紅書、抖音等）的連結。離開本網站時請參閱該網站的隱私權政策。</li>
+                <li><b>廣告與 Cookies：</b>本網站未來將使用 Google AdSense 服務。Google 及其合作夥伴會使用 Cookie 根據您先前的造訪紀錄放送廣告。用戶可隨時於瀏覽器設定中管理 Cookie。</li>
+            </ul>
+        </div>
+        <div id="contentTerms">
+            <ul class="list-disc pl-4 space-y-2">
+                <li><b>資訊準確性：</b>本網站提供的餐廳資訊、價格及營業狀態僅供參考。實際情況以餐廳官方公佈為準。</li>
+                <li><b>免責聲明：</b>本網站不對因依賴本網站資訊而導致的任何直接或間接損失負責。</li>
+                <li><b>服務變更：</b>我們保留隨時修改、暫停或終止本網站部分或全部功能的權利，而無需事前通知。</li>
+            </ul>
         </div>
     </div>
 
@@ -260,8 +307,36 @@
         };
 
         function showUserGuide() {
-            const guide = `<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone:</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android:</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details><details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「確認箭頭」跳轉。</div></details><details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註（如必點菜色）。</div></details><details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換瀏覽器、換手機或清除緩存紀錄會消失。</div></details><details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有 YouTube 片會顯示紅色掣。撳「分享」可複製連結。</div></details></div>`;
+            const guide = `
+                <div class="space-y-2">
+                    <p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p>
+                    <details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone:</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android:</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details>
+                    <details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「確認箭頭」跳轉。</div></details>
+                    <details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註（如必點菜色）。</div></details>
+                    <details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換瀏覽器、換手機或清除緩存紀錄會消失。</div></details>
+                    <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有 YouTube 片會顯示紅色掣。撳「分享」可複製連結。</div></details>
+                </div>`;
             showToast(guide, 0);
+        }
+
+        window.openPolicy = function(type) {
+            document.getElementById('mainContentView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('hidden');
+            document.getElementById('policyView').classList.remove('hidden');
+            
+            let title = "", contentId = "";
+            if(type === 'about') { title = "關於我們"; contentId = "contentAboutUs"; }
+            else if(type === 'privacy') { title = "隱私權政策"; contentId = "contentPrivacy"; }
+            else if(type === 'terms') { title = "服務條款"; contentId = "contentTerms"; }
+            
+            document.getElementById('policyTitle').innerText = title;
+            document.getElementById('policyContent').innerHTML = document.getElementById(contentId).innerHTML;
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+
+        window.closePolicy = function() {
+            document.getElementById('policyView').classList.add('hidden');
+            document.getElementById('mainContentView').classList.remove('hidden');
         }
 
         async function init() {
@@ -295,7 +370,6 @@
                     buildFilterPills(allData); 
                     applyFilters();
 
-                    // 【新增核心功能】：讀取 ?r= 參數並自動打開餐廳詳細資料
                     const urlParams = new URLSearchParams(window.location.search);
                     const sharedRestaurant = urlParams.get('r');
                     if (sharedRestaurant) {
@@ -431,7 +505,6 @@
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
         
-        // 【新增】返回時清除網址的 ?r= 參數
         window.closeDetail = function() { 
             document.getElementById('detailView').classList.add('hidden'); 
             document.getElementById('mainContentView').classList.remove('hidden'); 
@@ -469,6 +542,7 @@
                 inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + 
                     [...new Set(validData.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
             }
+            
             updatePillUI();
         }
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95 mb-1 mr-1">${l}</button>`; }
@@ -493,7 +567,6 @@
             showToast(msg); 
         }
         
-        // 分享連結功能
         window.shareRestaurant = function(idx) { 
             const item = currentRenderedData[idx]; 
             const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; 
