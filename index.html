@@ -44,17 +44,20 @@
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
 
-        /* 聯絡我們 Modal */
-        #contactModalOverlay {
+        /* 統一 Modal 彈窗樣式 */
+        #infoModalOverlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
             z-index: 11000; align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(5px);
         }
-        #contactModal {
+        #infoModal {
             background: white; border-radius: 40px; width: 100%; max-width: 550px; 
             padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 85vh; overflow-y: auto;
         }
 
         .guide-details summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; color: #fb923c; }
+        .guide-details summary::-webkit-details-marker { display: none; }
         .guide-details summary:after { content: '\f078'; font-family: 'Font Awesome 6 Free'; font-weight: 900; font-size: 10px; transition: 0.3s; }
         .guide-details[open] summary:after { transform: rotate(180deg); }
         .guide-content { padding: 12px 5px; color: #e5e7eb; font-size: 13px; line-height: 1.7; }
@@ -67,22 +70,15 @@
 
     <div id="customToast" onclick="event.stopPropagation()"></div>
 
-    <div id="contactModalOverlay" onclick="closeContactModal()">
-        <div id="contactModal" onclick="event.stopPropagation()">
-            <h2 class="text-[#d48806] text-2xl font-bold mb-6">聯絡我們</h2>
-            <p class="text-gray-600 text-sm mb-6 leading-relaxed">
-                如您發現餐廳資訊有誤、有私藏好店推介，或希望提供支持，歡迎隨時聯絡我們：
-            </p>
-            <p class="mb-6">
-                <span class="font-bold text-gray-800 text-sm">Facebook 群組：</span>
-                <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="text-blue-500 text-sm font-medium hover:underline">中山美食地圖群組</a>
-            </p>
-            <p class="text-gray-400 text-xs italic mb-10">
-                您的每一次反饋，都是對我們這份「血汗數據庫」最好的回報與鼓勵。
-            </p>
-            <button onclick="closeContactModal()" class="w-full bg-[#f0f5f9] text-gray-800 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-colors">
-                關閉
-            </button>
+    <div id="infoModalOverlay" onclick="closeInfoModal()">
+        <div id="infoModal" onclick="event.stopPropagation()">
+            <h2 id="infoModalTitle" class="text-[#d48806] text-2xl font-bold mb-6"></h2>
+            <div id="infoModalBody" class="text-gray-600 text-sm leading-relaxed space-y-4"></div>
+            <div class="mt-10">
+                <button onclick="closeInfoModal()" class="w-full bg-[#f0f5f9] text-gray-800 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-colors">
+                    關閉
+                </button>
+            </div>
         </div>
     </div>
 
@@ -163,9 +159,7 @@
                         <span class="text-[11px] text-[#ea580c] mt-1 leading-snug">掌握深圳、中山、珠海巴士資訊，出行必備！</span>
                     </div>
                 </div>
-                <div class="bg-[#f97316] text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm shrink-0 ml-2">
-                    免安裝即用
-                </div>
+                <div class="bg-[#f97316] text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm shrink-0 ml-2">免安裝即用</div>
             </a>
         </div>
 
@@ -177,7 +171,7 @@
         
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
             <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
-            <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10" style="background-color: #f97316;">
+            <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300" style="background-color: #f97316;">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
                     <div class="flex items-baseline gap-2"><h2 id="districtTitle" class="text-[22px] font-normal">--</h2><span id="districtCount" class="text-[12px] opacity-70">共 0 間</span></div>
@@ -207,17 +201,15 @@
             <div id="restaurantGrid" class="grid grid-cols-1 md:grid-cols-2 gap-px bg-gray-200 border-x border-b border-gray-200 rounded-b-2xl overflow-hidden"></div>
             
             <footer class="mt-8 pb-8 pt-4 border-t border-gray-200">
-                <div class="text-center text-[10px] text-gray-400 mb-4">
-                    資料來源: Trip.com • TripAdvisor • 本地食客推薦
-                </div>
+                <div class="text-center text-[10px] text-gray-400 mb-4">資料來源: Trip.com • TripAdvisor • 本地食客推薦</div>
                 <div class="flex flex-wrap justify-center gap-3 text-[11px] text-blue-500/90 font-medium">
-                    <a href="#" onclick="event.preventDefault(); openPolicy('about')" class="hover:underline">關於我們</a>
+                    <a href="#" onclick="event.preventDefault(); openInfoModal('about')" class="hover:underline">關於我們</a>
                     <span class="text-gray-300">|</span>
-                    <a href="#" onclick="event.preventDefault(); openContactModal()" class="hover:underline">聯絡我們</a>
+                    <a href="#" onclick="event.preventDefault(); openInfoModal('contact')" class="hover:underline">聯絡我們</a>
                     <span class="text-gray-300">|</span>
-                    <a href="#" onclick="event.preventDefault(); openPolicy('privacy')" class="hover:underline">隱私權政策</a>
+                    <a href="#" onclick="event.preventDefault(); openInfoModal('privacy')" class="hover:underline">隱私權政策</a>
                     <span class="text-gray-300">|</span>
-                    <a href="#" onclick="event.preventDefault(); openPolicy('terms')" class="hover:underline">服務條款</a>
+                    <a href="#" onclick="event.preventDefault(); openInfoModal('terms')" class="hover:underline">服務條款</a>
                 </div>
             </footer>
         </main>
@@ -266,20 +258,6 @@
         </div>
     </div>
 
-    <div id="policyView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
-        <div class="px-5 pt-4 pb-6 text-white relative z-10 bg-[#7a8f9a]">
-            <button onclick="closePolicy()" class="text-[13px] font-medium flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回</button>
-            <h2 id="policyTitle" class="text-[22px] font-normal leading-tight"></h2>
-        </div>
-        <div class="p-6 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen text-[13px] text-gray-700 leading-relaxed" id="policyContent"></div>
-    </div>
-
-    <div id="staticPolicies" class="hidden">
-        <div id="contentAboutUs">「中山美食地圖」致力於提供最全面的中山飲食資訊，方便大眾及北上旅客發掘城中美味。</div>
-        <div id="contentPrivacy">本網站使用 Google Analytics 4 (GA4) 收集匿名流量數據。個人紀錄僅儲存於您的設備本地端。</div>
-        <div id="contentTerms">本網站提供的餐廳資訊、價格及營業狀態僅供參考。實際情況以餐廳官方公佈為準。</div>
-    </div>
-
     <map name="image-map" id="mapCoordinates">
         <area shape="rect" coords="227,110,302,144" alt="黃圃鎮" onclick="setDistrict('黃圃鎮')">
         <area shape="rect" coords="278,531,377,574" alt="三鄉鎮" onclick="setDistrict('三鄉鎮')">
@@ -300,8 +278,25 @@
             const t = document.getElementById("customToast"); 
             if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; if(dur > 0) setTimeout(() => t.className = "", dur); } 
         }
-        window.openContactModal = function() { document.getElementById('contactModalOverlay').style.display = 'flex'; }
-        window.closeContactModal = function() { document.getElementById('contactModalOverlay').style.display = 'none'; }
+
+        /* 統一資訊彈窗控制 */
+        const modalContents = {
+            about: { title: "關於我們", body: "<p>「中山美食地圖」致力於提供最全面的中山飲食資訊，方便大眾及北上旅客發掘城中美味。</p><p>本平台彙整了各大旅遊網站的真實評價，配合便捷的地圖導航與個人化標記功能，打造專屬的美食清單。</p>" },
+            privacy: { title: "隱私權政策", body: "<ul class='list-disc pl-4 space-y-2'><li><b>數據儲存：</b>本網站的收藏及備註紀錄，均僅儲存於您的設備本地端 (Local Storage)。我們不會收集或將這些數據上傳至伺服器。</li><li><b>流量統計：</b>本網站使用 Google Analytics 4 (GA4) 收集匿名流量數據，以優化使用者體驗。</li><li><b>廣告與 Cookies：</b>Google 及其合作夥伴會使用 Cookie 根據您先前的造訪紀錄放送廣告。用戶可隨時於瀏覽器設定中管理 Cookie。</li></ul>" },
+            terms: { title: "服務條款", body: "<ul class='list-disc pl-4 space-y-2'><li><b>資訊準確性：</b>本網站提供的餐廳資訊、價格及營業狀態僅供參考。實際情況以餐廳官方公佈為準。</li><li><b>免責聲明：</b>本網站不對因依賴本網站資訊而導致的任何直接或間接損失負責。</li><li><b>服務變更：</b>我們保留隨時修改、暫停或終止本網站部分或全部功能的權利。</li></ul>" },
+            contact: { title: "聯絡我們", body: "<p>如您發現餐廳資訊有誤、有私藏好店推介，或希望提供支持，歡迎隨時聯絡我們：</p><p class='font-bold mt-4 text-gray-800'>Facebook 群組：<a href='https://www.facebook.com/groups/998954119219884' target='_blank' class='text-blue-500 hover:underline'>中山美食地圖群組</a></p><p class='text-gray-400 text-xs italic mt-6'>您的每一次反饋，都是對我們這份「血汗數據庫」最好的回報與鼓勵。</p>" }
+        };
+
+        window.openInfoModal = function(type) {
+            const content = modalContents[type];
+            if (!content) return;
+            document.getElementById('infoModalTitle').innerText = content.title;
+            document.getElementById('infoModalBody').innerHTML = content.body;
+            document.getElementById('infoModalOverlay').style.display = 'flex';
+        }
+        window.closeInfoModal = function() { document.getElementById('infoModalOverlay').style.display = 'none'; }
+
+        // 其餘 JavaScript 邏輯保持不變 ...
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
@@ -309,8 +304,6 @@
         window.handleXhsClick = function(name, district) { if (isMobileDevice()) { showToast("⚠️ 手機版不能用小紅書搜索，請用電腦版。", 5000); } else { window.open(`https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(name + " " + district)}`, '_blank'); } };
         window.toggleInlineFilters = function() { const sec = document.getElementById('inlineFilterSection'); const btn = document.getElementById('inlineFilterBtn'); if (sec.classList.contains('hidden')) { sec.classList.remove('hidden'); btn.innerHTML = '篩選 ▴'; } else { sec.classList.add('hidden'); btn.innerHTML = '篩選 ▾'; } };
         function showUserGuide() { showToast(`<div class="space-y-2"><p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p><details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone:</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android:</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details></div>`, 0); }
-        window.openPolicy = function(type) { document.getElementById('mainContentView').classList.add('hidden'); document.getElementById('detailView').classList.add('hidden'); document.getElementById('policyView').classList.remove('hidden'); let title = "", contentId = ""; if(type === 'about') { title = "關於我們"; contentId = "contentAboutUs"; } else if(type === 'privacy') { title = "隱私權政策"; contentId = "contentPrivacy"; } else if(type === 'terms') { title = "服務條款"; contentId = "contentTerms"; } document.getElementById('policyTitle').innerText = title; document.getElementById('policyContent').innerHTML = document.getElementById(contentId).innerHTML; window.scrollTo({ top: 0, behavior: 'auto' }); }
-        window.closePolicy = function() { document.getElementById('policyView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); }
         async function init() { try { const response = await fetch(apiUrl); const results = await response.json(); allData = results.map((row, index) => { const getVal = (key) => { const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase()); return foundKey ? (row[foundKey] || "").toString().trim() : ""; }; return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || getVal('Timestamp') || '', '_index': index }; }).filter(i => i.Restaurant_Name !== ""); buildFilterPills(allData); applyFilters(); document.getElementById('loader').classList.add('hidden'); refreshMap(); } catch (error) { document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入資料失敗。</div>'; } }
         window.setFilterState = function(t, v) { filtersState[t] = v; updatePillUI(); applyFilters(); }
         window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
@@ -376,7 +369,6 @@
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
         window.closeDetail = function() { document.getElementById('detailView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); refreshMap(); }
-
         function updateDetailUI(data) {
             const setBtn = (id, active, activeClass) => { const btn = document.getElementById(id); if(btn) btn.className = `px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border ${active ? activeClass : 'bg-white border-gray-200 text-gray-500'}`; };
             setBtn('btnVisited', data.visited, 'bg-gray-500 border-gray-500 text-white');
