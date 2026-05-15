@@ -18,7 +18,6 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-
       gtag('config', 'G-GCGDM1JK5W');
     </script>
 
@@ -36,6 +35,7 @@
         .filter-pill { transition: all 0.2s ease-in-out; }
         .star-active { color: #f5a623 !important; }
         
+        /* 吐司通知與彈窗樣式 */
         #customToast {
             visibility: hidden; min-width: 320px; max-width: 90%; background-color: rgba(0, 0, 0, 0.95); color: #fff;
             text-align: left; border-radius: 24px; padding: 20px; position: fixed; z-index: 10000;
@@ -44,6 +44,16 @@
         }
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
+
+        /* 聯絡我們專屬彈窗 (模擬圖片樣式) */
+        #contactModalOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
+            z-index: 11000; align-items: center; justify-content: center; padding: 20px;
+        }
+        #contactModal {
+            background: white; border-radius: 40px; width: 100%; max-width: 550px; 
+            padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
 
         .guide-details summary { list-style: none; display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-weight: bold; color: #fb923c; }
         .guide-details summary::-webkit-details-marker { display: none; }
@@ -58,6 +68,25 @@
 <body class="bg-gray-50 min-h-screen">
 
     <div id="customToast" onclick="event.stopPropagation()"></div>
+
+    <div id="contactModalOverlay" onclick="closeContactModal()">
+        <div id="contactModal" onclick="event.stopPropagation()">
+            <h2 class="text-[#d48806] text-2xl font-bold mb-6">聯絡我們</h2>
+            <p class="text-gray-600 text-sm mb-6 leading-relaxed">
+                如您發現班次資訊有誤、有新路線建議，或希望提供支持，歡迎隨時聯絡我們：
+            </p>
+            <p class="mb-6">
+                <span class="font-bold text-gray-800 text-sm">Facebook 群組：</span>
+                <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="text-blue-500 text-sm font-medium hover:underline">中山美食地圖群組</a>
+            </p>
+            <p class="text-gray-400 text-xs italic mb-10">
+                您的每一次反饋，都是對我們這份「血汗數據庫」最好的回報與鼓勵。
+            </p>
+            <button onclick="closeContactModal()" class="w-full bg-[#f0f5f9] text-gray-800 font-bold py-4 rounded-2xl hover:bg-gray-200 transition-colors">
+                關閉
+            </button>
+        </div>
+    </div>
 
     <div class="sticky top-0 z-50 shadow-sm flex flex-col bg-white">
         <header class="px-4 pt-5 pb-3 border-b border-gray-100">
@@ -188,7 +217,7 @@
                 <div class="flex flex-wrap justify-center gap-3 text-[11px] text-blue-500/90 font-medium">
                     <a href="#" onclick="event.preventDefault(); openPolicy('about')" class="hover:underline">關於我們</a>
                     <span class="text-gray-300">|</span>
-                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="hover:underline">聯絡我們</a>
+                    <a href="#" onclick="event.preventDefault(); openContactModal()" class="hover:underline">聯絡我們</a>
                     <span class="text-gray-300">|</span>
                     <a href="#" onclick="event.preventDefault(); openPolicy('privacy')" class="hover:underline">隱私權政策</a>
                     <span class="text-gray-300">|</span>
@@ -308,10 +337,7 @@
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
 
-        const districtColors = { 
-            "東區": "#ef4444", "坦洲鎮": "#7a8f9a", "石岐區": "#f59e0b", "西區": "#3b82f6", 
-            "南區": "#10b981", "小欖鎮": "#8b5cf6", "全部": "#f97316" 
-        };
+        const districtColors = { "東區": "#ef4444", "坦洲鎮": "#7a8f9a", "石岐區": "#f59e0b", "西區": "#3b82f6", "南區": "#10b981", "小欖鎮": "#8b5cf6", "全部": "#f97316" };
 
         function showToast(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
@@ -321,6 +347,11 @@
                 if(dur > 0) setTimeout(() => t.className = "", dur);
             } 
         }
+
+        /* 聯絡我們彈窗控制 */
+        window.openContactModal = function() { document.getElementById('contactModalOverlay').style.display = 'flex'; }
+        window.closeContactModal = function() { document.getElementById('contactModalOverlay').style.display = 'none'; }
+
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
         function saveUserData(n, d) { userRecords[n] = d; localStorage.setItem('zsFoodMap_v1', JSON.stringify(userRecords)); }
         function refreshMap() { setTimeout(() => { if(window.imageMapResize) imageMapResize(); }, 400); }
@@ -334,25 +365,19 @@
         window.toggleInlineFilters = function() {
             const sec = document.getElementById('inlineFilterSection');
             const btn = document.getElementById('inlineFilterBtn');
-            if (sec.classList.contains('hidden')) {
-                sec.classList.remove('hidden');
-                btn.innerHTML = '篩選 ▴';
-            } else {
-                sec.classList.add('hidden');
-                btn.innerHTML = '篩選 ▾';
-            }
+            if (sec.classList.contains('hidden')) { sec.classList.remove('hidden'); btn.innerHTML = '篩選 ▴'; } 
+            else { sec.classList.add('hidden'); btn.innerHTML = '篩選 ▾'; }
         };
 
         function showUserGuide() {
-            const guide = `
-                <div class="space-y-2">
-                    <p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p>
-                    <details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone:</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android:</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details>
-                    <details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「確認箭頭」跳轉。</div></details>
-                    <details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註（如必點菜色）。</div></details>
-                    <details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換瀏覽器、換手機或清除緩存紀錄會消失。</div></details>
-                    <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有 YouTube 片會顯示紅色掣。撳「分享」可複製連結。</div></details>
-                </div>`;
+            const guide = `<div class="space-y-2">
+                <p class="font-bold text-white text-xl mb-4 flex items-center gap-2"><i class="fa-solid fa-book-open text-orange-400"></i> 用戶操作手冊</p>
+                <details class="guide-details" open><summary>1. 📲 將地圖加到手機桌面</summary><div class="guide-content"><b>iPhone:</b> 撳底排「分享」掣 <i class="fa-solid fa-arrow-up-from-bracket"></i>，揀「加入主畫面」。<br><br><b>Android:</b> 撳右上角「三粒點」<i class="fa-solid fa-ellipsis-vertical"></i>，揀「加到主螢幕」。</div></details>
+                <details class="guide-details"><summary>2. 🔍 如何快速尋找餐廳？</summary><div class="guide-content"><b>區域搜尋：</b>直接喺地圖撳行政區。<br><br><b>關鍵字：</b>喺搜尋框打名，撳右邊「確認箭頭」跳轉。</div></details>
+                <details class="guide-details"><summary>3. 📝 個人化標記功能</summary><div class="guide-content">入到詳情可以標記「去過」、「收藏」或「想去」，仲可以寫備註（如必點菜色）。</div></details>
+                <details class="guide-details"><summary>4. ⚠️ 重要：關於數據儲存</summary><div class="guide-content">數據儲存喺你當時使用緊嘅瀏覽器。換瀏覽器、換手機或清除緩存紀錄會消失。</div></details>
+                <details class="guide-details"><summary>5. 🗺️ 導航、影片與分享</summary><div class="guide-content">撳「導航前往」會開地圖。如果有 YouTube 片會顯示紅色掣。撳「分享」可複製連結。</div></details>
+            </div>`;
             showToast(guide, 0);
         }
 
@@ -360,12 +385,10 @@
             document.getElementById('mainContentView').classList.add('hidden');
             document.getElementById('detailView').classList.add('hidden');
             document.getElementById('policyView').classList.remove('hidden');
-            
             let title = "", contentId = "";
             if(type === 'about') { title = "關於我們"; contentId = "contentAboutUs"; }
             else if(type === 'privacy') { title = "隱私權政策"; contentId = "contentPrivacy"; }
             else if(type === 'terms') { title = "服務條款"; contentId = "contentTerms"; }
-            
             document.getElementById('policyTitle').innerText = title;
             document.getElementById('policyContent').innerHTML = document.getElementById(contentId).innerHTML;
             window.scrollTo({ top: 0, behavior: 'auto' });
@@ -380,7 +403,6 @@
             try {
                 const response = await fetch(apiUrl);
                 const results = await response.json();
-                
                 allData = results.map((row, index) => { 
                     const getVal = (key) => {
                         const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
@@ -406,26 +428,16 @@
                 const minutes = now.getMinutes().toString().padStart(2, '0');
                 document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${hours}:${minutes}`;
                 
-                buildFilterPills(allData); 
-                applyFilters();
-
+                buildFilterPills(allData); applyFilters();
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedRestaurant = urlParams.get('r');
                 if (sharedRestaurant) {
                     const targetIdx = currentRenderedData.findIndex(item => item.Restaurant_Name === sharedRestaurant);
-                    if (targetIdx !== -1) {
-                        setTimeout(() => { openDetail(targetIdx); }, 100);
-                    } else {
-                        showToast('找不到指定的餐廳，可能已結業或名稱已更改。');
-                    }
+                    if (targetIdx !== -1) { setTimeout(() => { openDetail(targetIdx); }, 100); }
                 }
-
                 document.getElementById('loader').classList.add('hidden');
                 refreshMap();
-            } catch (error) {
-                console.error("載入資料失敗:", error);
-                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入資料失敗，請重新整理頁面。</div>';
-            }
+            } catch (error) { document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入資料失敗。</div>'; }
         }
 
         window.handleLiveSearch = function() { applyFilters(); }
@@ -433,27 +445,13 @@
         window.jumpToResults = function() { document.getElementById('filterMenu').classList.add('hidden'); const t = document.getElementById('resultsAnchor'); window.scrollTo({ top: t.offsetTop, behavior: 'smooth' }); }
         window.setFilterState = function(t, v) { filtersState[t] = v; updatePillUI(); applyFilters(); }
         window.setDistrict = function(d) { closeDetail(); filtersState.district = d; updatePillUI(); applyFilters(); jumpToResults(); }
-        
-        window.resetToHome = function() { 
-            closeDetail(); 
-            resetAllFilters(true); 
-            window.history.pushState({}, '', window.location.pathname); 
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-            refreshMap(); 
-        }
-        
+        window.resetToHome = function() { closeDetail(); resetAllFilters(true); window.history.pushState({}, '', window.location.pathname); window.scrollTo({ top: 0, behavior: 'smooth' }); refreshMap(); }
         window.resetAllFilters = function(full) { 
             if(full) closeDetail(); 
             filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' }; 
             document.getElementById('searchInput').value = ''; 
-            updatePillUI(); 
-            applyFilters(); 
-            if(full) { 
-                document.getElementById('filterMenu').classList.add('hidden'); 
-                document.getElementById('inlineFilterSection').classList.add('hidden');
-                document.getElementById('inlineFilterBtn').innerHTML = '篩選 ▾';
-                window.scrollTo({ top: 0, behavior: 'smooth' }); 
-            } 
+            updatePillUI(); applyFilters(); 
+            if(full) { document.getElementById('filterMenu').classList.add('hidden'); document.getElementById('inlineFilterSection').classList.add('hidden'); window.scrollTo({ top: 0, behavior: 'smooth' }); } 
         }
 
         function applyFilters() {
@@ -475,13 +473,8 @@
                 const aHasYt = a.Youtube && a.Youtube.startsWith('http') ? 1 : 0;
                 const bHasYt = b.Youtube && b.Youtube.startsWith('http') ? 1 : 0;
                 if (aHasYt !== bHasYt) return bHasYt - aHasYt;
-
-                const dateA = Date.parse(a.Date);
-                const dateB = Date.parse(b.Date);
-                if (!isNaN(dateA) && !isNaN(dateB) && dateA !== dateB) {
-                    return dateB - dateA;
-                }
-
+                const dateA = Date.parse(a.Date); const dateB = Date.parse(b.Date);
+                if (!isNaN(dateA) && !isNaN(dateB) && dateA !== dateB) return dateB - dateA;
                 return b._index - a._index;
             });
             renderData(currentRenderedData);
@@ -489,7 +482,6 @@
 
         function renderData(data) {
             const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
-            if(!container) return;
             header.style.backgroundColor = districtColors[filtersState.district] || "#f97316";
             header.classList.remove('hidden');
             document.getElementById('districtTitle').innerText = filtersState.district === '全部' ? (document.getElementById('searchInput').value ? '搜尋結果' : '所有地區') : filtersState.district;
@@ -497,10 +489,8 @@
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
-                const q = encodeURIComponent(item.Restaurant_Name + " " + item.District);
                 const hasYoutube = item.Youtube && item.Youtube.startsWith('http');
-                return `
-                <div class="bg-white p-4 relative border-b border-gray-100">
+                return `<div class="bg-white p-4 relative border-b border-gray-100">
                     <div class="flex gap-4 cursor-pointer mb-3" onclick="openDetail(${index})">
                         <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0 text-3xl border border-gray-100">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
                         <div class="flex-1 min-w-0 pr-6">
@@ -522,15 +512,9 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-4 gap-2 border-t border-gray-50 pt-3">
-                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition">
-                            <img src="image_c3e1d6.png" class="btn-img-sm" alt="導航">導航
-                        </a>
-                        <button onclick="event.stopPropagation(); handleXhsClick('${item.Restaurant_Name.replace(/'/g, "\\'")}', '${item.District}')" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition">
-                            <img src="image_c3d70c.png" class="btn-img-sm" alt="小紅書">小紅書
-                        </button>
-                        <a href="https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition">
-                            <img src="image_c3d676.png" class="btn-img-sm" alt="抖音">抖音
-                        </a>
+                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition"><img src="image_c3e1d6.png" class="btn-img-sm" alt="導航">導航</a>
+                        <button onclick="event.stopPropagation(); handleXhsClick('${item.Restaurant_Name.replace(/'/g, "\\'")}', '${item.District}')" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition"><img src="image_c3d70c.png" class="btn-img-sm" alt="小紅書">小紅書</button>
+                        <a href="https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition"><img src="image_c3d676.png" class="btn-img-sm" alt="抖音">抖音</a>
                         <button onclick="event.stopPropagation(); shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-green-100 bg-green-50/30 text-green-500 text-[10px] font-bold active:scale-95 transition"><i class="fa-solid fa-share-nodes"></i>分享</button>
                     </div>
                 </div>`;
@@ -558,16 +542,7 @@
             window.scrollTo({ top: 0, behavior: 'auto' });
         }
         
-        window.closeDetail = function() { 
-            document.getElementById('detailView').classList.add('hidden'); 
-            document.getElementById('mainContentView').classList.remove('hidden'); 
-            
-            const url = new URL(window.location);
-            url.searchParams.delete('r');
-            window.history.replaceState({}, '', url);
-            
-            refreshMap(); 
-        }
+        window.closeDetail = function() { document.getElementById('detailView').classList.add('hidden'); document.getElementById('mainContentView').classList.remove('hidden'); refreshMap(); }
 
         function updateDetailUI(data) {
             const setBtn = (id, active, activeClass) => { const btn = document.getElementById(id); if(btn) btn.className = `px-2.5 py-1.5 rounded-lg text-[10px] font-bold shadow-sm border ${active ? activeClass : 'bg-white border-gray-200 text-gray-500'}`; };
@@ -580,60 +555,27 @@
         window.toggleUserStatus = function(type) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data[type] = !data[type]; saveUserData(name, data); updateDetailUI(data); applyFilters(); }
         window.saveRating = function(val) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.rating = val; saveUserData(name, data); updateDetailUI(data); }
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); }
-        function copyAddress() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { showToast('✅ 地址已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); }); }
+        function copyAddress() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { showToast('✅ 地址已複製'); }); }
         
         function buildFilterPills(data) {
             const validData = data.filter(i => !(i.Status && i.Status.toUpperCase() === "X"));
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
-            if(!dG || !cG || !pG) return;
             dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(validData.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
             cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(validData.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
             pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
-            
             const inlineCat = document.getElementById('inlineCategoryFilter');
-            if (inlineCat) {
-                inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + 
-                    [...new Set(validData.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
-            }
-            
+            inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + [...new Set(validData.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
             updatePillUI();
         }
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 bg-white shadow-sm active:scale-95 mb-1 mr-1">${l}</button>`; }
-        
         function updatePillUI() { 
-            document.querySelectorAll('.filter-pill').forEach(p => { 
-                const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); 
-                if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; 
-                else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; 
-            }); 
-            const inlineCat = document.getElementById('inlineCategoryFilter');
-            if (inlineCat) inlineCat.value = filtersState.category;
-            const inlinePrice = document.getElementById('inlinePriceFilter');
-            if (inlinePrice) inlinePrice.value = filtersState.price;
+            document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-medium border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); 
+            document.getElementById('inlineCategoryFilter').value = filtersState.category; document.getElementById('inlinePriceFilter').value = filtersState.price;
         }
-        
         function toggleFilters() { document.getElementById('filterMenu').classList.toggle('hidden'); }
-        function showBookmarkGuide() { 
-            const ua = navigator.userAgent.toLowerCase();
-            const isiOS = /iphone|ipad|ipod/.test(ua);
-            let msg = isiOS ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>";
-            showToast(msg); 
-        }
-        
-        // 分享連結功能
-        window.shareRestaurant = function(idx) { 
-            const item = currentRenderedData[idx]; 
-            const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; 
-            if (navigator.share) navigator.share({ title: item.Restaurant_Name, url: shareUrl }); 
-            else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); } 
-        }
-        window.shareDetail = function() { 
-            if(!activeDetailItem) return; 
-            const shareUrl = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; 
-            if (navigator.share) navigator.share({ title: activeDetailItem.Restaurant_Name, url: shareUrl }); 
-            else { navigator.clipboard.writeText(shareUrl); showToast('✅ 連結已複製'); setTimeout(()=>document.getElementById('customToast').className='', 2000); } 
-        }
-
+        function showBookmarkGuide() { showToast(navigator.userAgent.toLowerCase().includes("iphone") ? "<b>【iPhone/iOS 用家】</b><br><br>1. 撳底排中間個「分享」掣 <i class='fa-solid fa-arrow-up-from-bracket text-blue-500'></i><br>2. 搵返<b>「加入主畫面」</b>" : "<b>【Android 用家】</b><br><br>1. 撳右上角「三粒點」<i class='fa-solid fa-ellipsis-vertical'></i><br>2. 搵返<b>「加到主螢幕」</b>"); }
+        window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; navigator.clipboard.writeText(url).then(() => { showToast('✅ 連結已複製'); }); }
+        window.shareDetail = function() { if(!activeDetailItem) return; const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; navigator.clipboard.writeText(url).then(() => { showToast('✅ 連結已複製'); }); }
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
