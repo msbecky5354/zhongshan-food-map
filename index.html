@@ -72,27 +72,27 @@
                     </div>
                 </div>
                 
-                <div class="flex items-center gap-1 ml-2 flex-shrink-0">
-                    <a href="https://szbus-web.vercel.app/" target="_blank" class="h-9 px-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm relative">
+                <div class="flex items-center gap-1.5 ml-2 flex-shrink-0">
+                    <a href="https://szbus-web.vercel.app/" target="_blank" class="h-9 px-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl flex items-center justify-center gap-1.5 active:scale-90 transition-transform shadow-sm relative shrink-0">
                         <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-white"></span>
                         </span>
-                        <img src="buslogo.png" class="w-4 h-4 object-contain rounded bg-white p-[1px]" alt="深圳巴士">
-                        <span class="text-[10px] font-bold">深巴</span>
+                        <img src="buslogo.png" class="w-4 h-4 object-contain rounded bg-white p-[1px]" alt="深中珠巴士懶人包">
+                        <span class="text-[10px] font-bold whitespace-nowrap">深中珠巴士懶人包</span>
                     </a>
 
-                    <button class="h-9 px-2.5 rounded-xl flex items-center justify-center gap-1 text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm" onclick="showUserGuide()">
+                    <button class="h-9 w-9 md:w-auto md:px-2.5 rounded-xl flex items-center justify-center gap-1 text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm shrink-0" onclick="showUserGuide()" title="指南">
                         <i class="fa-solid fa-circle-question text-base"></i>
-                        <span class="text-[10px] font-bold">指南</span>
+                        <span class="text-[10px] font-bold hidden md:inline">指南</span>
                     </button>
-                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="h-9 px-2.5 bg-[#1877F2] text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm">
+                    <a href="https://www.facebook.com/groups/998954119219884" target="_blank" class="h-9 w-9 md:w-auto md:px-2.5 bg-[#1877F2] text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm shrink-0" title="群組">
                         <i class="fa-brands fa-facebook-f text-base"></i>
-                        <span class="text-[10px] font-bold">群組</span>
+                        <span class="text-[10px] font-bold hidden md:inline">群組</span>
                     </a>
-                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="h-9 px-2.5 bg-[#FF0000] text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm">
+                    <a href="https://www.youtube.com/channel/UCzKP5A9OdzE50IpXyKwlmpw" target="_blank" class="h-9 w-9 md:w-auto md:px-2.5 bg-[#FF0000] text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm shrink-0" title="頻道">
                         <i class="fa-brands fa-youtube text-base"></i>
-                        <span class="text-[10px] font-bold">頻道</span>
+                        <span class="text-[10px] font-bold hidden md:inline">頻道</span>
                     </a>
                 </div>
             </div>
@@ -282,7 +282,6 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
-        // 對接你的私密 Google Apps Script API
         const apiUrl = 'https://script.google.com/macros/s/AKfycbz3ndkfrGdmioPbbBoM1qgw11G7eDs1Wvv9fR0zwPYadkc0pbJuv90KmQ9CnoleSgub3A/exec';
         
         let allData = [], currentRenderedData = [], activeDetailItem = null;
@@ -360,7 +359,6 @@
 
         async function init() {
             try {
-                // 直接讀取 Apps Script 吐出嚟嘅 JSON
                 const response = await fetch(apiUrl);
                 const results = await response.json();
                 
