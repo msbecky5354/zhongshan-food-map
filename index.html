@@ -73,13 +73,13 @@
                 </div>
                 
                 <div class="flex items-center gap-1.5 ml-2 flex-shrink-0">
-                    <a href="https://szbus-web.vercel.app/" target="_blank" class="h-9 px-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl flex items-center justify-center gap-1.5 active:scale-90 transition-transform shadow-sm relative shrink-0">
+                    <a href="https://szbus-web.vercel.app/" target="_blank" class="h-9 px-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl hidden md:flex items-center justify-center gap-1.5 active:scale-90 transition-transform shadow-sm relative shrink-0">
                         <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 border border-white"></span>
                         </span>
-                        <img src="buslogo.png" class="w-4 h-4 object-contain rounded bg-white p-[1px]" alt="深中珠巴士懶人包">
-                        <span class="text-[10px] font-bold whitespace-nowrap">深中珠巴士懶人包</span>
+                        <img src="buslogo.png" class="w-[22px] h-[22px] object-contain rounded-md bg-white p-[2px]" alt="深中珠巴士懶人包">
+                        <span class="text-[11px] font-bold whitespace-nowrap">深中珠巴士懶人包</span>
                     </a>
 
                     <button class="h-9 w-9 md:w-auto md:px-2.5 rounded-xl flex items-center justify-center gap-1 text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm shrink-0" onclick="showUserGuide()" title="指南">
@@ -124,7 +124,26 @@
     </div>
 
     <div id="mainContentView" class="block">
-        <section class="max-w-4xl mx-auto px-4 py-3 mt-2" id="mapSection">
+        
+        <div class="max-w-4xl mx-auto px-4 pt-3 pb-1">
+            <a href="https://szbus-web.vercel.app/" target="_blank" class="w-full border border-orange-200 bg-[#fffdfa] rounded-2xl p-3 flex items-center justify-between shadow-sm active:scale-[0.98] transition-transform">
+                <div class="flex items-center gap-3">
+                    <img src="buslogo.png" alt="深中珠巴士懶人包" class="w-10 h-10 rounded-xl object-contain border border-gray-100 shadow-sm bg-white">
+                    <div class="flex flex-col">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[14px] font-bold text-gray-800">深中珠巴士懶人包 Web App</span>
+                            <span class="bg-[#ef4444] text-white text-[9px] px-1 py-0.5 rounded font-bold leading-none">推薦</span>
+                        </div>
+                        <span class="text-[11px] text-[#ea580c] mt-0.5">掌握深中跨市巴士資訊，出行必備！</span>
+                    </div>
+                </div>
+                <div class="bg-[#f97316] text-white px-3 py-1.5 rounded-full text-[11px] font-bold shadow-sm shrink-0">
+                    免安裝即用
+                </div>
+            </a>
+        </div>
+
+        <section class="max-w-4xl mx-auto px-4 py-3 mt-1" id="mapSection">
             <div class="bg-white rounded-[2rem] p-4 ios-shadow border border-gray-100 overflow-hidden relative text-center">
                 <img src="image.png" alt="中山地圖" usemap="#image-map" id="visualMap" class="mx-auto">
             </div>
