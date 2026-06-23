@@ -210,8 +210,8 @@
             <div class="flex items-center gap-2 flex-wrap">
                 <h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2>
                 <span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase mt-1"></span>
-                <!-- 🌟 核心更新：詳情頁的「有伏」紅圈 Link -->
-                <a id="detailStatusLink" href="#" target="_blank" class="hidden items-center justify-center w-8 h-8 bg-red-600 text-white rounded-full border-2 border-red-100 shadow-sm text-[10px] font-black mt-1 ml-1 active:scale-95 transition-transform" title="點擊查看有伏詳情">有伏</a>
+                <!-- 🌟 核心更新：放大了的詳情頁「有伏」Link (w-10 h-10, text-[12px]) -->
+                <a id="detailStatusLink" href="#" target="_blank" class="hidden items-center justify-center w-10 h-10 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm text-[12px] font-black mt-1 ml-2 active:scale-95 transition-transform" title="點擊查看有伏詳情">有伏</a>
             </div>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
@@ -358,7 +358,6 @@
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
             currentRenderedData = allData.filter(item => {
-                // 🌟 核心更新：移除了舊版的 `if(item.Status === "X") return false;` 隱藏邏輯
                 const userData = getUserData(item.Restaurant_Name);
                 const matchD = filtersState.district === '全部' || item.District === filtersState.district;
                 const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
@@ -396,9 +395,9 @@
                                     ${hasYoutube ? `<i class="fa-brands fa-youtube text-red-600 text-lg"></i>` : ''}
                                 </div>
                                 
-                                <!-- 🌟 核心更新：有伏紅圈 Icon 擺放於心心左邊 -->
+                                <!-- 🌟 核心更新：放大了的白底紅字紅粗邊框的有伏 Icon (w-10 h-10, text-[12px]) -->
                                 <div class="flex items-center gap-3 shrink-0 ml-2">
-                                    ${item.Status ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center w-8 h-8 bg-red-600 text-white rounded-full border-2 border-red-100 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情"><span class="text-[10px] font-black">有伏</span></a>` : ''}
+                                    ${item.Status ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center w-10 h-10 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情"><span class="text-[12px] font-black">有伏</span></a>` : ''}
                                     <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
                                 </div>
                             </div>
@@ -430,7 +429,7 @@
             document.getElementById('detailName').innerText = item.Restaurant_Name;
             document.getElementById('detailDistrictBadge').innerText = item.District;
             
-            // 🌟 核心更新：同步控制詳情頁內嘅「有伏」紅圈
+            // 🌟 核心更新：同步放大詳情頁內嘅白底紅字紅邊框「有伏」Link
             const statusLink = document.getElementById('detailStatusLink');
             if (item.Status) {
                 statusLink.href = item.Status;
@@ -474,7 +473,6 @@
         window.copyAddress = function() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { window.showToast('✅ 地址已複製'); }); };
         
         function buildFilterPills(data) {
-            // 🌟 核心更新：不再篩選走「有伏」嘅餐廳，保留入類別入面
             const valid = data; 
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
             
