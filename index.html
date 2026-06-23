@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+HK:wght@400;500;700;900&display=swap');
         body { font-family: 'Noto Sans HK', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .ios-shadow { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         area { outline: none; cursor: pointer; }
@@ -194,7 +194,6 @@
                     <span class="text-gray-300">|</span>
                     <a href="#" onclick="event.preventDefault(); openInfoModal('terms')" class="hover:underline">服務條款</a>
                 </div>
-                <!-- 🌟 核心更新：新增了與圖片完全一致排版的著作權與開發團隊超連結 -->
                 <div class="text-center text-[12px] text-gray-400 font-medium tracking-wide">
                     <span>© 2026 中山美食地圖</span>
                     <span class="text-gray-200 mx-1.5">|</span>
@@ -208,7 +207,12 @@
     <div id="detailView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-[#f3f4f6]">
         <div id="detailHeaderColor" class="px-5 pt-4 pb-6 text-white relative z-10 bg-[#7a8f9a]">
             <button onclick="closeDetail()" class="text-[13px] font-medium flex items-center mb-3 active:scale-95 transition"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回</button>
-            <div class="flex items-center gap-2"><h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2><span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase"></span></div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2>
+                <span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase mt-1"></span>
+                <!-- 🌟 核心更新：詳情頁的「有伏」紅圈 Link -->
+                <a id="detailStatusLink" href="#" target="_blank" class="hidden items-center justify-center w-8 h-8 bg-red-600 text-white rounded-full border-2 border-red-100 shadow-sm text-[10px] font-black mt-1 ml-1 active:scale-95 transition-transform" title="點擊查看有伏詳情">有伏</a>
+            </div>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
             <div class="flex justify-between items-center border-b border-gray-100 pb-4">
@@ -284,7 +288,6 @@
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
         const districtColors = { "東區": "#ef4444", "坦洲鎮": "#7a8f9a", "石岐區": "#f59e0b", "西區": "#3b82f6", "南區": "#10b981", "小欖鎮": "#8b5cf6", "全部": "#f97316" };
 
-        /* 全域函數掛載 */
         window.showToast = function(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
             if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; if(dur > 0) setTimeout(() => t.className = "", dur); } 
@@ -355,7 +358,7 @@
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
             currentRenderedData = allData.filter(item => {
-                if (item.Status && item.Status.toUpperCase() === "X") return false;
+                // 🌟 核心更新：移除了舊版的 `if(item.Status === "X") return false;` 隱藏邏輯
                 const userData = getUserData(item.Restaurant_Name);
                 const matchD = filtersState.district === '全部' || item.District === filtersState.district;
                 const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
@@ -378,9 +381,11 @@
             document.getElementById('districtTitle').innerText = filtersState.district === '全部' ? (document.getElementById('searchInput').value ? '搜尋結果' : '所有地區') : filtersState.district;
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
             if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
+            
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
                 const hasYoutube = item.Youtube && item.Youtube.startsWith('http');
+                
                 return `<div class="bg-white p-4 relative border-b border-gray-100">
                     <div class="flex gap-4 cursor-pointer mb-3" onclick="openDetail(${index})">
                         <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0 text-3xl border border-gray-100">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
@@ -390,8 +395,14 @@
                                     <h3 class="text-[16px] font-bold text-gray-800 truncate">${item.Restaurant_Name}</h3>
                                     ${hasYoutube ? `<i class="fa-brands fa-youtube text-red-600 text-lg"></i>` : ''}
                                 </div>
-                                <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
+                                
+                                <!-- 🌟 核心更新：有伏紅圈 Icon 擺放於心心左邊 -->
+                                <div class="flex items-center gap-3 shrink-0 ml-2">
+                                    ${item.Status ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center w-8 h-8 bg-red-600 text-white rounded-full border-2 border-red-100 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情"><span class="text-[10px] font-black">有伏</span></a>` : ''}
+                                    <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
+                                </div>
                             </div>
+                            
                             <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5 leading-tight">${item.Highlight || '查看詳情'}</p>
                             <div class="flex justify-between items-center mt-2">
                                 <div class="flex items-center gap-1.5">
@@ -415,16 +426,31 @@
         window.openDetail = function(idx) {
             const item = currentRenderedData[idx]; if(!item) return;
             activeDetailItem = item; const data = getUserData(item.Restaurant_Name);
+            
             document.getElementById('detailName').innerText = item.Restaurant_Name;
             document.getElementById('detailDistrictBadge').innerText = item.District;
+            
+            // 🌟 核心更新：同步控制詳情頁內嘅「有伏」紅圈
+            const statusLink = document.getElementById('detailStatusLink');
+            if (item.Status) {
+                statusLink.href = item.Status;
+                statusLink.classList.remove('hidden');
+                statusLink.classList.add('inline-flex');
+            } else {
+                statusLink.classList.add('hidden');
+                statusLink.classList.remove('inline-flex');
+            }
+
             document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-utensils mr-1"></i>${item.Category || '美食'}`;
             document.getElementById('detailPrice').innerHTML = `<i class="fa-solid fa-sack-dollar text-[#d4b068] mr-1"></i>人均 ¥${item.Avg_Cost || '--'}`;
             document.getElementById('detailHighlight').innerText = item.Highlight || '暫無詳細描述';
             document.getElementById('detailAddress').innerText = item.Address || `中山市${item.District}`;
             document.getElementById('noteInput').value = data.note || '';
             updateDetailUI(data);
+            
             const ytSection = document.getElementById('youtubeSection'), ytBtn = document.getElementById('btnYoutubeDetail');
             if(item.Youtube && item.Youtube.startsWith('http')) { ytSection.classList.remove('hidden'); ytBtn.href = item.Youtube; } else { ytSection.classList.add('hidden'); }
+            
             document.getElementById('btnNav').href = item.Amap_URL || '#';
             document.getElementById('btnDy').href = `https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}`;
             document.getElementById('mainContentView').classList.add('hidden');
@@ -441,22 +467,28 @@
             const stars = document.querySelectorAll('#starRating i');
             stars.forEach((s, i) => { if(i < data.rating) s.classList.add('star-active'); else s.classList.remove('star-active'); });
         }
+        
         window.toggleUserStatus = function(type) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data[type] = !data[type]; saveUserData(name, data); updateDetailUI(data); applyFilters(); };
         window.saveRating = function(val) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.rating = val; saveUserData(name, data); updateDetailUI(data); };
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); };
         window.copyAddress = function() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { window.showToast('✅ 地址已複製'); }); };
         
         function buildFilterPills(data) {
+            // 🌟 核心更新：不再篩選走「有伏」嘅餐廳，保留入類別入面
+            const valid = data; 
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
-            const valid = data.filter(i => !(i.Status && i.Status.toUpperCase() === "X"));
+            
             dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(valid.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
             cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(valid.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
             pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
+            
             const inlineCat = document.getElementById('inlineCategoryFilter');
             inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + [...new Set(valid.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
             updatePillUI();
         }
+        
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] border border-gray-200 bg-white shadow-sm mb-1 mr-1">${l}</button>`; }
+        
         function updatePillUI() { 
             document.querySelectorAll('.filter-pill').forEach(p => { const t = p.getAttribute('data-type'), v = p.getAttribute('data-value'); if (filtersState[t] === v) p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] font-bold border border-[#f97316] text-white bg-[#f97316] shadow-sm mb-1 mr-1"; else p.className = "filter-pill px-3 py-1.5 rounded-full text-[11px] border border-gray-200 text-gray-600 bg-white shadow-sm mb-1 mr-1"; }); 
             document.getElementById('inlineCategoryFilter').value = filtersState.category; document.getElementById('inlinePriceFilter').value = filtersState.price;
