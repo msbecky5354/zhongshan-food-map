@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-adsense-account" content="ca-pub-8256903623772163">
 
-    <!-- SEO 優化 -->
     <meta name="description" content="中山美食地圖 - 精選中山地道必食餐廳及招牌菜推介。香港人北上中山搵食、大灣區一日遊必備攻略，附帶一鍵導航，免安裝、完全免費！">
     <meta name="keywords" content="中山美食, 中山餐廳推介, 中山自由行, 北上搵食, 大灣區美食, 石岐乳鴿, 中山攻略, 免費旅遊App, 懶人工具駅, 中山好去處">
     <meta property="og:title" content="中山美食地圖 | 北上搵食必備">
@@ -219,8 +218,10 @@
             <div class="flex items-center gap-2 flex-wrap">
                 <h2 id="detailName" class="text-[26px] font-normal leading-tight"></h2>
                 <span id="detailDistrictBadge" class="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase mt-1"></span>
-                <!-- 🌟 核心更新：放大了的詳情頁「有伏」Link (w-10 h-10, text-[12px]) -->
-                <a id="detailStatusLink" href="#" target="_blank" class="hidden items-center justify-center w-10 h-10 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm text-[12px] font-black mt-1 ml-2 active:scale-95 transition-transform" title="點擊查看有伏詳情">有伏</a>
+                <a id="detailStatusLink" href="#" target="_blank" class="hidden relative items-center justify-center w-9 h-9 shrink-0 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm mt-1 ml-3 active:scale-95 transition-transform" title="點擊查看有伏詳情">
+                    <span class="absolute -top-4 text-[14px] animate-bounce drop-shadow-sm pointer-events-none">👇</span>
+                    <span class="text-[11px] font-black leading-none mt-0.5">有伏</span>
+                </a>
             </div>
         </div>
         <div class="p-4 space-y-4 bg-white -mt-2 rounded-t-2xl relative z-20 min-h-screen">
@@ -355,7 +356,7 @@
                         return foundKey ? (row[foundKey] || "").toString().trim() : "";
                     };
                     return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
-                }).filter(i => i.Restaurant_Name !== "");
+                }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
                 const now = new Date();
                 document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
                 buildFilterPills(allData); applyFilters();
@@ -404,13 +405,14 @@
                                     ${hasYoutube ? `<i class="fa-brands fa-youtube text-red-600 text-lg"></i>` : ''}
                                 </div>
                                 
-                                <!-- 🌟 核心更新：放大了的白底紅字紅粗邊框的有伏 Icon (w-10 h-10, text-[12px]) -->
                                 <div class="flex items-center gap-3 shrink-0 ml-2">
-                                    ${item.Status ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center w-10 h-10 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情"><span class="text-[12px] font-black">有伏</span></a>` : ''}
+                                    ${(item.Status && item.Status.startsWith('http')) ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="relative flex items-center justify-center w-9 h-9 shrink-0 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情">
+                                        <span class="absolute -top-4 text-[14px] animate-bounce drop-shadow-sm pointer-events-none">👇</span>
+                                        <span class="text-[11px] font-black leading-none mt-0.5">有伏</span>
+                                    </a>` : ''}
                                     <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
                                 </div>
                             </div>
-                            
                             <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5 leading-tight">${item.Highlight || '查看詳情'}</p>
                             <div class="flex justify-between items-center mt-2">
                                 <div class="flex items-center gap-1.5">
@@ -440,11 +442,12 @@
             
             // 🌟 核心更新：同步放大詳情頁內嘅白底紅字紅邊框「有伏」Link
             const statusLink = document.getElementById('detailStatusLink');
-            if (item.Status) {
+            if (item.Status && item.Status.startsWith('http')) {
                 statusLink.href = item.Status;
                 statusLink.classList.remove('hidden');
                 statusLink.classList.add('inline-flex');
             } else {
+                statusLink.href = "#"; // 重置 Link 防呆
                 statusLink.classList.add('hidden');
                 statusLink.classList.remove('inline-flex');
             }
