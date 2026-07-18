@@ -291,7 +291,12 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
-        const apiUrl = 'https://script.google.com/macros/s/AKfycbz3ndkfrGdmioPbbBoM1qgw11G7eDs1Wvv9fR0zwPYadkc0pbJuv90KmQ9CnoleSgub3A/exec';
+        // --- 核心修改部分 ---
+        // 舊代碼: const apiUrl = 'https://script.google.com/macros/s/.../exec';
+        // 新代碼: 更改為讀取同層目錄嘅 data.json
+        const apiUrl = 'data.json'; 
+        // ------------------
+
         let allData = [], currentRenderedData = [], activeDetailItem = null;
         let filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
@@ -348,7 +353,12 @@
 
         async function init() {
             try {
-                const response = await fetch(apiUrl);
+                // --- 核心修改部分 ---
+                // 加入 ?t= 時間戳參數作為 cache-busting，防止 GitHub Pages 緩存舊資料
+                const fetchUrl = apiUrl + '?t=' + new Date().getTime();
+                const response = await fetch(fetchUrl);
+                // ------------------
+                
                 const results = await response.json();
                 allData = results.map((row, index) => { 
                     const getVal = (key) => {
@@ -362,7 +372,10 @@
                 buildFilterPills(allData); applyFilters();
                 document.getElementById('loader').classList.add('hidden');
                 refreshMap();
-            } catch (error) { document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; }
+            } catch (error) { 
+                console.error("載入 JSON 失敗:", error);
+                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。請確保 data.json 檔案已上傳至正確位置。</div>'; 
+            }
         }
 
         function applyFilters() {
@@ -440,7 +453,6 @@
             document.getElementById('detailName').innerText = item.Restaurant_Name;
             document.getElementById('detailDistrictBadge').innerText = item.District;
             
-            // 🌟 核心更新：同步放大詳情頁內嘅白底紅字紅邊框「有伏」Link
             const statusLink = document.getElementById('detailStatusLink');
             if (item.Status && item.Status.startsWith('http')) {
                 statusLink.href = item.Status;
