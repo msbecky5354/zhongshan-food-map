@@ -19,7 +19,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f97316">
     <link rel="apple-touch-icon" href="app-icon-512.png">
-
+    <!-- 喺引入主邏輯之前，先車個數據檔案入去 -->
+   <script src="data.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8256903623772163" crossorigin="anonymous"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCGDM1JK5W"></script>
     <script>
@@ -351,32 +352,33 @@
             else { window.open(`https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(name + " " + district)}`, '_blank'); }
         };
 
-        async function init() {
-            try {
-                // --- 核心修改部分 ---
-                // 加入 ?t= 時間戳參數作為 cache-busting，防止 GitHub Pages 緩存舊資料
-                const fetchUrl = apiUrl + '?t=' + new Date().getTime();
-                const response = await fetch(fetchUrl);
-                // ------------------
-                
-                const results = await response.json();
-                allData = results.map((row, index) => { 
-                    const getVal = (key) => {
-                        const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
-                        return foundKey ? (row[foundKey] || "").toString().trim() : "";
-                    };
-                    return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
-                }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
-                const now = new Date();
-                document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
-                buildFilterPills(allData); applyFilters();
-                document.getElementById('loader').classList.add('hidden');
-                refreshMap();
-            } catch (error) { 
-                console.error("載入 JSON 失敗:", error);
-                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。請確保 data.json 檔案已上傳至正確位置。</div>'; 
-            }
+      async function init() {
+    try {
+        // ❌ 刪除原本的 fetch(fetchUrl) 代碼
+        // 💡 改為直接讀取 window.allRestaurantData
+        if (!window.allRestaurantData) {
+            throw new Error("數據未載入");
         }
+        const results = window.allRestaurantData;
+
+        allData = results.map((row, index) => { 
+            const getVal = (key) => {
+                const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
+                return foundKey ? (row[foundKey] || "").toString().trim() : "";
+            };
+            return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
+        }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
+
+        const now = new Date();
+        document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+        buildFilterPills(allData); applyFilters();
+        document.getElementById('loader').classList.add('hidden');
+        refreshMap();
+    } catch (error) { 
+        console.error("載入數據失敗:", error);
+        document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; 
+    }
+}
 
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
