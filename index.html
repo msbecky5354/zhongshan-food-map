@@ -5,32 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="google-adsense-account" content="ca-pub-8256903623772163">
 
-    <meta name="description" content="中山美食地圖 - 精選中山地道必食餐廳及招牌菜推介。香港人北上中山搵食、大灣區一日遊必備攻略，附帶一鍵導航，免安裝、完全免費！">
-    <meta name="keywords" content="中山美食, 中山餐廳推介, 中山自由行, 北上搵食, 大灣區美食, 石岐乳鴿, 中山攻略, 免費旅遊App, 懶人工具駅, 中山好去處">
-    <meta property="og:title" content="中山美食地圖 | 北上搵食必備">
-    <meta property="og:description" content="精選中山地道必食餐廳及招牌菜，帶你食勻大灣區好味道，完全免費！">
+    <!-- ================================================================= -->
+    <!-- 🌟 SEO 核心中樞：Meta 搜尋引擎標籤 🌟 -->
+    <!-- ================================================================= -->
+    <title>中山美食地圖 | 北上搵食必備・地道餐廳與必食推介</title>
+    <meta name="description" content="中山美食地圖 - 精選中山地道必食餐廳及招牌菜推介（石岐乳鴿、東區美食、坦洲/小欖美食）。香港人北上中山搵食、深中通道自由行及大灣區一日遊必備攻略，附帶一鍵導航，免安裝、完全免費！">
+    <meta name="keywords" content="中山美食, 中山美食地圖, 中山餐廳推介, 石岐乳鴿, 中山自由行, 北上搵食, 大灣區美食, 深中通道美食, 中山好去處, 東區美食, 坦洲美食, 小欖美食, 免費旅遊App, 懶人工具駅">
+    <meta name="author" content="懶人工具駅">
+    <meta name="robots" content="index, follow">
+
+    <!-- 🌟 SEO 最佳化：標準網址標籤 🌟 -->
+    <link rel="canonical" href="https://zhongshan-food-map.vercel.app/">
+
+    <!-- ================================================================= -->
+    <!-- 🌟 社交媒體分享預覽標籤 (Open Graph & Twitter Cards) 🌟 -->
+    <!-- ================================================================= -->
+    <meta property="og:title" content="中山美食地圖 | 北上搵食必備指南">
+    <meta property="og:description" content="精選中山地道必食餐廳及招牌菜，包含地圖定位與一鍵導航，帶你食勻大灣區好味道！">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://zhongshan-food-map.vercel.app/">
+    <meta property="og:image" content="app-icon-512.png">
+    <meta property="og:site_name" content="中山美食地圖">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="中山美食地圖 | 北上搵食必備指南">
+    <meta name="twitter:description" content="精選中山地道必食餐廳及招牌菜，包含地圖定位與一鍵導航！">
+    <meta name="twitter:image" content="app-icon-512.png">
 
     <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EB6B6MD5BK"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-EB6B6MD5BK');
-</script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EB6B6MD5BK"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-EB6B6MD5BK');
+    </script>
 
     <meta name="google-site-verification" content="Hc5hN1_E9_sRd-qshFZDMPThUHWkh4-9ajxGvxR43wE" />
     
-    <title>中山美食地圖</title>
+    <!-- ================================================================= -->
+    <!-- 🌟 Schema.org 結構化數據 (JSON-LD) - 提升 Google Rich Snippets 🌟 -->
+    <!-- ================================================================= -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "中山美食地圖",
+      "url": "https://zhongshan-food-map.vercel.app/",
+      "description": "精選中山地道必食餐廳及招牌菜推介，專為香港人北上搵食而設的互動美食地圖指南。",
+      "applicationCategory": "TravelApplication",
+      "operatingSystem": "All",
+      "inLanguage": "zh-HK",
+      "author": {
+        "@type": "Organization",
+        "name": "懶人工具駅",
+        "url": "https://lazytoolsstation.vercel.app"
+      }
+    }
+    </script>
     
     <link rel="icon" type="image/png" href="app-icon-512.png">
     <link rel="shortcut icon" href="app-icon-512.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#f97316">
     <link rel="apple-touch-icon" href="app-icon-512.png">
-    <!-- 喺引入主邏輯之前，先車個數據檔案入去 -->
-   <script src="data.js"></script>
+
+    <!-- 引入數據檔案 -->
+    <script src="data.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8256903623772163" crossorigin="anonymous"></script>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-GCGDM1JK5W"></script>
     <script>
@@ -52,9 +93,10 @@
         .filter-pill { transition: all 0.2s ease-in-out; }
         .star-active { color: #f5a623 !important; }
         
+        /* 🚨 修復重點：提升 Toast z-index 至 20000，確保永遠浮在 Modal (z-index: 11000) 上方 */
         #customToast {
             visibility: hidden; min-width: 320px; max-width: 90%; background-color: rgba(0, 0, 0, 0.95); color: #fff;
-            text-align: left; border-radius: 24px; padding: 20px; position: fixed; z-index: 10000;
+            text-align: left; border-radius: 24px; padding: 20px; position: fixed; z-index: 20000;
             left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 14px; line-height: 1.6;
             backdrop-filter: blur(15px); box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
@@ -95,8 +137,8 @@
             </div>
 
             <div class="space-y-2">
-                <button onclick="copySiteUrl()" class="w-full bg-[#f97316] text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm text-sm">
-                    <i class="fa-regular fa-copy"></i> 複製網站連結
+                <button id="btnCopySite" onclick="copySiteUrl(event)" class="w-full bg-[#f97316] text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm text-sm">
+                    <i class="fa-regular fa-copy"></i> <span>複製網站連結</span>
                 </button>
             </div>
         </div>
@@ -342,10 +384,14 @@
 
         window.showToast = function(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
-            if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; if(dur > 0) setTimeout(() => t.className = "", dur); } 
+            if(t) { 
+                t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="document.getElementById('customToast').className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold active:scale-95 transition-transform'>關閉</button></div>`; 
+                t.className = "show"; 
+                if(dur > 0) setTimeout(() => t.className = "", dur); 
+            } 
         };
 
-        /* --- 萬能剪貼簿複製 (支援 file://, HTTP, HTTPS) --- */
+        /* --- 萬能剪貼簿複製 (支援 file://, HTTP, HTTPS 及手機端) --- */
         window.copyToClipboard = function(text, successMsg = '✅ 已複製到剪貼簿') {
             if (navigator.clipboard && window.isSecureContext) {
                 navigator.clipboard.writeText(text).then(() => {
@@ -380,7 +426,7 @@
             document.body.removeChild(textArea);
         }
 
-        /* --- QR Code 分享邏輯 --- */
+        /* --- QR Code 分享邏輯與複製按鈕修復 --- */
         window.openQrModal = function() {
             const currentUrl = window.location.href;
             document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
@@ -391,8 +437,20 @@
             document.getElementById('qrModalOverlay').style.display = 'none';
         };
 
-        window.copySiteUrl = function() {
-            window.copyToClipboard(window.location.href, '✅ 網站連結已複製到剪貼簿！');
+        window.copySiteUrl = function(evt) {
+            if(evt) evt.stopPropagation();
+            const urlToCopy = window.location.href;
+            window.copyToClipboard(urlToCopy, '✅ 網站連結已複製到剪貼簿！');
+            
+            // 按鈕動態反饋，確保用戶點擊感流暢
+            const btn = document.getElementById('btnCopySite');
+            if (btn) {
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> <span>已複製連結！</span>';
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                }, 2000);
+            }
         };
 
         window.openInfoModal = function(type) {
@@ -438,31 +496,31 @@
             else { window.open(`https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(name + " " + district)}`, '_blank'); }
         };
 
-      async function init() {
-    try {
-        if (!window.allRestaurantData) {
-            throw new Error("數據未載入");
+        async function init() {
+            try {
+                if (!window.allRestaurantData) {
+                    throw new Error("數據未載入");
+                }
+                const results = window.allRestaurantData;
+
+                allData = results.map((row, index) => { 
+                    const getVal = (key) => {
+                        const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
+                        return foundKey ? (row[foundKey] || "").toString().trim() : "";
+                    };
+                    return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
+                }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
+
+                const now = new Date();
+                document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+                buildFilterPills(allData); applyFilters();
+                document.getElementById('loader').classList.add('hidden');
+                refreshMap();
+            } catch (error) { 
+                console.error("載入數據失敗:", error);
+                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; 
+            }
         }
-        const results = window.allRestaurantData;
-
-        allData = results.map((row, index) => { 
-            const getVal = (key) => {
-                const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
-                return foundKey ? (row[foundKey] || "").toString().trim() : "";
-            };
-            return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
-        }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
-
-        const now = new Date();
-        document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
-        buildFilterPills(allData); applyFilters();
-        document.getElementById('loader').classList.add('hidden');
-        refreshMap();
-    } catch (error) { 
-        console.error("載入數據失敗:", error);
-        document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; 
-    }
-}
 
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -545,7 +603,7 @@
                 statusLink.classList.remove('hidden');
                 statusLink.classList.add('inline-flex');
             } else {
-                statusLink.href = "#"; // 重置 Link 防呆
+                statusLink.href = "#";
                 statusLink.classList.add('hidden');
                 statusLink.classList.remove('inline-flex');
             }
@@ -609,13 +667,13 @@
         window.shareRestaurant = function(idx) {
             const item = currentRenderedData[idx];
             const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`;
-            window.copyToClipboard(url, '✅ 連結已複製');
+            window.copyToClipboard(url, '✅ 餐廳連結已複製');
         };
 
         window.shareDetail = function() {
             if(!activeDetailItem) return;
             const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`;
-            window.copyToClipboard(url, '✅ 連結已複製');
+            window.copyToClipboard(url, '✅ 餐廳連結已複製');
         };
         
         document.addEventListener('DOMContentLoaded', init);
