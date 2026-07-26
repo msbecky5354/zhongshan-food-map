@@ -135,7 +135,7 @@
                         <span class="text-[11px] font-bold whitespace-nowrap">深中珠巴士<span class="text-yellow-300">懶人包</span></span>
                     </a>
 
-                    <!-- 新增的分享/QR Code 按鈕 -->
+                    <!-- 右上角分享按鈕 -->
                     <button class="h-9 w-9 md:w-auto md:px-2.5 bg-orange-500 text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm shrink-0" onclick="openQrModal()" title="分享">
                         <i class="fa-solid fa-qrcode text-base"></i>
                         <span class="text-[10px] font-bold hidden md:inline">分享</span>
@@ -345,6 +345,41 @@
             if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; if(dur > 0) setTimeout(() => t.className = "", dur); } 
         };
 
+        /* --- 萬能剪貼簿複製 (支援 file://, HTTP, HTTPS) --- */
+        window.copyToClipboard = function(text, successMsg = '✅ 已複製到剪貼簿') {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    window.showToast(successMsg);
+                }).catch(() => {
+                    fallbackCopy(text, successMsg);
+                });
+            } else {
+                fallbackCopy(text, successMsg);
+            }
+        };
+
+        function fallbackCopy(text, successMsg) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    window.showToast(successMsg);
+                } else {
+                    window.showToast('❌ 複製失敗，請手動複製');
+                }
+            } catch (err) {
+                window.showToast('❌ 複製失敗，請手動複製');
+            }
+            document.body.removeChild(textArea);
+        }
+
         /* --- QR Code 分享邏輯 --- */
         window.openQrModal = function() {
             const currentUrl = window.location.href;
@@ -357,9 +392,7 @@
         };
 
         window.copySiteUrl = function() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                window.showToast('✅ 網站連結已複製到剪貼簿！');
-            });
+            window.copyToClipboard(window.location.href, '✅ 網站連結已複製到剪貼簿！');
         };
 
         window.openInfoModal = function(type) {
@@ -547,7 +580,11 @@
         window.toggleUserStatus = function(type) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data[type] = !data[type]; saveUserData(name, data); updateDetailUI(data); applyFilters(); };
         window.saveRating = function(val) { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.rating = val; saveUserData(name, data); updateDetailUI(data); };
         window.saveNote = function() { if(!activeDetailItem) return; const name = activeDetailItem.Restaurant_Name; let data = getUserData(name); data.note = document.getElementById('noteInput').value; saveUserData(name, data); };
-        window.copyAddress = function() { const addr = document.getElementById('detailAddress').innerText; navigator.clipboard.writeText(addr).then(() => { window.showToast('✅ 地址已複製'); }); };
+        
+        window.copyAddress = function() {
+            const addr = document.getElementById('detailAddress').innerText;
+            window.copyToClipboard(addr, '✅ 地址已複製');
+        };
         
         function buildFilterPills(data) {
             const valid = data; 
@@ -569,8 +606,17 @@
             document.getElementById('inlineCategoryFilter').value = filtersState.category; document.getElementById('inlinePriceFilter').value = filtersState.price;
         }
 
-        window.shareRestaurant = function(idx) { const item = currentRenderedData[idx]; const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`; navigator.clipboard.writeText(url).then(() => { window.showToast('✅ 連結已複製'); }); };
-        window.shareDetail = function() { if(!activeDetailItem) return; const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`; navigator.clipboard.writeText(url).then(() => { window.showToast('✅ 連結已複製'); }); };
+        window.shareRestaurant = function(idx) {
+            const item = currentRenderedData[idx];
+            const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(item.Restaurant_Name)}`;
+            window.copyToClipboard(url, '✅ 連結已複製');
+        };
+
+        window.shareDetail = function() {
+            if(!activeDetailItem) return;
+            const url = `${window.location.origin}${window.location.pathname}?r=${encodeURIComponent(activeDetailItem.Restaurant_Name)}`;
+            window.copyToClipboard(url, '✅ 連結已複製');
+        };
         
         document.addEventListener('DOMContentLoaded', init);
     </script>
