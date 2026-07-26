@@ -93,6 +93,18 @@
         .filter-pill { transition: all 0.2s ease-in-out; }
         .star-active { color: #f5a623 !important; }
         
+        /* 天氣走馬燈滾動動畫 */
+        @keyframes weatherScroll {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-scroll {
+            display: inline-block;
+            white-space: nowrap;
+            animation: weatherScroll 18s linear infinite;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
         /* 🚨 修復重點：提升 Toast z-index 至 20000，確保永遠浮在 Modal (z-index: 11000) 上方 */
         #customToast {
             visibility: hidden; min-width: 320px; max-width: 90%; background-color: rgba(0, 0, 0, 0.95); color: #fff;
@@ -155,7 +167,7 @@
     </div>
 
     <div class="sticky top-0 z-50 shadow-sm flex flex-col bg-white">
-        <header class="px-4 pt-5 pb-3 border-b border-gray-100">
+        <header class="px-4 pt-4 pb-3 border-b border-gray-100">
             <div class="max-w-6xl mx-auto flex items-center justify-between">
                 <div class="flex items-center cursor-pointer active:opacity-60" onclick="resetToHome()">
                     <div class="w-11 h-11 rounded-2xl overflow-hidden border border-gray-100 bg-white flex-shrink-0">
@@ -196,6 +208,12 @@
                         <span class="text-[10px] font-bold hidden md:inline">頻道</span>
                     </a>
                 </div>
+            </div>
+
+            <!-- 🌤️ 中山天氣與特別天氣動態元件區 -->
+            <div class="max-w-6xl mx-auto mt-2 flex flex-col gap-1">
+                <div id="special-weather-container" class="opacity-0 transition-opacity"></div>
+                <div id="weather-badge-container" class="opacity-0 transition-opacity"></div>
             </div>
         </header>
 
@@ -382,6 +400,148 @@
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
         const districtColors = { "東區": "#ef4444", "坦洲鎮": "#7a8f9a", "石岐區": "#f59e0b", "西區": "#3b82f6", "南區": "#10b981", "小欖鎮": "#8b5cf6", "全部": "#f97316" };
 
+        /* ================================================================= */
+        /* 🌤️ 中山天氣動態載入邏輯 */
+        /* ================================================================= */
+        async function fetchWeatherNews() {
+            const container = document.getElementById('weather-badge-container');
+            if (!container) return;
+
+            try {
+                const apiUrl = `https://msbecky5354.github.io/JSON/data/zs_weather.json?v=${Date.now()}`; 
+                const res = await fetch(apiUrl, { method: 'GET' });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    let msg = data.zs_message || data.hk_message || data.message || ""; 
+                    
+                    if (msg) {
+                        msg = msg.replace(/\n/g, '<span class="text-blue-300 mx-3">|</span>'); 
+                        msg = msg.replace(/\*(.*?)\*/g, '<strong class="font-bold text-blue-900">$1</strong>'); 
+                        msg = msg.replace(/(\|\s*\|)+/g, '<span class="text-blue-300 mx-3">|</span>');
+
+                        container.innerHTML = `
+                            <div class="weather-ticker-container w-full overflow-hidden bg-blue-50/60 rounded-md border border-blue-100/50 px-2 flex items-center h-7 text-[12px] text-blue-800 shadow-sm">
+                                <i class="fa-solid fa-cloud-sun text-blue-500 mr-2 shrink-0 text-[11px]"></i>
+                                <div class="w-full overflow-hidden relative h-full flex items-center no-scrollbar">
+                                    <div class="animate-scroll font-medium tracking-wide">
+                                        ${msg}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.classList.remove('opacity-0');
+                    }
+                }
+            } catch (e) {
+                console.log("Routine weather fetch failed:", e);
+            }
+        }
+
+        async function fetchSpecialNews() {
+            const container = document.getElementById('special-weather-container');
+            if (!container) return;
+
+            try {
+                const apiUrl = `https://msbecky5354.github.io/JSON/data/zs_special_weather.json?v=${Date.now()}`; 
+                const res = await fetch(apiUrl, { method: 'GET' });
+
+                if (res.ok) {
+                    const textData = await res.text();
+                    
+                    if (!textData || textData.trim() === "") return;
+
+                    const data = JSON.parse(textData);
+                    let msg = data.zs_message || data.hk_message || data.special_message || data.message || ""; 
+                    
+                    if (msg && msg.trim() !== "") {
+                        window._currentSpecialMsg = msg;
+
+                        let themeColor = '#dc2626';
+                        let textColor = '#ffffff';
+
+                        if (msg.includes('一號')) { themeColor = '#fca5a5'; textColor = '#1e293b'; } 
+                        else if (msg.includes('三號') || msg.includes('橙')) { themeColor = '#f97316'; } 
+                        else if (msg.includes('八號')) { themeColor = '#b91c1c'; } 
+                        else if (msg.includes('九號') || msg.includes('十號')) { themeColor = '#450a0a'; } 
+                        else if (msg.includes('黃色')) { themeColor = '#d97706'; } 
+                        else if (msg.includes('黑色')) { themeColor = '#09090b'; }
+                        else if (msg.includes('白')) { themeColor = '#ffffff'; textColor = '#1e293b'; } 
+                        else if (msg.includes('藍') || msg.includes('蓝')) { themeColor = '#2563eb'; } 
+                        else if (msg.includes('黃') || msg.includes('黄')) { themeColor = '#eab308'; textColor = '#1e293b'; } 
+
+                        window._specialThemeColor = themeColor;
+                        window._specialTextColor = textColor;
+
+                        container.innerHTML = `
+                            <div onclick="openSpecialWeatherModal()" style="background-color: ${themeColor}; color: ${textColor};" class="border border-black/10 text-[11px] px-2.5 py-1 rounded-xl font-bold flex items-center shadow-sm animate-pulse max-w-full truncate cursor-pointer transition-transform active:scale-95" title="${msg}">
+                                <i class="fa-solid fa-triangle-exclamation mr-1.5 shrink-0 opacity-90"></i>
+                                <span class="truncate drop-shadow-sm">${msg}</span>
+                            </div>
+                        `;
+                        container.classList.remove('opacity-0');
+                    }
+                }
+            } catch (e) {
+                console.log("Special weather fetch failed or file is empty.", e);
+            }
+        }
+
+        window.openSpecialWeatherModal = function() {
+            const msg = window._currentSpecialMsg || "暫無特別天氣消息";
+            const formattedMsg = msg.replace(/\n/g, '<br>');
+            
+            const themeColor = window._specialThemeColor || '#dc2626';
+            const textColor = window._specialTextColor || '#ffffff';
+            
+            let modal = document.getElementById('special-weather-modal-container');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'special-weather-modal-container';
+                modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm z-[20000] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 px-4';
+                document.body.appendChild(modal);
+            }
+
+            modal.innerHTML = `
+                <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl transform scale-95 transition-transform duration-300 relative overflow-hidden border border-white/50">
+                    <div style="background-color: ${themeColor}; color: ${textColor};" class="p-6 text-center relative transition-colors duration-500">
+                        <i class="fa-solid fa-triangle-exclamation text-4xl animate-pulse drop-shadow-md"></i>
+                        <h3 class="font-black text-xl mt-2 tracking-wide drop-shadow-sm">極端天氣預警</h3>
+                        <button onclick="closeSpecialWeatherModal()" style="color: ${textColor};" class="absolute top-3 right-3 text-xl leading-none w-8 h-8 flex items-center justify-center rounded-full bg-black/10 hover:bg-black/20 transition-colors">&times;</button>
+                    </div>
+                    
+                    <div class="p-6 max-h-[60vh] overflow-y-auto text-gray-800 text-sm md:text-base leading-relaxed font-bold bg-slate-50/80">
+                        ${formattedMsg}
+                    </div>
+                    
+                    <div class="p-4 border-t border-gray-100 bg-white text-center">
+                        <button onclick="closeSpecialWeatherModal()" style="background-color: ${themeColor}; color: ${textColor};" class="font-bold py-3 px-8 rounded-xl shadow-md transition-all active:scale-95 w-full text-base">
+                            我明白咗
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            modal.onclick = function(e) {
+                if (e.target === this) closeSpecialWeatherModal();
+            };
+
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.firstElementChild.classList.remove('scale-95');
+            });
+        };
+
+        window.closeSpecialWeatherModal = function() {
+            const modal = document.getElementById('special-weather-modal-container');
+            if (modal) {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.firstElementChild.classList.add('scale-95');
+            }
+        };
+
+        /* ================================================================= */
+
         window.showToast = function(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
             if(t) { 
@@ -442,7 +602,6 @@
             const urlToCopy = window.location.href;
             window.copyToClipboard(urlToCopy, '✅ 網站連結已複製到剪貼簿！');
             
-            // 按鈕動態反饋，確保用戶點擊感流暢
             const btn = document.getElementById('btnCopySite');
             if (btn) {
                 const originalHtml = btn.innerHTML;
@@ -498,6 +657,10 @@
 
         async function init() {
             try {
+                // 自動同步載入中山天氣數據
+                fetchWeatherNews();
+                fetchSpecialNews();
+
                 if (!window.allRestaurantData) {
                     throw new Error("數據未載入");
                 }
