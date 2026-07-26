@@ -61,12 +61,12 @@
         #customToast.show { visibility: visible; animation: fadein 0.3s; }
         @keyframes fadein { from {opacity: 0; transform: translate(-50%, -45%);} to {opacity: 1; transform: translate(-50%, -50%);} }
 
-        #infoModalOverlay {
+        #infoModalOverlay, #qrModalOverlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
             z-index: 11000; align-items: center; justify-content: center; padding: 20px;
             backdrop-filter: blur(5px);
         }
-        #infoModal {
+        #infoModal, #qrModal {
             background: white; border-radius: 40px; width: 100%; max-width: 550px; 
             padding: 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
             max-height: 85vh; overflow-y: auto;
@@ -77,6 +77,30 @@
 <body class="bg-gray-50 min-h-screen">
 
     <div id="customToast" onclick="event.stopPropagation()"></div>
+
+    <!-- QR Code 分享彈窗 -->
+    <div id="qrModalOverlay" onclick="closeQrModal()">
+        <div id="qrModal" class="text-center !max-w-sm !p-6" onclick="event.stopPropagation()">
+            <button onclick="closeQrModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center active:scale-90 transition">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            <div class="w-12 h-12 bg-orange-100 text-[#f97316] rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h2 class="text-gray-800 text-xl font-bold mb-1">分享中山美食地圖</h2>
+            <p class="text-gray-400 text-xs mb-5">掃描 QR Code 或複製連結分享給好友</p>
+
+            <div class="bg-gray-50 p-4 rounded-3xl border border-gray-100 inline-block mb-5">
+                <img id="qrCodeImg" src="" alt="QR Code" class="w-48 h-48 mx-auto rounded-xl shadow-sm">
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="copySiteUrl()" class="w-full bg-[#f97316] text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform flex items-center justify-center gap-2 shadow-sm text-sm">
+                    <i class="fa-regular fa-copy"></i> 複製網站連結
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="infoModalOverlay" onclick="closeInfoModal()">
         <div id="infoModal" onclick="event.stopPropagation()">
@@ -110,6 +134,12 @@
                         <img src="buslogo.png" class="w-[22px] h-[22px] object-contain rounded-md bg-white p-[2px]" alt="深中珠巴士懶人包">
                         <span class="text-[11px] font-bold whitespace-nowrap">深中珠巴士<span class="text-yellow-300">懶人包</span></span>
                     </a>
+
+                    <!-- 新增的分享/QR Code 按鈕 -->
+                    <button class="h-9 w-9 md:w-auto md:px-2.5 bg-orange-500 text-white rounded-xl flex items-center justify-center gap-1 active:scale-90 transition-transform shadow-sm shrink-0" onclick="openQrModal()" title="分享">
+                        <i class="fa-solid fa-qrcode text-base"></i>
+                        <span class="text-[10px] font-bold hidden md:inline">分享</span>
+                    </button>
 
                     <button class="h-9 w-9 md:w-auto md:px-2.5 rounded-xl flex items-center justify-center gap-1 text-gray-500 bg-gray-50 border border-gray-100 active:scale-90 transition-transform shadow-sm shrink-0" onclick="showUserGuide()" title="指南">
                         <i class="fa-solid fa-circle-question text-base"></i>
@@ -302,11 +332,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
-        // --- 核心修改部分 ---
-        // 舊代碼: const apiUrl = 'https://script.google.com/macros/s/.../exec';
-        // 新代碼: 更改為讀取同層目錄嘅 data.json
         const apiUrl = 'data.json'; 
-        // ------------------
 
         let allData = [], currentRenderedData = [], activeDetailItem = null;
         let filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
@@ -317,6 +343,23 @@
         window.showToast = function(msg, dur = 3000) { 
             const t = document.getElementById("customToast"); 
             if(t) { t.innerHTML = msg + `<div class='mt-4 text-center'><button onclick="this.parentElement.parentElement.className=''" class='bg-white/20 px-6 py-2 rounded-full text-xs font-bold'>關閉</button></div>`; t.className = "show"; if(dur > 0) setTimeout(() => t.className = "", dur); } 
+        };
+
+        /* --- QR Code 分享邏輯 --- */
+        window.openQrModal = function() {
+            const currentUrl = window.location.href;
+            document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentUrl)}`;
+            document.getElementById('qrModalOverlay').style.display = 'flex';
+        };
+
+        window.closeQrModal = function() {
+            document.getElementById('qrModalOverlay').style.display = 'none';
+        };
+
+        window.copySiteUrl = function() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                window.showToast('✅ 網站連結已複製到剪貼簿！');
+            });
         };
 
         window.openInfoModal = function(type) {
@@ -364,8 +407,6 @@
 
       async function init() {
     try {
-        // ❌ 刪除原本的 fetch(fetchUrl) 代碼
-        // 💡 改為直接讀取 window.allRestaurantData
         if (!window.allRestaurantData) {
             throw new Error("數據未載入");
         }
