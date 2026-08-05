@@ -231,6 +231,32 @@
         </div>
     </div>
 
+    <!-- 📖 全新專屬互動式用戶指南大彈窗 -->
+<div id="userGuideModalOverlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[25000] hidden items-center justify-center p-4" onclick="closeUserGuideModal()">
+    <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onclick="event.stopPropagation()">
+        <!-- 彈窗標題欄 -->
+        <div class="bg-gradient-to-r from-orange-500 to-amber-500 text-white p-5 flex items-center justify-between shrink-0 shadow-sm">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-base leading-tight">用戶操作手冊</h3>
+                    <p class="text-[11px] text-orange-100 font-medium">點擊下方卡片查看詳細使用指南</p>
+                </div>
+            </div>
+            <button onclick="closeUserGuideModal()" class="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition active:scale-95 text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <!-- 動態內容區 (首頁四大卡片 vs 詳情頁) -->
+        <div id="userGuideContentArea" class="p-5 overflow-y-auto flex-1 bg-gray-50/50 space-y-3">
+            <!-- 內容將由 JavaScript 動態渲染 -->
+        </div>
+    </div>
+</div>
+
     <div id="infoModalOverlay" onclick="closeInfoModal()">
         <div id="infoModal" onclick="event.stopPropagation()">
             <h2 id="infoModalTitle" class="text-[#d48806] text-2xl font-bold mb-6"></h2>
