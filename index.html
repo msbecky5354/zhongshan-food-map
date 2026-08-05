@@ -690,7 +690,7 @@
             currentRenderedData = allData.filter(item => {
                 const userData = getUserData(item.Restaurant_Name);
                 const matchD = filtersState.district === '全部' || item.District === filtersState.district;
-                const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
+                const matchC = filtersState.category === '全部' || (item.Category && item.Category.includes(filtersState.category));
                 const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
                 const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
                 return matchD && matchC && matchS && matchTag;
@@ -812,11 +812,23 @@
             const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
             
             dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(valid.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
-            cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(valid.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
+            
+            const allCategories = [];
+            valid.forEach(i => {
+                if (i.Category) {
+                    i.Category.split('/').forEach(c => {
+                        const trimmed = c.trim();
+                        if (trimmed) allCategories.push(trimmed);
+                    });
+                }
+            });
+            const uniqueCategories = [...new Set(allCategories)];
+
+            cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + uniqueCategories.map(c => createPill('category', c, `${CATEGORY_ICONS[c] || '🍽️'} ${c}`)).join('');
             pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
             
             const inlineCat = document.getElementById('inlineCategoryFilter');
-            inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + [...new Set(valid.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
+            inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + uniqueCategories.map(c => `<option value="${c}">${CATEGORY_ICONS[c] || '🍽️'} ${c}</option>`).join('');
             updatePillUI();
         }
         
