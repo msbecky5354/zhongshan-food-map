@@ -970,34 +970,46 @@ window.renderUserGuideDetail = function(categoryKey) {
             else { window.open(`https://www.xiaohongshu.com/search_result/?keyword=${encodeURIComponent(name + " " + district)}`, '_blank'); }
         };
 
-        async function init() {
-            try {
-                fetchWeatherNews();
-                fetchSpecialNews();
+       async function init() {
+    try {
+        fetchWeatherNews();
+        fetchSpecialNews();
 
-                if (!window.allRestaurantData) {
-                    throw new Error("數據未載入");
-                }
-                const results = window.allRestaurantData;
-
-                allData = results.map((row, index) => { 
-                    const getVal = (key) => {
-                        const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
-                        return foundKey ? (row[foundKey] || "").toString().trim() : "";
-                    };
-                    return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), 'Date': getVal('Date') || getVal('日期') || '', '_index': index };
-                }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
-
-                const now = new Date();
-                document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
-                buildFilterPills(allData); applyFilters();
-                initMapInteractions();
-                document.getElementById('loader').classList.add('hidden');
-            } catch (error) { 
-                console.error("載入數據失敗:", error);
-                document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; 
-            }
+        if (!window.allRestaurantData) {
+            throw new Error("數據未載入");
         }
+        const results = window.allRestaurantData;
+
+        allData = results.map((row, index) => { 
+            const getVal = (key) => {
+                const foundKey = Object.keys(row).find(k => k.trim().toLowerCase() === key.toLowerCase());
+                return foundKey ? (row[foundKey] || "").toString().trim() : "";
+            };
+            return { 
+                'Restaurant_Name': getVal('Restaurant_Name'), 
+                'District': getVal('District'), 
+                'Category': getVal('Category'), 
+                'Avg_Cost': getVal('Avg_Cost'), 
+                'Description': getVal('Description'), 
+                'Address': getVal('Address'), 
+                'Amap_URL': getVal('Amap_URL'), 
+                'Status': getVal('status'), 
+                'Youtube': getVal('Youtube'), 
+                'Date': getVal('Date') || getVal('日期') || '', 
+                '_index': index 
+            };
+        }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
+
+        const now = new Date();
+        document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+        buildFilterPills(allData); applyFilters();
+        initMapInteractions();
+        document.getElementById('loader').classList.add('hidden');
+    } catch (error) { 
+        console.error("載入數據失敗:", error);
+        document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; 
+    }
+}
 
         function applyFilters() {
             const term = document.getElementById('searchInput').value.toLowerCase().trim();
