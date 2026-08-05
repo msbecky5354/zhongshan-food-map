@@ -686,23 +686,42 @@
         }
 
         function applyFilters() {
-            const term = document.getElementById('searchInput').value.toLowerCase().trim();
-            currentRenderedData = allData.filter(item => {
-                const userData = getUserData(item.Restaurant_Name);
-                const matchD = filtersState.district === '全部' || item.District === filtersState.district;
-                const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
-                const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
-                const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
-                return matchD && matchC && matchS && matchTag;
-            }).sort((a, b) => {
-                const aHasYt = a.Youtube && a.Youtube.startsWith('http') ? 1 : 0;
-                const bHasYt = b.Youtube && b.Youtube.startsWith('http') ? 1 : 0;
-                if (aHasYt !== bHasYt) return bHasYt - aHasYt;
-                return b._index - a._index;
-            });
-            renderData(currentRenderedData);
+    const term = document.getElementById('searchInput').value.toLowerCase().trim();
+    currentRenderedData = allData.filter(item => {
+        const userData = getUserData(item.Restaurant_Name);
+        const matchD = filtersState.district === '全部' || item.District === filtersState.district;
+        const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
+        const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
+        const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
+        
+        // 🌟 新增：價位篩選邏輯 (Price Filter)
+        let matchP = true;
+        if (filtersState.price !== '全部') {
+            const cost = parseFloat(item.Avg_Cost);
+            // 如果數據冇提供價錢，或者唔係數字，篩選特定價位時將會隱藏
+            if (isNaN(cost)) {
+                matchP = false; 
+            } else {
+                if (filtersState.price === '0-50') {
+                    matchP = cost <= 50;
+                } else if (filtersState.price === '51-100') {
+                    matchP = cost > 50 && cost <= 100;
+                } else if (filtersState.price === '101-') {
+                    matchP = cost > 100;
+                }
+            }
         }
-
+        
+        // 確保所有條件 (包含 matchP) 都符合先會顯示
+        return matchD && matchC && matchS && matchTag && matchP;
+    }).sort((a, b) => {
+        const aHasYt = a.Youtube && a.Youtube.startsWith('http') ? 1 : 0;
+        const bHasYt = b.Youtube && b.Youtube.startsWith('http') ? 1 : 0;
+        if (aHasYt !== bHasYt) return bHasYt - aHasYt;
+        return b._index - a._index;
+    });
+    renderData(currentRenderedData);
+}
         function renderData(data) {
             const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
             header.style.backgroundColor = districtColors[filtersState.district] || "#f97316";
