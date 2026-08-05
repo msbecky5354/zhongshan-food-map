@@ -1120,51 +1120,68 @@ window.removeCategoryFilter = function(cat) {
 };
 
         
-        function renderData(data) {
+       function renderData(data) {
             const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
             header.style.backgroundColor = districtColors[filtersState.district] || "#f97316";
             header.classList.remove('hidden');
             document.getElementById('districtTitle').innerText = filtersState.district === '全部' ? (document.getElementById('searchInput').value ? '搜尋結果' : '所有地區') : filtersState.district;
             document.getElementById('districtCount').innerText = `共 ${data.length} 間`;
-            if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white">🍽️ 找不到結果。</div>`; return; }
+            if (data.length === 0) { container.innerHTML = `<div class="col-span-full p-20 text-center text-gray-400 bg-white font-bold text-base">🍽️ 找不到符合條件的餐廳。</div>`; return; }
             
             container.innerHTML = data.map((item, index) => {
                 const userData = getUserData(item.Restaurant_Name);
                 const hasYoutube = item.Youtube && item.Youtube.startsWith('http');
                 
-                return `<div class="bg-white p-4 relative border-b border-gray-100">
-                    <div class="flex gap-4 cursor-pointer mb-3" onclick="openDetail(${index})">
-                        <div class="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0 text-3xl border border-gray-100">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
-                        <div class="flex-1 min-w-0 pr-6">
+                return `<div class="bg-white p-5 relative border border-slate-100 shadow-sm hover:shadow-md hover:border-cyan-400 transition-all duration-300 rounded-2xl mb-3">
+                    <div class="flex gap-4 cursor-pointer mb-4 items-start" onclick="openDetail(${index})">
+                        <!-- 科技風深色圖示方塊，與純白底產生強烈視覺對比 -->
+                        <div class="w-16 h-16 rounded-2xl bg-slate-900 text-cyan-400 flex items-center justify-center flex-shrink-0 text-3xl border border-cyan-500/30 shadow-inner">${CATEGORY_ICONS[item.Category] || '🍽️'}</div>
+                        
+                        <div class="flex-1 min-w-0 pr-2">
                             <div class="flex justify-between items-start">
-                                <div class="flex items-center gap-1.5 truncate">
-                                    <h3 class="text-[16px] font-bold text-gray-800 truncate">${item.Restaurant_Name}</h3>
-                                    ${hasYoutube ? `<i class="fa-brands fa-youtube text-red-600 text-lg"></i>` : ''}
+                                <div class="flex items-center gap-2 truncate">
+                                    <!-- 餐廳名稱：超大、特粗、具現代感 -->
+                                    <h3 class="text-lg font-black text-slate-900 tracking-tight truncate">${item.Restaurant_Name}</h3>
+                                    ${hasYoutube ? `<i class="fa-brands fa-youtube text-red-600 text-xl shrink-0"></i>` : ''}
                                 </div>
                                 
                                 <div class="flex items-center gap-3 shrink-0 ml-2">
                                     ${(item.Status && item.Status.startsWith('http')) ? `<a href="${item.Status}" target="_blank" onclick="event.stopPropagation()" class="relative flex items-center justify-center w-9 h-9 shrink-0 bg-white text-red-600 rounded-full border-2 border-red-600 shadow-sm active:scale-90 transition-transform" title="點擊查看有伏詳情">
-                                        <span class="absolute -top-4 text-[14px] animate-bounce drop-shadow-sm pointer-events-none">👇</span>
+                                        <span class="absolute -top-4 text-[13px] animate-bounce drop-shadow-sm pointer-events-none">👇</span>
                                         <span class="text-[11px] font-black leading-none mt-0.5">有伏</span>
                                     </a>` : ''}
-                                    <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-400' : 'text-gray-200'} text-lg"></i>
+                                    <i class="fa-solid fa-heart ${userData.favorite ? 'text-orange-500' : 'text-slate-200'} text-xl"></i>
                                 </div>
                             </div>
-                            <p class="text-[11px] text-gray-400 line-clamp-1 mt-0.5 leading-tight">${item.Highlight || '查看詳情'}</p>
-                            <div class="flex justify-between items-center mt-2">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-[10px] font-bold">${item.District}</span>
-                                    <span class="bg-gray-100 text-gray-500 px-2.5 py-0.5 rounded-full text-[10px] font-medium">${item.Category}</span>
+                            
+                            <!-- 食客點評摘要 -->
+                            <p class="text-xs text-slate-500 line-clamp-1 mt-1 font-medium leading-relaxed">${item.Highlight || '查看詳細餐廳資訊'}</p>
+                            
+                            <!-- 地區、類別與人均價錢 -->
+                            <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-lg text-[11px] font-bold border border-slate-200/60">${item.District}</span>
+                                    <span class="bg-cyan-50 text-cyan-700 px-3 py-0.5 rounded-full text-[11px] font-bold border border-cyan-100">${item.Category}</span>
                                 </div>
-                                <span class="text-[11px] text-gray-400">人均 ¥${item.Avg_Cost || '--'}</span>
+                                <span class="text-xs font-black text-cyan-600 tracking-wide">人均 ¥${item.Avg_Cost || '--'}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-4 gap-2 border-t border-gray-50 pt-3">
-                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-blue-100 bg-blue-50/30 text-blue-500 text-[10px] font-bold active:scale-95 transition">導航</a>
-                        <button onclick="event.stopPropagation(); handleXhsClick('${item.Restaurant_Name.replace(/'/g, "\\'")}', '${item.District}')" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-red-100 bg-red-50/30 text-red-500 text-[10px] font-bold active:scale-95 transition">小紅書</button>
-                        <a href="https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-800 text-[10px] font-bold active:scale-95 transition">抖音</a>
-                        <button onclick="event.stopPropagation(); window.shareRestaurant(${index})" class="flex items-center justify-center gap-1 py-1.5 rounded-lg border border-green-100 bg-green-50/30 text-green-500 text-[10px] font-bold active:scale-95 transition">分享</button>
+                    
+                    <!-- 底部功能按鈕列：Hi-Tech 扁平化 Cyber 風格 -->
+                    <div class="grid grid-cols-4 gap-2.5 pt-3 border-t border-slate-100">
+                        <a href="${item.Amap_URL || '#'}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-blue-200 bg-blue-50/50 text-blue-600 text-xs font-bold active:scale-95 transition shadow-sm">
+                            <i class="fa-solid fa-location-arrow text-[11px]"></i> 導航
+                        </a>
+                        <button onclick="event.stopPropagation(); handleXhsClick('${item.Restaurant_Name.replace(/'/g, "\\'")}', '${item.District}')" class="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-red-200 bg-red-50/50 text-red-600 text-xs font-bold active:scale-95 transition shadow-sm">
+                            <i class="fa-solid fa-book-open text-[11px]"></i> 小紅書
+                        </button>
+                        <a href="https://www.douyin.com/search/${encodeURIComponent(item.Restaurant_Name + " " + item.District)}" target="_blank" onclick="event.stopPropagation()" class="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 text-xs font-bold active:scale-95 transition shadow-sm">
+                            <i class="fa-brands fa-tiktok text-[11px]"></i> 抖音
+                        </a>
+                        <button onclick="event.stopPropagation(); window.shareRestaurant(${index})" class="flex items-center justify-center gap-1.5 py-2 rounded-xl border border-emerald-200 bg-emerald-50/50 text-emerald-600 text-xs font-bold active:scale-95 transition shadow-sm">
+                            <i class="fa-solid fa-share-nodes text-[11px]"></i> 分享
+                        </button>
                     </div>
                 </div>`;
             }).join('');
