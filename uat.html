@@ -93,7 +93,6 @@
         .filter-pill { transition: all 0.2s ease-in-out; }
         .star-active { color: #f5a623 !important; }
         
-        /* 天氣走馬燈滾動動畫 */
         @keyframes weatherScroll {
             0% { transform: translateX(100%); }
             100% { transform: translateX(-100%); }
@@ -130,7 +129,6 @@
 
     <div id="customToast" onclick="event.stopPropagation()"></div>
 
-    <!-- QR Code 分享彈窗 -->
     <div id="qrModalOverlay" onclick="closeQrModal()">
         <div id="qrModal" class="text-center !max-w-sm !p-6" onclick="event.stopPropagation()">
             <button onclick="closeQrModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 flex items-center justify-center active:scale-90 transition">
@@ -330,8 +328,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/image-map-resizer/1.0.10/js/imageMapResizer.min.js"></script>
     <script>
         let allData = [], currentRenderedData = [], activeDetailItem = null;
-        
-        // 💡 升級為支援多選的狀態（category 改為 Set 或 陣列）
         let filtersState = { district: '全部', categories: new Set(['全部']), price: '全部', myTag: '全部' };
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
         const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
@@ -416,7 +412,6 @@
         window.triggerSearch = function() { closeDetail(); applyFilters(); document.activeElement.blur(); jumpToResults(); };
         window.jumpToResults = function() { document.getElementById('filterMenu').classList.add('hidden'); window.scrollTo({ top: document.getElementById('resultsAnchor').offsetTop - 100, behavior: 'smooth' }); };
         
-        // 💡 支援多選菜式的狀態設定
         window.setFilterState = function(t, v) { 
             if (t === 'category') {
                 if (v === '全部') {
@@ -462,7 +457,10 @@
                     return { 'Restaurant_Name': getVal('Restaurant_Name'), 'District': getVal('District'), 'Category': getVal('Category'), 'Avg_Cost': getVal('Avg_Cost'), 'Highlight': getVal('Highlight'), 'Address': getVal('Address'), 'Amap_URL': getVal('Amap_URL'), 'Status': getVal('status'), 'Youtube': getVal('Youtube'), '_index': index };
                 }).filter(i => i.Restaurant_Name !== "" && i.Status.toUpperCase() !== "X");
 
-                document.getElementById('updateTime').innerText = `最後更新：${new.getFullYear()}年${new.getMonth()+1}月${new.getDate()}日`;
+                // 💡 修正 JavaScript 語法錯誤：改用 new Date().getFullYear()
+                const now = new Date();
+                document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
+                
                 buildFilterPills(allData); applyFilters();
                 document.getElementById('loader').classList.add('hidden');
             } catch (e) { document.getElementById('loader').innerHTML = '<div class="text-gray-400">載入失敗。</div>'; }
@@ -473,10 +471,7 @@
             currentRenderedData = allData.filter(item => {
                 const userData = getUserData(item.Restaurant_Name);
                 const matchD = filtersState.district === '全部' || item.District === filtersState.district;
-                
-                // 💡 多選菜式匹配邏輯：只要餐廳包含任一已選菜式即符合
                 const matchC = filtersState.categories.has('全部') || [...filtersState.categories].some(cat => item.Category && item.Category.includes(cat));
-                
                 const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
                 const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
                 return matchD && matchC && matchS && matchTag;
