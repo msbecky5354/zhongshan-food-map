@@ -1024,7 +1024,7 @@ window.renderUserGuideDetail = function(categoryKey) {
                     matchC = filtersState.category.some(cat => item.Category && item.Category.includes(cat));
                 }
 
-                const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
+                const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Description && item.Description.toLowerCase().includes(term));
                 const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
 
                 let matchP = true;
@@ -1166,8 +1166,8 @@ window.removeCategoryFilter = function(cat) {
                                 </div>
                             </div>
                             
-                            <!-- 食客點評摘要 -->
-                            <p class="text-xs text-slate-500 line-clamp-1 mt-1 font-medium leading-relaxed">${item.Highlight || '查看詳細餐廳資訊'}</p>
+                            <!-- 餐廳描述摘要 -->
+<p class="text-xs text-slate-500 line-clamp-1 mt-1 font-medium leading-relaxed">${item.Description || '查看詳細餐廳資訊'}</p>
                             
                             <!-- 地區、類別與人均價錢 -->
                             <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-100">
@@ -1219,7 +1219,7 @@ window.removeCategoryFilter = function(cat) {
 
             document.getElementById('detailCategory').innerHTML = `<i class="fa-solid fa-utensils mr-1"></i>${item.Category || '美食'}`;
             document.getElementById('detailPrice').innerHTML = `<i class="fa-solid fa-sack-dollar text-[#d4b068] mr-1"></i>人均 ¥${item.Avg_Cost || '--'}`;
-            document.getElementById('detailHighlight').innerText = item.Highlight || '暫無詳細描述';
+            document.getElementById('detailHighlight').innerText = item.Description || '暫無詳細描述';
             document.getElementById('detailAddress').innerText = item.Address || `中山市${item.District}`;
             document.getElementById('noteInput').value = data.note || '';
             updateDetailUI(data);
