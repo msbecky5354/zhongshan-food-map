@@ -218,13 +218,30 @@
         </header>
 
         <section class="px-4 py-2 bg-white">
-         <div class="max-w-4xl mx-auto flex gap-1.5 items-center">
+        <div class="max-w-4xl mx-auto flex gap-1.5 items-center">
+    <!-- 搜尋框區域：內含放大鏡、輸入框、常駐嘅 X 重置按鈕、以及「搜索」按鈕 -->
     <div class="relative flex-1 ios-shadow rounded-2xl overflow-hidden flex bg-gray-50 border border-gray-100 items-center pr-2">
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-        <input type="text" id="searchInput" oninput="handleLiveSearch(); toggleClearBtn();" onkeydown="if(event.key==='Enter') triggerSearch()" placeholder="搜尋餐廳..." class="w-full pl-10 pr-8 py-2.5 bg-transparent text-sm focus:outline-none">
-        <button id="btnClearSearch" onclick="document.getElementById('searchInput').value=''; handleLiveSearch(); toggleClearBtn();" class="hidden text-gray-400 hover:text-gray-600 px-1.5 py-1 text-xs"><i class="fa-solid fa-circle-xmark"></i></button>
+        <input type="text" id="searchInput" oninput="handleLiveSearch()" onkeydown="if(event.key==='Enter') triggerSearch()" placeholder="搜尋餐廳..." class="w-full pl-10 pr-8 py-2.5 bg-transparent text-sm focus:outline-none">
+
+        window.resetSearchInput = function() {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = '';
+        handleLiveSearch(); // 立即重新整理搜尋結果
+        input.focus();
+    }
+};
+        <!-- 常駐顯示嘅 X 重置按鈕 -->
+        <button onclick="resetSearchInput()" class="text-gray-400 hover:text-gray-600 px-1.5 py-1 text-xs shrink-0" title="重置搜尋">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+        
+        <!-- 搜索按鈕（改為中文字） -->
         <button onclick="triggerSearch()" class="ml-1 px-3 py-1.5 bg-orange-500 text-white rounded-xl text-xs font-bold flex items-center justify-center active:scale-90 transition shadow-sm whitespace-nowrap">搜索</button>
     </div>
+
+    <!-- 保留書籤指南與篩選開關，已成功移除垃圾桶按鈕 -->
     <button onclick="showBookmarkGuide()" class="w-10 h-10 border border-orange-100 rounded-2xl flex items-center justify-center text-orange-500 bg-white shadow-sm active:scale-90 shrink-0"><i class="fa-solid fa-bookmark text-sm"></i></button>
     <button onclick="toggleFilters()" class="w-10 h-10 bg-white border border-gray-100 rounded-2xl flex items-center justify-center text-gray-500 active:bg-gray-50 shrink-0"><i class="fa-solid fa-sliders text-sm"></i></button>
 </div>
