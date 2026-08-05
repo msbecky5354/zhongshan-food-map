@@ -1,1 +1,48 @@
-d
+name: Sync Food Data from Google
+
+on:
+  workflow_dispatch: # 保持手動執行，可隨時手動點擊觸發同步
+
+env:
+  # 0 Hardcode 永久模板：由 GitHub Secrets 動態讀取 GAS API URL
+  GAS_API_URL: ${{ secrets.GAS_API_URL }}
+
+jobs:
+  fetch-and-save:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN }}
+
+      - name: Fetch and Format Data for data.js
+        run: |
+          # 1. 寫入 JS 變數開頭
+          echo -n "window.allRestaurantData = " > data.js
+          
+          # 2. 抓取 GAS 的 JSON 數據並追加寫入 data.js
+          curl -L "${{ env.GAS_API_URL }}" >> data.js
+          
+          # 3. 寫入 JS 結尾分號
+          echo ";" >> data.js
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "action@github.com"
+          
+          # 使用 github.repository 動態綁定當前倉庫路徑，絕不寫死
+          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }}.git
+          
+          git add data.js
+          
+          # 檢查數據是否有變動，避免無意義 Commit
+          if ! git diff --staged --quiet; then
+            git commit -m "Auto-sync latest restaurant data from Google Sheet"
+            git push
+          else
+            echo "數據冇改變，無需更新"
+          fi
