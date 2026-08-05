@@ -376,7 +376,9 @@
         </section>
         
         <main class="max-w-6xl mx-auto px-4 pb-10 mt-2">
-            <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
+         <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
+<!-- 🌟 新增：已選篩選條件動態顯示列 -->
+<div id="activeFiltersBar" class="hidden bg-white px-4 py-2.5 border-x border-gray-200"></div>
             <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300" style="background-color: #f97316;">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
@@ -835,8 +837,91 @@
                 return b._index - a._index;
             });
             renderData(currentRenderedData);
+            renderActiveFilters(); // 每次過濾後自動更新已選標籤列
         }
 
+        // 🌟 渲染已選篩選條件標籤
+function renderActiveFilters() {
+    const bar = document.getElementById('activeFiltersBar');
+    if (!bar) return;
+
+    let tagsHtml = '';
+    const term = document.getElementById('searchInput').value.trim();
+    
+    // 1. 搜尋關鍵字
+    if (term) {
+        tagsHtml += `<span class="inline-flex items-center gap-1 bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full text-[11px] font-bold">
+            搜尋: ${term} 
+            <button onclick="clearSearchFilter()" class="hover:text-orange-800 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>`;
+    }
+
+    // 2. 我的標記
+    if (filtersState.myTag !== 'all' && filtersState.myTag !== '全部') {
+        const tagNames = { 'visited': '✅ 去過', 'favorite': '🔖 收藏', 'want': '📌 想去' };
+        tagsHtml += `<span class="inline-flex items-center gap-1 bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full text-[11px] font-bold">
+            標記: ${tagNames[filtersState.myTag] || filtersState.myTag} 
+            <button onclick="setFilterState('myTag', '全部')" class="hover:text-orange-800 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>`;
+    }
+
+    // 3. 地區
+    if (filtersState.district !== '全部') {
+        tagsHtml += `<span class="inline-flex items-center gap-1 bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full text-[11px] font-bold">
+            地區: ${filtersState.district} 
+            <button onclick="setFilterState('district', '全部')" class="hover:text-orange-800 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>`;
+    }
+
+    // 4. 多選菜式
+    if (!filtersState.category.includes('全部')) {
+        filtersState.category.forEach(cat => {
+            tagsHtml += `<span class="inline-flex items-center gap-1 bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full text-[11px] font-bold">
+                ${cat} 
+                <button onclick="removeCategoryFilter('${cat}')" class="hover:text-orange-800 ml-1"><i class="fa-solid fa-xmark"></i></button>
+            </span>`;
+        });
+    }
+
+    // 5. 價位
+    if (filtersState.price !== '全部') {
+        const priceNames = { '0-50': '¥50以下', '51-100': '¥50-100', '101-': '¥100以上' };
+        tagsHtml += `<span class="inline-flex items-center gap-1 bg-orange-50 text-orange-600 border border-orange-200 px-2.5 py-1 rounded-full text-[11px] font-bold">
+            價位: ${priceNames[filtersState.price] || filtersState.price} 
+            <button onclick="setFilterState('price', '全部')" class="hover:text-orange-800 ml-1"><i class="fa-solid fa-xmark"></i></button>
+        </span>`;
+    }
+
+    // 控制顯示或隱藏
+    if (tagsHtml !== '') {
+        bar.innerHTML = `<div class="flex items-center flex-wrap gap-1.5"><span class="text-[11px] text-gray-400 font-bold mr-1">已選條件：</span>${tagsHtml}</div>`;
+        bar.classList.remove('hidden');
+    } else {
+        bar.innerHTML = '';
+        bar.classList.add('hidden');
+    }
+}
+
+// 輔助函數：單獨清除搜尋
+window.clearSearchFilter = function() {
+    document.getElementById('searchInput').value = '';
+    applyFilters();
+};
+
+// 輔助函數：單獨移除某個多選菜式
+window.removeCategoryFilter = function(cat) {
+    let idx = filtersState.category.indexOf(cat);
+    if (idx > -1) {
+        filtersState.category.splice(idx, 1);
+        if (filtersState.category.length === 0) {
+            filtersState.category = ['全部'];
+        }
+    }
+    updatePillUI();
+    applyFilters();
+};
+
+        
         function renderData(data) {
             const container = document.getElementById('restaurantGrid'), header = document.getElementById('districtHeader');
             header.style.backgroundColor = districtColors[filtersState.district] || "#f97316";
