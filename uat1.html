@@ -233,7 +233,6 @@
 
 <!-- 📖 升級版大型互動式用戶指南彈窗（手機全螢幕適配、大字體） -->
 <div id="userGuideModalOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[25000] hidden items-center justify-center p-0 md:p-4" onclick="closeUserGuideModal()">
-    <!-- 手機上全螢幕顯示 (w-full h-full)，電腦上保持靚靚圓角大卡片 (md:max-w-xl md:rounded-[32px]) -->
     <div class="bg-white w-full h-full md:h-auto md:max-h-[85vh] md:max-w-xl md:rounded-[32px] shadow-2xl overflow-hidden flex flex-col" onclick="event.stopPropagation()">
         
         <!-- 彈窗頂部標題欄 -->
@@ -788,69 +787,178 @@
 
         window.toggleFilters = function() { document.getElementById('filterMenu').classList.toggle('hidden'); };
         window.toggleInlineFilters = function() { document.getElementById('inlineFilterSection').classList.toggle('hidden'); };
-        window.showUserGuide = function() { 
-    window.showToast(`
-        <div class='space-y-3 text-left max-h-[70vh] overflow-y-auto pr-2'>
-            <div class='border-b border-white/20 pb-2 mb-2'>
-                <p class='font-black text-white text-base tracking-wide'>📖 中山美食指南・用戶操作手冊</p>
-                <p class='text-[11px] text-gray-300'>解鎖北上搵食所有隱藏功能與實用小技巧！</p>
-            </div>
-            
-            <details class='bg-white/10 p-3 rounded-2xl border border-white/10' open>
-                <summary class='font-bold text-orange-400 cursor-pointer text-xs flex items-center gap-1.5'>
-                    <i class='fa-solid fa-mobile-screen-button'></i> 📲 如何加入手機主畫面 (隨時隨地一鍵開App)
-                </summary>
-                <div class='text-[11px] text-gray-200 mt-2 space-y-2 leading-relaxed'>
-                    <div class='bg-black/30 p-2.5 rounded-xl border border-white/5'>
-                        <p class='font-bold text-orange-300 mb-1'>🍏 iOS (iPhone / iPad 用戶)：</p>
-                        <ol class='list-decimal list-inside space-y-1 text-gray-300'>
-                            <li>使用 <span class='text-white font-bold'>Safari 瀏覽器</span> 開啟本網站。</li>
-                            <li>點擊下方工具列的 <span class='text-white font-bold'>「分享」按鈕</span>（正方形帶有向上箭嘴的圖示）。</li>
-                            <li>在彈出的選單中向下滑動，尋找並點擊 <span class='text-white font-bold'>「加入主畫面」</span>。</li>
-                            <li>點擊右上角的 <span class='text-white font-bold'>「新增」</span>，即可完成！桌面會直接出現專屬捷徑圖示。</li>
-                        </ol>
-                    </div>
-                    <div class='bg-black/30 p-2.5 rounded-xl border border-white/5'>
-                        <p class='font-bold text-orange-300 mb-1'>🤖 Android (安卓手機用戶)：</p>
-                        <ol class='list-decimal list-inside space-y-1 text-gray-300'>
-                            <li>使用 <span class='text-white font-bold'>Google Chrome 瀏覽器</span> 開啟本網站。</li>
-                            <li>點擊右上角的 <span class='text-white font-bold'>「三點 (選單)」</span> 按鈕。</li>
-                            <li>在選單中點擊 <span class='text-white font-bold'>「加到主螢幕」</span> 或 <span class='text-white font-bold'>「安裝應用程式」</span>。</li>
-                            <li>點擊 <span class='text-white font-bold'>「安裝」</span> 或 <span class='text-white font-bold'>「新增」</span>，即可完成安裝！</li>
-                        </ol>
-                    </div>
-                </div>
-            </details>
-
-            <details class='bg-white/10 p-3 rounded-2xl border border-white/10'>
-                <summary class='font-bold text-orange-400 cursor-pointer text-xs flex items-center gap-1.5'>
-                    <i class='fa-solid fa-map-location-dot'></i> 🗺️ 互動地圖與地區篩選
-                </summary>
-                <p class='text-[11px] text-gray-200 mt-2 leading-relaxed'>
-                    直接點擊地圖上的各個城鎮標籤（或雙擊），頁面會自動跳轉並即時過濾出該地區所有精選地道餐廳，同時顯示總店數與導航按鈕。
-                </p>
-            </details>
-
-            <details class='bg-white/10 p-3 rounded-2xl border border-white/10'>
-                <summary class='font-bold text-orange-400 cursor-pointer text-xs flex items-center gap-1.5'>
-                    <i class='fa-solid fa-filter'></i> 🔍 智能搜尋與多重過濾
-                </summary>
-                <p class='text-[11px] text-gray-200 mt-2 leading-relaxed'>
-                    支援菜式<span class='text-orange-300 font-bold'>多選功能</span>（例如同時點選「粵菜」同「家常菜」），亦可按價位及關鍵字精準搜索。點擊搜尋框右側的<span class='text-red-400 font-bold'>紅色 X 按鈕</span>可一鍵重置所有篩選條件。
-                </p>
-            </details>
-
-            <details class='bg-white/10 p-3 rounded-2xl border border-white/10'>
-                <summary class='font-bold text-orange-400 cursor-pointer text-xs flex items-center gap-1.5'>
-                    <i class='fa-solid fa-star'></i> ⭐ 個人標記與心水筆記
-                </summary>
-                <p class='text-[11px] text-gray-200 mt-2 leading-relaxed'>
-                    進入餐廳詳情頁，可以自由標記「✅ 去過」、「🔖 收藏」、「📌 想去」，進行星星評分，並留下你的私人試食心得與備註（資料安全儲存於你的裝置本地）。
-                </p>
-            </details>
-        </div>
-    `, 0); 
+     // 📖 打開指南大彈窗
+window.showUserGuide = function() {
+    const overlay = document.getElementById('userGuideModalOverlay');
+    if (overlay) {
+        overlay.style.display = 'flex';
+        renderUserGuideMenu();
+    }
 };
+
+window.closeUserGuideModal = function() {
+    const overlay = document.getElementById('userGuideModalOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
+};
+
+// 渲染四大類別目錄首頁（大字體卡片）
+function renderUserGuideMenu() {
+    const container = document.getElementById('userGuideContentArea');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="grid grid-cols-1 gap-3.5">
+            <div onclick="renderUserGuideDetail('home_screen')" class="bg-white p-4.5 md:p-5 rounded-2xl border border-orange-100 shadow-sm hover:border-orange-300 transition cursor-pointer flex items-center gap-4 group active:scale-[0.99]">
+                <div class="w-14 h-14 rounded-2xl bg-orange-50 text-orange-500 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-gray-800 text-sm md:text-base mb-1">📲 如何加入手機主畫面</h4>
+                    <p class="text-xs md:text-sm text-gray-500 leading-snug">將網站一鍵釘選到 iOS 及 Android 手機桌面</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-300 text-sm mr-2"></i>
+            </div>
+
+            <div onclick="renderUserGuideDetail('map_filter')" class="bg-white p-4.5 md:p-5 rounded-2xl border border-blue-100 shadow-sm hover:border-blue-300 transition cursor-pointer flex items-center gap-4 group active:scale-[0.99]">
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-gray-800 text-sm md:text-base mb-1">🗺️ 互動地圖與地區篩選</h4>
+                    <p class="text-xs md:text-sm text-gray-500 leading-snug">點擊地圖標籤快速鎖定心水城鎮與餐廳</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-300 text-sm mr-2"></i>
+            </div>
+
+            <div onclick="renderUserGuideDetail('search_filter')" class="bg-white p-4.5 md:p-5 rounded-2xl border border-emerald-100 shadow-sm hover:border-emerald-300 transition cursor-pointer flex items-center gap-4 group active:scale-[0.99]">
+                <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                    <i class="fa-solid fa-filter"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-gray-800 text-sm md:text-base mb-1">🔍 智能搜尋與多重過濾</h4>
+                    <p class="text-xs md:text-sm text-gray-500 leading-snug">菜式多選、價位過濾與一鍵重置功能</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-300 text-sm mr-2"></i>
+            </div>
+
+            <div onclick="renderUserGuideDetail('bookmarks')" class="bg-white p-4.5 md:p-5 rounded-2xl border border-purple-100 shadow-sm hover:border-purple-300 transition cursor-pointer flex items-center gap-4 group active:scale-[0.99]">
+                <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h4 class="font-bold text-gray-800 text-sm md:text-base mb-1">⭐ 個人標記與心水筆記</h4>
+                    <p class="text-xs md:text-sm text-gray-500 leading-snug">去過, 收藏, 想去標記與私人試食筆記儲存</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-gray-300 text-sm mr-2"></i>
+            </div>
+        </div>
+    `;
+}
+
+// 渲染特定類別的放大詳細教學（大字體、舒適排版）
+window.renderUserGuideDetail = function(categoryKey) {
+    const container = document.getElementById('userGuideContentArea');
+    if (!container) return;
+
+    let contentHtml = '';
+
+    if (categoryKey === 'home_screen') {
+        contentHtml = `
+            <div class="space-y-4">
+                <div class="bg-orange-50 p-4.5 md:p-5 rounded-2xl border border-orange-200 shadow-sm">
+                    <h4 class="font-bold text-orange-900 text-sm md:text-base mb-2.5 flex items-center gap-2">
+                        <i class="fa-brands fa-apple text-lg"></i> iOS (iPhone / iPad 用戶)
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-2 text-xs md:text-sm text-gray-800 leading-relaxed font-medium">
+                        <li>使用 <span class="font-bold text-gray-900 underline">Safari 瀏覽器</span> 開啟本網站。</li>
+                        <li>點擊下方工具列的 <span class="font-bold text-gray-900">「分享」按鈕</span>（正方形帶有向上箭嘴的圖示）。</li>
+                        <li>在彈出的選單中向下滑動，尋找並點擊 <span class="font-bold text-gray-900">「加入主畫面」</span>。</li>
+                        <li>點擊右上角的 <span class="font-bold text-gray-900">「新增」</span>，即可完成！手機桌面會直接出現專屬捷徑圖示。</li>
+                    </ol>
+                </div>
+                <div class="bg-blue-50 p-4.5 md:p-5 rounded-2xl border border-blue-200 shadow-sm">
+                    <h4 class="font-bold text-blue-900 text-sm md:text-base mb-2.5 flex items-center gap-2">
+                        <i class="fa-brands fa-android text-lg"></i> Android (安卓手機用戶)
+                    </h4>
+                    <ol class="list-decimal list-inside space-y-2 text-xs md:text-sm text-gray-800 leading-relaxed font-medium">
+                        <li>使用 <span class="font-bold text-gray-900 underline">Google Chrome 瀏覽器</span> 開啟本網站。</li>
+                        <li>點擊右上角的 <span class="font-bold text-gray-900">「三點 (選單)」</span> 按鈕。</li>
+                        <li>在選單中點擊 <span class="font-bold text-gray-900">「加到主螢幕」</span> 或 <span class="font-bold text-gray-900">「安裝應用程式」</span>。</li>
+                        <li>點擊 <span class="font-bold text-gray-900">「安裝」</span> 或 <span class="font-bold text-gray-900">「新增」</span>，即可完成安裝！</li>
+                    </ol>
+                </div>
+            </div>
+        `;
+    } else if (categoryKey === 'map_filter') {
+        contentHtml = `
+            <div class="bg-blue-50 p-5 rounded-2xl border border-blue-200 shadow-sm space-y-3.5">
+                <h4 class="font-bold text-blue-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-map text-lg"></i> 互動地圖操作指南
+                </h4>
+                <p class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium">
+                    網站主頁設有精美的中山城鎮互動地圖。你可以直接點擊（或雙擊）地圖上的任何一個城鎮名稱標籤（例如：東區、石岐區、坦洲鎮等）。
+                </p>
+                <div class="bg-white p-4 rounded-xl border border-blue-100 text-xs md:text-sm text-gray-700 space-y-2">
+                    <p class="font-bold text-blue-900">✨ 功能亮點：</p>
+                    <p>• 點擊後頁面會自動順暢捲動並過濾出該區所有美食。</p>
+                    <p>• 標題列會顯示實時餐廳總數及一鍵導航按鈕。</p>
+                </div>
+            </div>
+        `;
+    } else if (categoryKey === 'search_filter') {
+        contentHtml = `
+            <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 shadow-sm space-y-3.5">
+                <h4 class="font-bold text-emerald-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-magnifying-glass text-lg"></i> 智能搜尋與多重過濾
+                </h4>
+                <ul class="space-y-2.5 text-xs md:text-sm text-gray-800 leading-relaxed font-medium">
+                    <li class="flex items-start gap-2.5">
+                        <span class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-bold text-xs mt-0.5">1</span>
+                        <span><strong class="text-gray-900">菜式多選：</strong>你可以同時勾選多個喜愛的菜式（例如同時選「粵菜」與「家常菜」），靈活性極高。</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-bold text-xs mt-0.5">2</span>
+                        <span><strong class="text-gray-900">一鍵重置：</strong>點擊搜尋框右側的<span class="text-red-600 font-bold">紅色 X 按鈕</span>，可立即清空搜尋並重置所有篩選條件。</span>
+                    </li>
+                    <li class="flex items-start gap-2.5">
+                        <span class="bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded font-bold text-xs mt-0.5">3</span>
+                        <span><strong class="text-gray-900">價位過濾：</strong>自由選擇 ¥50 以下、¥50-100 或 ¥100 以上的性價比餐廳。</span>
+                    </li>
+                </ul>
+            </div>
+        `;
+    } else if (categoryKey === 'bookmarks') {
+        contentHtml = `
+            <div class="bg-purple-50 p-5 rounded-2xl border border-purple-200 shadow-sm space-y-3.5">
+                <h4 class="font-bold text-purple-900 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-star text-lg"></i> 個人標記與心水筆記
+                </h4>
+                <p class="text-xs md:text-sm text-gray-800 leading-relaxed font-medium">
+                    每間餐廳的詳情頁內，均提供貼心的個人化管理工具：
+                </p>
+                <div class="grid grid-cols-3 gap-2 text-center text-xs md:text-sm font-bold text-purple-900">
+                    <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-sm">✅ 去過標記</div>
+                    <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-sm">🔖 收藏心水</div>
+                    <div class="bg-white p-3 rounded-xl border border-purple-200 shadow-sm">📌 想去清單</div>
+                </div>
+                <p class="text-xs text-gray-600 leading-relaxed pt-1">
+                    💡 <strong class="text-gray-800">私密安全：</strong>所有星級評分與私人備註心得均安全保存在你的手機或電腦本地端（LocalStorage），絕對私密。
+                </p>
+            </div>
+        `;
+    }
+
+    container.innerHTML = `
+        <div class="space-y-4">
+            <button onclick="renderUserGuideMenu()" class="inline-flex items-center gap-2 text-xs md:text-sm font-bold text-orange-600 hover:text-orange-700 bg-orange-100 px-4 py-2 rounded-xl border border-orange-200 active:scale-95 transition shadow-sm">
+                <i class="fa-solid fa-arrow-left"></i> 返回手冊目錄
+            </button>
+            ${contentHtml}
+        </div>
+    `;
+}
         window.showBookmarkGuide = function() { window.showToast("點擊餐廳詳情內的「收藏」或「想去」即可標記。"); };
 
         function getUserData(n) { return userRecords[n] || { visited: false, favorite: false, want: false, rating: 0, note: '' }; }
