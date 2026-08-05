@@ -224,14 +224,7 @@
         <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
         <input type="text" id="searchInput" oninput="handleLiveSearch()" onkeydown="if(event.key==='Enter') triggerSearch()" placeholder="搜尋餐廳..." class="w-full pl-10 pr-8 py-2.5 bg-transparent text-sm focus:outline-none">
 
-        window.resetSearchInput = function() {
-    const input = document.getElementById('searchInput');
-    if (input) {
-        input.value = '';
-        handleLiveSearch(); // 立即重新整理搜尋結果
-        input.focus();
-    }
-};
+    
         <!-- 常駐顯示嘅 X 重置按鈕 -->
         <button onclick="resetSearchInput()" class="text-gray-400 hover:text-gray-600 px-1.5 py-1 text-xs shrink-0" title="重置搜尋">
             <i class="fa-solid fa-circle-xmark"></i>
@@ -254,6 +247,15 @@
             else btn.classList.add('hidden');
         }
     }
+
+        window.resetSearchInput = function() {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = '';
+        handleLiveSearch(); // 立即重新整理搜尋結果
+        input.focus();
+    }
+};
 </script>
             
             <div id="filterMenu" class="hidden max-w-4xl mx-auto mt-3 p-4 bg-white rounded-2xl ios-shadow border border-gray-100 relative">
