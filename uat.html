@@ -397,7 +397,7 @@
         let allData = [], currentRenderedData = [], activeDetailItem = null;
         let filtersState = { district: '全部', category: '全部', price: '全部', myTag: '全部' };
         let userRecords = JSON.parse(localStorage.getItem('zsFoodMap_v1') || '{}');
-        const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲" };
+        const CATEGORY_ICONS = { "粵菜": "🍚", "日式料理": "🍣", "海鮮酒樓": "🦞", "海鮮粥": "🍜", "粥麵小食": "🍜", "咖啡 Chill 地方": "☕", "農家菜": "🌿", "西式": "🍝", "順德菜": "🥘", "火鍋": "🍲", "家常菜": "🥘", "港式輕食": "🥪", "特色小食": "🍢", "麵粉類": "🥟", "咖啡": "☕" };
         const districtColors = { "東區": "#ef4444", "坦洲鎮": "#7a8f9a", "石岐區": "#f59e0b", "西區": "#3b82f6", "南區": "#10b981", "小欖鎮": "#8b5cf6", "全部": "#f97316" };
 
         /* ================================================================= */
@@ -685,34 +685,31 @@
             }
         }
 
-        function applyFilters() {
+       function applyFilters() {
     const term = document.getElementById('searchInput').value.toLowerCase().trim();
     currentRenderedData = allData.filter(item => {
         const userData = getUserData(item.Restaurant_Name);
         const matchD = filtersState.district === '全部' || item.District === filtersState.district;
-        const matchC = filtersState.category === '全部' || item.Category === filtersState.category;
+        
+        // ✅ 核心修改：由「===」改為「includes」，只要字串有包含該分類就符合
+        const matchC = filtersState.category === '全部' || (item.Category && item.Category.includes(filtersState.category));
+        
         const matchS = item.Restaurant_Name.toLowerCase().includes(term) || (item.Highlight && item.Highlight.toLowerCase().includes(term));
         const matchTag = filtersState.myTag === '全部' || userData[filtersState.myTag] === true;
         
-        // 🌟 新增：價位篩選邏輯 (Price Filter)
+        // 💰 價位篩選修復（保留上次草稿邏輯）
         let matchP = true;
         if (filtersState.price !== '全部') {
             const cost = parseFloat(item.Avg_Cost);
-            // 如果數據冇提供價錢，或者唔係數字，篩選特定價位時將會隱藏
             if (isNaN(cost)) {
                 matchP = false; 
             } else {
-                if (filtersState.price === '0-50') {
-                    matchP = cost <= 50;
-                } else if (filtersState.price === '51-100') {
-                    matchP = cost > 50 && cost <= 100;
-                } else if (filtersState.price === '101-') {
-                    matchP = cost > 100;
-                }
+                if (filtersState.price === '0-50') matchP = cost <= 50;
+                else if (filtersState.price === '51-100') matchP = cost > 50 && cost <= 100;
+                else if (filtersState.price === '101-') matchP = cost > 100;
             }
         }
         
-        // 確保所有條件 (包含 matchP) 都符合先會顯示
         return matchD && matchC && matchS && matchTag && matchP;
     }).sort((a, b) => {
         const aHasYt = a.Youtube && a.Youtube.startsWith('http') ? 1 : 0;
@@ -827,17 +824,29 @@
         };
         
         function buildFilterPills(data) {
-            const valid = data; 
-            const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
-            
-            dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(valid.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
-            cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + [...new Set(valid.map(i=>i.Category))].map(c => createPill('category', c, `${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}`)).join('');
-            pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
-            
-            const inlineCat = document.getElementById('inlineCategoryFilter');
-            inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + [...new Set(valid.map(i=>i.Category))].map(c => `<option value="${c}">${CATEGORY_ICONS[c?.trim()] || '🍽️'} ${c}</option>`).join('');
-            updatePillUI();
+    const valid = data; 
+    const dG = document.getElementById('filterGridDistrict'), cG = document.getElementById('filterGridCategory'), pG = document.getElementById('filterGridPrice');
+    
+    // ✅ 核心修改：自動拆解含有 '/' 或 ',' 嘅分類，清除前後空格，過濾空白，最後去重複
+    let allCategories = [];
+    valid.forEach(i => {
+        if (i.Category) {
+            let splitCats = i.Category.split(/[/,]/).map(c => c.trim()).filter(c => c !== "");
+            allCategories.push(...splitCats);
         }
+    });
+    let uniqueCategories = [...new Set(allCategories)];
+    
+    dG.innerHTML = createPill('district', '全部', '全部') + [...new Set(valid.map(i=>i.District))].map(d => createPill('district', d, d)).join('');
+    
+    // 改用 uniqueCategories 生成清單，畫面上就會自動分開「粵菜」同「家常菜」兩粒掣
+    cG.innerHTML = createPill('category', '全部', '🍽️ 全部') + uniqueCategories.map(c => createPill('category', c, `${CATEGORY_ICONS[c] || '🍽️'} ${c}`)).join('');
+    pG.innerHTML = createPill('price', '全部', '全部') + ['0-50', '51-100', '101-'].map((v, i) => createPill('price', v, ['¥50以下', '¥50-100', '¥100以上'][i])).join('');
+    
+    const inlineCat = document.getElementById('inlineCategoryFilter');
+    inlineCat.innerHTML = `<option value="全部">🍽️ 全部類別</option>` + uniqueCategories.map(c => `<option value="${c}">${CATEGORY_ICONS[c] || '🍽️'} ${c}</option>`).join('');
+    updatePillUI();
+}
         
         function createPill(t, v, l) { return `<button onclick="setFilterState('${t}', '${v}')" data-type="${t}" data-value="${v}" class="filter-pill px-3 py-1.5 rounded-full text-[11px] border border-gray-200 bg-white shadow-sm mb-1 mr-1">${l}</button>`; }
         
