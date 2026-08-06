@@ -456,15 +456,15 @@
         </main>
     </div>
 
-  <!-- 🌟 Hi-Tech Cyber 風格餐廳詳情頁 (純白底 + 頂部地區顏色對應 + 收藏按鈕上移) -->
+  <!-- 🌟 Hi-Tech Cyber 風格餐廳詳情頁 (純白底 + 頂部地區顏色對應 + 右上角 3 個收藏按鈕) -->
     <div id="detailView" class="hidden max-w-4xl mx-auto w-full min-h-screen bg-slate-50">
-        <!-- 頂部標題列：背景顏色隨地區自動變換（如石岐區會對應專屬顏色） -->
+        <!-- 頂部標題列：背景顏色隨地區自動變換，右上角收納 3 個按鈕 -->
         <div id="detailHeaderColor" class="px-6 pt-5 pb-8 text-white relative z-10 border-b-2 border-cyan-400/50 shadow-xl transition-colors duration-300">
             <div class="flex justify-between items-start mb-4">
                 <button onclick="closeDetail()" class="text-xs font-bold text-white/90 hover:text-white flex items-center active:scale-95 transition bg-black/25 px-3.5 py-1.5 rounded-xl border border-white/20 w-fit backdrop-blur-md">
                     <i class="fa-solid fa-angle-left mr-1.5"></i> 返回列表
                 </button>
-                <!-- 🌟 創意收納：將「去過/收藏/想去」按鈕組收藏到頂部右側 -->
+                <!-- 🌟 創意收納：完美保留右上角「去過/收藏/想去」按鈕組 -->
                 <div class="flex gap-1 bg-black/30 p-1 rounded-2xl border border-white/30 backdrop-blur-md shadow-lg">
                     <button id="btnVisited" onclick="toggleUserStatus('visited')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition shadow-sm border border-white/20">去過?</button>
                     <button id="btnFav" onclick="toggleUserStatus('favorite')" class="px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition shadow-sm border border-white/20">收藏</button>
@@ -482,15 +482,9 @@
             </div>
         </div>
 
-        <!-- 內容容器：純白底色、精緻 Cyber 彩色邊框 (Box Border with colored lines) -->
+        <!-- 內容容器：純白底色、Cyber 彩色邊框 -->
         <div class="p-5 md:p-8 space-y-6 bg-white -mt-4 rounded-t-[32px] relative z-20 min-h-screen shadow-2xl border-t-2 border-cyan-400/40">
             
-            <!-- 星星評分狀態列 -->
-            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div id="detailStars" class="text-amber-400 text-base"></div>
-                <span class="text-[11px] font-bold text-slate-400 tracking-wider">本地安全儲存</span>
-            </div>
-
             <!-- 星星評分點擊區 (帶有 Cyber 色彩左邊框) -->
             <div id="starRating" class="text-slate-200 text-3xl space-x-2 cursor-pointer flex items-center bg-slate-50/80 p-3.5 rounded-2xl border-2 border-slate-100 border-l-4 border-l-amber-400 shadow-sm">
                 <i class="fa-solid fa-star hover:text-amber-400 transition-colors" onclick="saveRating(1)"></i>
@@ -514,7 +508,7 @@
                 <span id="detailPrice" class="bg-slate-50 text-slate-800 px-4 py-1.5 rounded-xl text-xs md:text-sm font-bold border border-slate-200 shadow-sm"></span>
             </div>
 
-           <!-- 餐廳描述卡片 -->
+            <!-- 餐廳描述卡片 (Cyber 帶彩色左邊框) -->
             <div class="bg-white rounded-2xl p-5 border-2 border-slate-200/80 border-l-4 border-l-orange-500 shadow-sm">
                 <h4 class="text-xs md:text-sm font-black text-slate-800 mb-2.5 flex items-center gap-2">
                     <i class="fa-solid fa-circle-info text-orange-500"></i> 餐廳描述
