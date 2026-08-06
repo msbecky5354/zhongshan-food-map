@@ -1125,8 +1125,13 @@ window.renderUserGuideDetail = function(categoryKey) {
                     document.getElementById('updateTime').innerText = `最後更新：${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日`;
                 }
 
-                buildFilterPills(allData); applyFilters();
+                buildFilterPills(allData); 
+                applyFilters();
                 initMapInteractions();
+                
+                // 🌟 新增：初始化完成後檢查有無分享連結
+                checkSharedUrl();
+
                 document.getElementById('loader').classList.add('hidden');
             } catch (error) { 
                 console.error("載入數據失敗:", error);
@@ -1522,6 +1527,38 @@ window.openDetail = function(idx) {
                     el.style.color = textColor;
                 }
             });
+        }
+
+        // 🌟 處理分享連結（Deep Linking）：自動打開分享嘅餐廳詳情
+        function checkSharedUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sharedRestaurantName = urlParams.get('r');
+            if (!sharedRestaurantName) return;
+
+            // 解碼餐廳名稱並喺全部資料中尋找對應索引
+            const decodedName = decodeURIComponent(sharedRestaurantName);
+            const targetIndex = allData.findIndex(item => item.Restaurant_Name === decodedName);
+
+            if (targetIndex !== -1) {
+                // 強制將當前列表過濾至該餐廳所屬地區或全部，確保 currentRenderedData 包含目標餐廳
+                filtersState.district = '全部';
+                filtersState.category = ['全部'];
+                filtersState.price = '全部';
+                filtersState.myTag = '全部';
+                document.getElementById('searchInput').value = '';
+                applyFilters();
+
+                // 重新精準尋找在渲染後陣列中的真實 index
+                const renderedIndex = currentRenderedData.findIndex(item => item.Restaurant_Name === decodedName);
+                if (renderedIndex !== -1) {
+                    openDetail(renderedIndex);
+                } else {
+                    openDetail(targetIndex);
+                }
+
+                // 靜靜地清走網址上的 ?r= 參數，保持網址整潔
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
         }
     </script>
 </body>
