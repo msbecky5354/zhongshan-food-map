@@ -15,7 +15,7 @@
     <meta name="robots" content="index, follow">
 
     <!-- 🌟 SEO 最佳化：標準網址標籤 🌟 -->
-    <link rel="canonical" href="https://zhongshan-food-map.vercel.app/">
+    <link rel="canonical" href="https://msbecky5354.github.io/zhongshan-food-map/">
 
     <!-- ================================================================= -->
     <!-- 🌟 社交媒體分享預覽標籤 (Open Graph & Twitter Cards) 🌟 -->
@@ -23,7 +23,7 @@
     <meta property="og:title" content="中山美食指南 | 北上搵食必備指南">
     <meta property="og:description" content="精選中山地道必食餐廳及招牌菜，包含定位與一鍵導航，帶你食勻大灣區好味道！">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://zhongshan-food-map.vercel.app/">
+    <meta property="og:url" content="https://msbecky5354.github.io/zhongshan-food-map/">
     <meta property="og:image" content="app-icon-512.png">
     <meta property="og:site_name" content="中山美食指南">
     
@@ -51,7 +51,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "中山美食指南",
-      "url": "https://zhongshan-food-map.vercel.app/",
+      "url": "https://msbecky5354.github.io/zhongshan-food-map/",
       "description": "精選中山地道必食餐廳及招牌菜推介，專為香港人北上搵食而設的互動美食指南。",
       "applicationCategory": "TravelApplication",
       "operatingSystem": "All",
@@ -194,15 +194,13 @@
             cursor: default;
         }
 
-      /* 📱 手機版自動隱藏指南針文字標籤，避免遮擋圖案 */
+     /* 📱 手機版縮細標籤字體及間距，並保留指南針文字 */
         @media (max-width: 640px) {
             :root {
                 --tag-font-size: 9.5px;
                 --tag-padding: 2px 4px;
             }
-            .compass-tag {
-                display: none !important; 
-            }
+            /* 已經徹底移除 .compass-tag { display: none !important; } */
         }
     </style>
 </head>
@@ -409,18 +407,18 @@
          <div id="resultsAnchor" class="scroll-mt-[180px]"></div>
 <!-- 🌟 新增：已選篩選條件動態顯示列 -->
 <div id="activeFiltersBar" class="hidden bg-white px-4 py-2.5 border-x border-gray-200"></div>
-            <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300" style="background-color: #f97316;">
+           <div id="districtHeader" class="hidden text-white px-5 pt-3 pb-4 rounded-t-2xl relative z-10 transition-colors duration-300" style="background-color: #f97316;">
                 <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="text-[12px] opacity-90 flex items-center mb-2"><i class="fa-solid fa-angle-left mr-1.5"></i> 返回地圖</button>
                 <div class="flex justify-between items-end">
                     <!-- 🌟 升級：泡泡膠囊框地區名 🌟 -->
-<div class="flex items-center gap-2.5">
-    <h2 id="districtTitle" class="text-[16px] font-bold text-white bg-black/20 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/30 shadow-sm inline-flex items-center gap-1.5">
-        <i class="fa-solid fa-location-dot text-[13px] text-white/90"></i>
-        <span>--</span>
-    </h2>
-    <span id="districtCount" class="text-[12px] opacity-85 font-medium tracking-wide">共 0 間</span>
-</div>
-                    <button id="inlineFilterBtn" onclick="toggleInlineFilters()" class="bg-white/20 px-3 py-1 rounded text-[11px] font-bold transition-all">篩選 ▾</button>
+                    <div class="flex items-center gap-2.5">
+                        <h2 id="districtTitle" class="text-[16px] font-bold text-white bg-black/20 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/30 shadow-sm inline-flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-dot text-[13px] text-white/90"></i>
+                            <span>--</span>
+                        </h2>
+                        <span id="districtCount" class="text-[12px] opacity-85 font-medium tracking-wide">共 0 間</span>
+                    </div>
+                    <!-- 已移除右側的「篩選 ▾」按鈕 -->
                 </div>
             </div>
 
