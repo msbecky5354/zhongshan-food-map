@@ -1383,31 +1383,22 @@ window.removeCategoryFilter = function(cat) {
             window.copyToClipboard(url, '✅ 餐廳連結已複製');
         };
 
-        /* 🌟 鎖定地圖雙擊互動 (嚴格排除 compass-tag) 🌟 */
+/* 🌟 優化地圖互動：支援手機與電腦單擊即時過濾 🌟 */
         function initMapInteractions() {
             const tags = document.querySelectorAll('.tech-tag:not(.compass-tag)');
-            let lastTapTime = 0;
 
             tags.forEach(tag => {
-                const handleDoubleClick = () => {
+                const handleClick = (e) => {
+                    e.preventDefault();
                     const name = tag.textContent.trim();
                     setDistrict(name);
                 };
 
-                tag.addEventListener('dblclick', (e) => {
-                    e.preventDefault();
-                    handleDoubleClick();
-                });
-
+                tag.addEventListener('click', handleClick);
                 tag.addEventListener('touchend', (e) => {
-                    const currentTime = new Date().getTime();
-                    const tapLength = currentTime - lastTapTime;
-                    if (tapLength < 300 && tapLength > 0) {
-                        e.preventDefault();
-                        handleDoubleClick();
-                    }
-                    lastTapTime = currentTime;
-                });
+                    e.preventDefault();
+                    handleClick(e);
+                }, { passive: false });
             });
         }
         
