@@ -15,7 +15,7 @@
     <meta name="robots" content="index, follow">
 
     <!-- 🌟 SEO 最佳化：標準網址標籤 🌟 -->
-    <link rel="canonical" href="https://msbecky5354.github.io/zhongshan-food-map/">
+    <link rel="canonical" href="https://zhongshan-food-map.vercel.app/">
 
     <!-- ================================================================= -->
     <!-- 🌟 社交媒體分享預覽標籤 (Open Graph & Twitter Cards) 🌟 -->
@@ -23,7 +23,7 @@
     <meta property="og:title" content="中山美食指南 | 北上搵食必備指南">
     <meta property="og:description" content="精選中山地道必食餐廳及招牌菜，包含定位與一鍵導航，帶你食勻大灣區好味道！">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://msbecky5354.github.io/zhongshan-food-map/">
+    <meta property="og:url" content="https://zhongshan-food-map.vercel.app/">
     <meta property="og:image" content="app-icon-512.png">
     <meta property="og:site_name" content="中山美食指南">
     
@@ -51,7 +51,7 @@
       "@context": "https://schema.org",
       "@type": "WebApplication",
       "name": "中山美食指南",
-      "url": "https://msbecky5354.github.io/zhongshan-food-map/",
+      "url": "https://zhongshan-food-map.vercel.app/",
       "description": "精選中山地道必食餐廳及招牌菜推介，專為香港人北上搵食而設的互動美食指南。",
       "applicationCategory": "TravelApplication",
       "operatingSystem": "All",
@@ -185,22 +185,28 @@
             box-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
         }
 
-        .compass-tag {
-            border-color: #38bdf8;
-            color: var(--compass-text);
-            font-size: 9.5px;
-            padding: 2px 5px;
+       .compass-tag {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #0f172a !important; /* 深藍色，配襯星星圖案 */
+            text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 0 0 4px #fff; /* 白色描邊，確保清晰 */
+            font-size: 11px;
+            font-weight: 900;
+            padding: 0;
             pointer-events: none;
             cursor: default;
         }
 
-     /* 📱 手機版縮細標籤字體及間距，並保留指南針文字 */
+      /* 📱 手機版縮細標籤字體及間距，指南針只顯示單字母 */
         @media (max-width: 640px) {
             :root {
                 --tag-font-size: 9.5px;
                 --tag-padding: 2px 4px;
             }
-            /* 已經徹底移除 .compass-tag { display: none !important; } */
+            .compass-tag {
+                font-size: 13px !important; /* 單字母稍微放大 */
+            }
         }
     </style>
 </head>
