@@ -13,7 +13,7 @@
   .card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
   h1{font-size:19px;line-height:1.4}
   h2{font-size:16px;margin-bottom:10px}
-  .sub{color:var(--muted);font-size:12px;margin-top:4px}
+  .sub{color:var(--muted);font-size:12px;margin-top:4px;line-height:1.6}
   .banner{border-radius:16px;padding:16px;text-align:center;font-weight:700;font-size:17px}
   .banner span{display:block;font-weight:400;font-size:12.5px;margin-top:6px;line-height:1.5}
   .banner.idle{background:#eee;color:#666}
@@ -42,6 +42,10 @@
   .tab.on{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:700}
   .result{margin-top:10px;font-size:14px;font-weight:700;text-align:center}
   a{color:var(--gold)}
+  .cinput{flex:1;min-width:0;border:1px solid #ddd;border-radius:10px;padding:10px;font-size:14px;background:#faf7f0}
+  .cblocked{font-size:12px;display:flex;gap:4px;align-items:center;white-space:nowrap;color:#555}
+  .cslot{padding:10px 0;border-top:1px solid #f0ead9}
+  .cslot:first-child{border-top:0;padding-top:0}
 </style>
 </head>
 <body>
@@ -59,6 +63,12 @@
   <div class="sectionTitle">目標節點回應參考（僅作延遲參考）<span id="probeSummary"></span></div>
   <div id="targets" style="display:flex;flex-direction:column;gap:10px"></div>
   <div class="note" id="probeNote"></div>
+
+  <div class="sectionTitle">自訂檢測目標（最多 3 個）</div>
+  <div class="card">
+    <div id="customs"></div>
+    <div class="sub">直接打網址（例如 netflix.com，會自動用 HTTPS）。「中國被牆」預設勾咗：出口喺 CN 時就算有回應都只標黃；測中國境內網站請取消勾選。網址會自動記住。</div>
+  </div>
 
   <div class="row">
     <button class="gold" id="btnCheck">立即檢測</button>
@@ -81,10 +91,9 @@
 
 <script>
 /* ===== 設定 ===== */
-const EXPECTED_CC = 'US';                 // 預期 VPN 出口國
+const EXPECTED_CC = 'US';
 const PROBE_TIMEOUT = 6000, IMG_TIMEOUT = 3500, EXIT_TIMEOUT = 6000;
 
-/* 已移除：懶人工具站 favicon.ico（網站冇呢個檔案，會 404） */
 const TARGETS = [
   {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',     cnBlocked:true},
   {name:'Facebook',   url:'https://www.facebook.com/favicon.ico',    cnBlocked:true},
@@ -99,7 +108,6 @@ const EXIT_APIS = [
   {url:'https://api.ip.sb/geoip',src:'ip.sb',    map:d=>({ip:d.ip,cc:d.country_code,country:d.country,region:d.region||d.city,ok:!!d.ip})},
 ];
 
-/* 中國境內：加入 Speedtest.cn 官方測速（新分頁開啟） */
 const SPEED_NODES = {
   out:[{name:'Cloudflare Speed (1MB)',url:'https://speed.cloudflare.com/__down?bytes=1048576'},
        {name:'Cloudflare Speed (5MB)',url:'https://speed.cloudflare.com/__down?bytes=5242880'}],
@@ -110,8 +118,62 @@ const SPEED_NODES = {
 
 /* ===== 工具 ===== */
 const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const bust = u => u + (u.includes('?')?'&':'?') + '_vt=' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 function sig(ms){ const c=new AbortController(); setTimeout(()=>c.abort(),ms); return c.signal; }
+
+/* ===== 自訂目標（3 個空格，自動記住） ===== */
+let customs;
+try{ customs = JSON.parse(localStorage.getItem('vt_customs')); }catch(e){ customs=null; }
+if(!Array.isArray(customs) || customs.length!==3)
+  customs = Array.from({length:3},()=>({url:'',blocked:true}));
+function saveCustoms(){ try{ localStorage.setItem('vt_customs',JSON.stringify(customs)); }catch(e){} }
+
+function normalizeUrl(s){
+  s=(s||'').trim(); if(!s) return null;
+  s=s.replace(/^https?:\/\//i,'');           // 一律用 HTTPS（避免 mixed content 被瀏覽器擋）
+  try{
+    const u=new URL('https://'+s);
+    if(!u.hostname || !u.hostname.includes('.')) return null;
+    return u.href;
+  }catch(e){ return null; }
+}
+
+function buildCustoms(){
+  $('customs').innerHTML = customs.map((c,i)=>`
+    <div class="cslot">
+      <div class="trow">
+        <input class="cinput" id="curl${i}" placeholder="空格 ${i+1}：例如 netflix.com" value="${esc(c.url)}">
+        <label class="cblocked"><input type="checkbox" id="cblk${i}" ${c.blocked?'checked':''}> 中國被牆</label>
+      </div>
+      <div class="trow" style="margin-top:6px">
+        <div class="thint" id="chint${i}" style="color:#8a8a8a;margin-top:0"></div>
+        <span class="pill idle" id="cpill${i}">${c.url.trim()?'待檢測':'未填寫'}</span>
+      </div>
+    </div>`).join('');
+  customs.forEach((_,i)=>{
+    $('curl'+i).addEventListener('input',e=>{
+      customs[i].url=e.target.value; saveCustoms();
+      $('cpill'+i).className='pill idle';
+      $('cpill'+i).textContent=e.target.value.trim()?'待檢測':'未填寫';
+      $('chint'+i).textContent='';
+    });
+    $('cblk'+i).addEventListener('change',e=>{ customs[i].blocked=e.target.checked; saveCustoms(); });
+  });
+}
+
+/* 自訂目標：只測連線回應，唔做圖示驗證 */
+async function probeCustom(url){
+  const u=bust(url); const t0=performance.now();
+  try{
+    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',
+                   referrerPolicy:'no-referrer',signal:sig(PROBE_TIMEOUT)});
+    return {state:'up', ms:Math.round(performance.now()-t0)};
+  }catch(e){
+    return {state:'down', ms:Math.round(performance.now()-t0),
+            reason:e.name==='AbortError'?'timeout':'blocked'};
+  }
+}
 
 /* ===== 出口查詢（不快取） ===== */
 async function getExit(){
@@ -125,7 +187,7 @@ async function getExit(){
   return null;
 }
 
-/* ===== 節點探測：強制走網路 + 驗證真實圖示 ===== */
+/* ===== 固定節點探測：強制走網路 + 驗證真實圖示 ===== */
 async function probe(t){
   const u = bust(t.url);
   const t0 = performance.now();
@@ -187,6 +249,21 @@ async function runCheck(){
   setBanner('idle','檢測中...','正在查詢出口地點與節點回應');
   TARGETS.forEach((_,i)=>{ $('pill'+i).className='pill idle'; $('pill'+i).textContent='檢測中…'; $('hint'+i).textContent=''; });
 
+  /* 自訂目標狀態 */
+  const cJobs = customs.map(c=>{
+    const raw=(c.url||'').trim();
+    if(!raw) return {skip:'empty'};
+    const norm=normalizeUrl(raw);
+    if(!norm) return {skip:'invalid'};
+    return {norm, blocked:c.blocked};
+  });
+  cJobs.forEach((j,i)=>{
+    const p=$('cpill'+i), h=$('chint'+i);
+    if(j.skip==='empty'){ p.className='pill idle'; p.textContent='未填寫'; h.textContent=''; }
+    else if(j.skip==='invalid'){ p.className='pill bad'; p.textContent='網址無效'; h.textContent='請輸入正確網址，例如 netflix.com'; }
+    else { p.className='pill idle'; p.textContent='檢測中…'; h.textContent=''; }
+  });
+
   const exit = await getExit();
   if(exit){
     $('exitGeo').textContent = `${exit.country} (${exit.cc}) · ${exit.region||''}`;
@@ -199,7 +276,12 @@ async function runCheck(){
     setBanner('idle','無法判定出口地點','請確認網路後重試；下方回應僅供參考');
   }
 
-  const results = await Promise.all(TARGETS.map(t=>probe(t)));
+  /* 固定＋自訂目標同時探測 */
+  const [results, cResults] = await Promise.all([
+    Promise.all(TARGETS.map(t=>probe(t))),
+    Promise.all(cJobs.map(j=> j.norm ? probeCustom(j.norm) : Promise.resolve(null)))
+  ]);
+
   let okCount=0;
   results.forEach((r,i)=>{
     const c = classify(TARGETS[i], r, exit);
@@ -207,7 +289,17 @@ async function runCheck(){
     $('pill'+i).className='pill '+c.cls; $('pill'+i).textContent=c.pill;
     $('hint'+i).textContent=c.hint;
   });
-  $('probeSummary').textContent = `${okCount}/${TARGETS.length} 節點有回應`;
+
+  let cOk=0, cTotal=0;
+  cResults.forEach((r,i)=>{
+    const j=cJobs[i]; if(!j.norm || !r) return;
+    cTotal++;
+    const c = classify({cnBlocked:j.blocked}, r, exit);
+    if(c.cls==='ok'){ cOk++; c.hint='自訂目標：伺服器有回應（只測連線，不驗證內容）'; }
+    $('cpill'+i).className='pill '+c.cls; $('cpill'+i).textContent=c.pill;
+    $('chint'+i).textContent=c.hint;
+  });
+  $('probeSummary').textContent = `${okCount+cOk}/${TARGETS.length+cTotal} 節點有回應`;
 
   const note=$('probeNote');
   if(exit && exit.cc==='CN'){
@@ -266,7 +358,7 @@ $('btnSpeed').addEventListener('click',async()=>{
   const mbps=[];
   for(let i=0;i<SPEED_NODES[region].length;i++){
     const n=SPEED_NODES[region][i];
-    if(n.external) continue;               // 官方測速網：用手動撳按鈕，唔計入頁內測速
+    if(n.external) continue;
     $('sp'+i).className='pill idle'; $('sp'+i).textContent='測速中…';
     try{
       const m=await speedOne(n); mbps.push(m);
@@ -283,7 +375,7 @@ $('btnSpeed').addEventListener('click',async()=>{
 });
 
 /* ===== 初始化 ===== */
-buildTargets(); buildSpeedNodes(); runCheck();
+buildTargets(); buildCustoms(); buildSpeedNodes(); runCheck();
 </script>
 </body>
 </html>
