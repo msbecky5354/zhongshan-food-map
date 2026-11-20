@@ -75,7 +75,7 @@
     <div class="sub" id="speedInfo"></div>
     <div id="speedNodes" style="display:flex;flex-direction:column;gap:10px;margin-top:10px"></div>
     <div class="result" id="speedResult">尚未執行測速</div>
-    <div class="sub">測速以瀏覽器實際下載計算，僅供參考；中國境內節點若失敗，可改用 <a href="https://www.speedtest.cn/" target="_blank" rel="noopener">Speedtest.cn</a></div>
+    <div class="sub">頁內測速以瀏覽器實際下載計算，僅供參考；官方測速請用 Speedtest.cn 按鈕</div>
   </div>
 </div>
 
@@ -84,13 +84,13 @@
 const EXPECTED_CC = 'US';                 // 預期 VPN 出口國
 const PROBE_TIMEOUT = 6000, IMG_TIMEOUT = 3500, EXIT_TIMEOUT = 6000;
 
+/* 已移除：懶人工具站 favicon.ico（網站冇呢個檔案，會 404） */
 const TARGETS = [
-  {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',              cnBlocked:true},
-  {name:'Facebook',   url:'https://www.facebook.com/favicon.ico',             cnBlocked:true},
-  {name:'TradingView',url:'https://www.tradingview.com/favicon.ico',          cnBlocked:true},
-  {name:'Google',     url:'https://www.google.com/favicon.ico',               cnBlocked:true},
-  {name:'懶人工具站', url:'https://lazytoolsstation.vercel.app/favicon.ico',  cnBlocked:true},
-  {name:'百度（對照組）', url:'https://www.baidu.com/favicon.ico',            cnBlocked:false},
+  {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',     cnBlocked:true},
+  {name:'Facebook',   url:'https://www.facebook.com/favicon.ico',    cnBlocked:true},
+  {name:'TradingView',url:'https://www.tradingview.com/favicon.ico', cnBlocked:true},
+  {name:'Google',     url:'https://www.google.com/favicon.ico',      cnBlocked:true},
+  {name:'百度（對照組）', url:'https://www.baidu.com/favicon.ico',   cnBlocked:false},
 ];
 
 const EXIT_APIS = [
@@ -99,10 +99,12 @@ const EXIT_APIS = [
   {url:'https://api.ip.sb/geoip',src:'ip.sb',    map:d=>({ip:d.ip,cc:d.country_code,country:d.country,region:d.region||d.city,ok:!!d.ip})},
 ];
 
+/* 中國境內：加入 Speedtest.cn 官方測速（新分頁開啟） */
 const SPEED_NODES = {
   out:[{name:'Cloudflare Speed (1MB)',url:'https://speed.cloudflare.com/__down?bytes=1048576'},
        {name:'Cloudflare Speed (5MB)',url:'https://speed.cloudflare.com/__down?bytes=5242880'}],
-  cn: [{name:'Staticfile CDN（約1MB）',url:'https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js'},
+  cn: [{name:'Speedtest.cn 測速網（官方）',url:'https://www.speedtest.cn/',external:true},
+       {name:'Staticfile CDN（約1MB）',url:'https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js'},
        {name:'360 Baomitu CDN（約1MB）',url:'https://lib.baomitu.com/echarts/5.4.3/echarts.min.js'}]
 };
 
@@ -125,7 +127,7 @@ async function getExit(){
 
 /* ===== 節點探測：強制走網路 + 驗證真實圖示 ===== */
 async function probe(t){
-  const u = bust(t.url);                       // 修正1：唯一 URL，杜絕舊快取
+  const u = bust(t.url);
   const t0 = performance.now();
   try{
     await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',
@@ -135,7 +137,7 @@ async function probe(t){
             reason:e.name==='AbortError'?'timeout':'blocked'};
   }
   const ms = Math.round(performance.now()-t0);
-  const real = await verifyImage(u);           // 修正2：內容驗證，防污染/劫持假回應
+  const real = await verifyImage(u);
   return {state: real?'up':'fake', ms};
 }
 function verifyImage(u){
@@ -156,11 +158,12 @@ function classify(t, r, exit){
   if(r.state==='down')
     return {cls:'bad', pill:r.reason==='timeout'?'無回應／逾時':'無回應',
             hint:(inCN&&t.cnBlocked)?'中國直連預期結果（被牆）':''};
-  if(inCN && t.cnBlocked)                      // 修正3：地理交叉比對
+  if(inCN && t.cnBlocked)
     return {cls:'warn', pill:`可疑回應 · ${r.ms} ms`,
             hint:'出口在中國仍收到回應：疑似 DNS 污染／劫持，非真實可用'};
   if(r.state==='fake')
-    return {cls:'warn', pill:`可疑回應 · ${r.ms} ms`, hint:'有回應但非正常圖示（可能被劫持）'};
+    return {cls:'warn', pill:`可疑回應 · ${r.ms} ms`,
+            hint:'伺服器有回應，但回應非正常圖示（可能 404／劫持）'};
   return {cls:'ok', pill:`有回應 · ${r.ms} ms`, hint:''};
 }
 
@@ -233,10 +236,13 @@ function buildSpeedNodes(){
     <div class="card" style="box-shadow:none;border:1px solid #eee">
       <div class="trow">
         <div><div class="tname" style="font-size:14px">${n.name}</div><div class="turl">${n.url}</div></div>
-        <span class="pill idle" id="sp${i}">待測速</span>
+        ${n.external
+          ? `<a class="pill ok" style="text-decoration:none" href="${n.url}" target="_blank" rel="noopener">開啟測速 ↗</a>`
+          : `<span class="pill idle" id="sp${i}">待測速</span>`}
       </div>
+      ${n.external ? '<div class="thint" style="color:#8a8a8a">新分頁開啟官方測速網，請揀中國境內伺服器；開住 VPN 測嘅係「VPN→中國」路線，熄咗 VPN 就係直連</div>' : ''}
     </div>`).join('');
-  $('speedInfo').textContent=`目前區域：${region==='out'?'境外 (Outside China)':'中國境內 (China)'}（共 ${SPEED_NODES[region].length} 個測速節點）`;
+  $('speedInfo').textContent=`目前區域：${region==='out'?'境外 (Outside China)':'中國境內 (China)'}（共 ${SPEED_NODES[region].length} 個節點）`;
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
   if(speedRunning) return;
@@ -259,9 +265,11 @@ $('btnSpeed').addEventListener('click',async()=>{
   $('speedResult').textContent='測速中...';
   const mbps=[];
   for(let i=0;i<SPEED_NODES[region].length;i++){
+    const n=SPEED_NODES[region][i];
+    if(n.external) continue;               // 官方測速網：用手動撳按鈕，唔計入頁內測速
     $('sp'+i).className='pill idle'; $('sp'+i).textContent='測速中…';
     try{
-      const m=await speedOne(SPEED_NODES[region][i]); mbps.push(m);
+      const m=await speedOne(n); mbps.push(m);
       $('sp'+i).className='pill ok'; $('sp'+i).textContent=`${m.toFixed(1)} Mbps`;
     }catch(e){
       $('sp'+i).className='pill bad'; $('sp'+i).textContent='失敗';
@@ -269,7 +277,7 @@ $('btnSpeed').addEventListener('click',async()=>{
   }
   $('speedResult').textContent = mbps.length
     ? `最快 ${Math.max(...mbps).toFixed(1)} Mbps（平均 ${(mbps.reduce((a,b)=>a+b,0)/mbps.length).toFixed(1)} Mbps）`
-    : '全部節點測速失敗（可能未開 VPN 或 CORS 限制）';
+    : '頁內節點全部失敗（可能未開 VPN 或 CORS 限制）——中國境內請用 Speedtest.cn 按鈕';
   $('btnSpeed').disabled=false; $('btnSpeed').textContent='開始測速';
   speedRunning=false;
 });
