@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VPN 通道、出口地點與測速檢測</title>
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --card: #ffffff;
+      --text: #1f2328;
+      --muted: #656d76;
+      --border: #e5e2dc;
+      --accent: #b89552;
+      --accent-hover: #9f7e40;
+      --ok-bg: #eaf7ee;
+      --ok-text: #1a7f37;
+      --fail-bg: #ffebe9;
+      --fail-text: #cf222e;
+      --wait-bg: #f3f4f6;
+      --wait-text: #57606a;
+      --soft-bg: #faf9f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Noto Sans HK", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    .timestamp {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .summary-box {
+      border-radius: 12px;
+      padding: 18px 20px;
+      text-align: center;
+      margin-bottom: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .summary-box.ok {
+      background: var(--ok-bg);
+      color: var(--ok-text);
+    }
+
+    .summary-box.fail {
+      background: var(--fail-bg);
+      color: var(--fail-text);
+    }
+
+    .summary-box.wait {
+      background: var(--wait-bg);
+      color: var(--wait-text);
+    }
+
+    .summary-status {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-sub {
+      font-size: 13px;
+      opacity: 0.92;
+    }
+
+    .location-card {
+      border: 1px solid var(--border);
+      background: var(--soft-bg);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .location-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .location-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .location-meta {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      margin-top: 18px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      gap: 10px;
+    }
+
+    .item-name {
+      font-weight: 600;
+    }
+
+    .item-url {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+      word-break: break-all;
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      min-width: 96px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .badge.ok {
+      background: var(--ok-bg);
+      color: var(--ok-text);
+    }
+
+    .badge.fail {
+      background: var(--fail-bg);
+      color: var(--fail-text);
+    }
+
+    .badge.wait {
+      background: var(--wait-bg);
+      color: var(--wait-text);
+    }
+
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: var(--soft-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .auto-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text);
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .auto-toggle input {
+      accent-color: var(--accent);
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 24px 0 6px;
+    }
+
+    .speed-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .zone-group {
+      display: flex;
+      background: var(--soft-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .zone-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .zone-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .speed-summary {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      background: var(--soft-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">VPN 通道、出口地點與測速檢測</div>
+      <div class="timestamp" id="lastChecked">尚未檢測</div>
+    </div>
+
+    <div class="summary-box wait" id="summaryBox">
+      <div class="summary-status" id="summaryStatus">準備檢測...</div>
+      <div class="summary-sub" id="summarySub">無需刷新頁面，直接測試外網通道與出口地點</div>
+    </div>
+
+    <div class="location-card">
+      <div>
+        <div class="location-label">目前 VPN 出口地點</div>
+        <div class="location-value" id="geoLocation">查詢中...</div>
+      </div>
+      <div class="location-meta" id="geoMeta">-</div>
+    </div>
+
+    <div class="section-label">檢測目標節點</div>
+    <div class="list" id="vpnList"></div>
+
+    <div class="controls">
+      <button class="btn-primary" id="checkBtn" onclick="runAllChecks()">立即檢測</button>
+      <label class="auto-toggle">
+        <input type="checkbox" id="autoCheckToggle" onchange="toggleAutoCheck()" />
+        <span id="autoLabel">每 10 秒自動測</span>
+      </label>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-label">頻寬測速（Speedtest）</div>
+    <div class="speed-toolbar">
+      <div class="zone-group" role="group" aria-label="測速區域選擇">
+        <button type="button" class="zone-btn" id="zone-outside" onclick="selectSpeedZone('outside')">境外 (Outside China)</button>
+        <button type="button" class="zone-btn" id="zone-china" onclick="selectSpeedZone('china')">中國境內 (China)</button>
+      </div>
+      <button type="button" class="btn-secondary" id="speedBtn" onclick="runSpeedtest()">開始測速</button>
+    </div>
+
+    <div class="speed-summary" id="speedSummary">尚未執行測速</div>
+    <div class="list" id="speedList"></div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 頂部參數配置區（可隨時按需要自行修改）
+    // ==========================================
+    const CONFIG = {
+      timeoutMs: 6000,             // 通道與地點查詢超時（毫秒）：6000 = 6 秒
+      autoCheckIntervalMs: 10000,  // 自動檢測間隔（毫秒）：10000 = 10 秒
+      showPublicIp: true,          // 是否同時顯示對外 IP
+
+      // 出口地理位置查詢接口（按順序嘗試，失敗或逾時自動跳下一個）
+      geoEndpoints: [
+        {
+          name: "ipwho.is",
+          url: "https://ipwho.is/",
+          parse: (data) => {
+            if (!data || data.success === false) return null;
+            return {
+              country: data.country || "",
+              code: data.country_code || "",
+              region: data.region || data.city || "",
+              ip: data.ip || ""
+            };
+          }
+        },
+        {
+          name: "ipapi.co",
+          url: "https://ipapi.co/json/",
+          parse: (data) => {
+            if (!data || data.error) return null;
+            return {
+              country: data.country_name || "",
+              code: data.country_code || "",
+              region: data.region || data.city || "",
+              ip: data.ip || ""
+            };
+          }
+        },
+        {
+          name: "geojs",
+          url: "https://get.geojs.io/v1/ip/geo.json",
+          parse: (data) => {
+            if (!data || !data.country) return null;
+            return {
+              country: data.country || "",
+              code: data.country_code || "",
+              region: data.region || data.city || "",
+              ip: data.ip || ""
+            };
+          }
+        }
+      ],
+
+      // 檢測目標節點（用輕量 favicon.ico 避免載入重型網頁）
+      vpnTargets: [
+        { name: "YouTube", url: "https://www.youtube.com/favicon.ico" },
+        { name: "Facebook", url: "https://www.facebook.com/favicon.ico" },
+        { name: "TradingView", url: "https://www.tradingview.com/favicon.ico" },
+        { name: "Google", url: "https://www.google.com/favicon.ico" },
+        { name: "懶人工具站", url: "https://lazytoolsstation.vercel.app/favicon.ico" }
+      ],
+
+      // Speedtest 測速配置（可自行增減測試檔 URL 與實際 sizeBytes）
+      speedtest: {
+        defaultZone: "outside", // "outside"（境外）或 "china"（中國境內）
+        timeoutMs: 8000,        // 單次測速超時（毫秒）：8000 = 8 秒
+        zones: {
+          outside: {
+            label: "境外 (Outside China)",
+            targets: [
+              {
+                name: "Cloudflare Speed (1MB)",
+                url: "https://speed.cloudflare.com/__down?bytes=1048576",
+                sizeBytes: 1048576
+              },
+              {
+                name: "Cloudflare Speed (5MB)",
+                url: "https://speed.cloudflare.com/__down?bytes=5242880",
+                sizeBytes: 5242880
+              }
+            ]
+          },
+          china: {
+            label: "中國境內 (China)",
+            targets: [
+              {
+                name: "npmmirror CDN (echarts ~1.0MB)",
+                url: "https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js",
+                sizeBytes: 1050000
+              }
+            ]
+          }
+        }
+      }
+    };
+    // ==========================================
+
+    let autoTimer = null;
+    let isChecking = false;
+    let isSpeedTesting = false;
+    let currentSpeedZone = CONFIG.speedtest.defaultZone in CONFIG.speedtest.zones
+      ? CONFIG.speedtest.defaultZone
+      : "outside";
+
+    document.getElementById("autoLabel").textContent =
+      `每 ${Math.round(CONFIG.autoCheckIntervalMs / 1000)} 秒自動測`;
+
+    function renderInitialRows() {
+      const vpnList = document.getElementById("vpnList");
+      vpnList.innerHTML = CONFIG.vpnTargets.map((item, idx) => `
+        <div class="item">
+          <div>
+            <div class="item-name">${item.name}</div>
+            <div class="item-url">${item.url}</div>
+          </div>
+          <span class="badge wait" id="vpn-badge-${idx}">等待中</span>
+        </div>
+      `).join("");
+
+      renderSpeedZone();
+    }
+
+    function selectSpeedZone(zone) {
+      if (!(zone in CONFIG.speedtest.zones)) return;
+      currentSpeedZone = zone;
+      renderSpeedZone();
+    }
+
+    function renderSpeedZone() {
+      document.getElementById("zone-outside").classList.toggle("active", currentSpeedZone === "outside");
+      document.getElementById("zone-china").classList.toggle("active", currentSpeedZone === "china");
+
+      const zoneConfig = CONFIG.speedtest.zones[currentSpeedZone];
+      const speedList = document.getElementById("speedList");
+      const speedSummary = document.getElementById("speedSummary");
+
+      if (!zoneConfig.targets || zoneConfig.targets.length === 0) {
+        speedList.innerHTML = "";
+        speedSummary.textContent =
+          `「${zoneConfig.label}」尚未設定測速節點，請喺頂部 CONFIG.speedtest.zones.${currentSpeedZone}.targets 填入測試連結。`;
+        return;
+      }
+
+      speedSummary.textContent = `目前區域：${zoneConfig.label}（共 ${zoneConfig.targets.length} 個測速節點）`;
+      speedList.innerHTML = zoneConfig.targets.map((item, idx) => `
+        <div class="item">
+          <div>
+            <div class="item-name">${item.name}</div>
+            <div class="item-url">${item.url}</div>
+          </div>
+          <span class="badge wait" id="speed-badge-${idx}">待測速</span>
+        </div>
+      `).join("");
+    }
+
+    function probeTarget(url, timeoutMs) {
+      return new Promise((resolve) => {
+        const start = performance.now();
+        const img = new Image();
+        let done = false;
+
+        const finish = (ok) => {
+          if (done) return;
+          done = true;
+          clearTimeout(timer);
+          img.onload = null;
+          img.onerror = null;
+          const latency = Math.round(performance.now() - start);
+          resolve({ ok, latency });
+        };
+
+        const timer = setTimeout(() => finish(false), timeoutMs);
+
+        img.onload = () => finish(true);
+        img.onerror = () => finish(false);
+
+        const sep = url.includes("?") ? "&" : "?";
+        img.src = `${url}${sep}_t=${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      });
+    }
+
+    async function fetchJsonWithTimeout(url, timeoutMs) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const sep = url.includes("?") ? "&" : "?";
+        const resp = await fetch(`${url}${sep}_t=${Date.now()}`, {
+          signal: controller.signal,
+          cache: "no-store"
+        });
+        if (!resp.ok) return null;
+        return await resp.json();
+      } catch (_) {
+        return null;
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function detectVpnLocation() {
+      for (const ep of CONFIG.geoEndpoints) {
+        const raw = await fetchJsonWithTimeout(ep.url, CONFIG.timeoutMs);
+        if (!raw) continue;
+        const parsed = ep.parse(raw);
+        if (parsed && (parsed.country || parsed.code)) {
+          return { ...parsed, source: ep.name };
+        }
+      }
+      return null;
+    }
+
+    async function measureDownloadSpeed(target, timeoutMs) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      const start = performance.now();
+
+      try {
+        const sep = target.url.includes("?") ? "&" : "?";
+        const resp = await fetch(`${target.url}${sep}_t=${Date.now()}`, {
+          signal: controller.signal,
+          cache: "no-store"
+        });
+        if (!resp.ok) {
+          return { ok: false, reason: `HTTP ${resp.status}` };
+        }
+
+        const buf = await resp.arrayBuffer();
+        const elapsedMs = Math.max(performance.now() - start, 1);
+        const bytes = buf.byteLength || target.sizeBytes || 0;
+
+        if (!bytes) {
+          return { ok: false, reason: "無數據" };
+        }
+
+        const seconds = elapsedMs / 1000;
+        const mbps = ((bytes * 8) / (1024 * 1024)) / seconds;
+        const mbs = (bytes / (1024 * 1024)) / seconds;
+
+        return {
+          ok: true,
+          mbps: mbps.toFixed(2),
+          mbs: mbs.toFixed(2),
+          elapsedMs: Math.round(elapsedMs)
+        };
+      } catch (err) {
+        const isAbort = err && err.name === "AbortError";
+        return { ok: false, reason: isAbort ? "逾時" : "CORS / 連線失敗" };
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function runSpeedtest() {
+      if (isSpeedTesting) return;
+      const zoneConfig = CONFIG.speedtest.zones[currentSpeedZone];
+      if (!zoneConfig || !zoneConfig.targets || zoneConfig.targets.length === 0) {
+        renderSpeedZone();
+        return;
+      }
+
+      isSpeedTesting = true;
+      const speedBtn = document.getElementById("speedBtn");
+      const speedSummary = document.getElementById("speedSummary");
+      speedBtn.disabled = true;
+      speedSummary.textContent = `正在測試「${zoneConfig.label}」下載速度...`;
+
+      zoneConfig.targets.forEach((_, idx) => {
+        const badge = document.getElementById(`speed-badge-${idx}`);
+        if (badge) {
+          badge.className = "badge wait";
+          badge.textContent = "測速中...";
+        }
+      });
+
+      const results = [];
+      for (let i = 0; i < zoneConfig.targets.length; i++) {
+        const target = zoneConfig.targets[i];
+        const res = await measureDownloadSpeed(target, CONFIG.speedtest.timeoutMs);
+        results.push(res);
+
+        const badge = document.getElementById(`speed-badge-${i}`);
+        if (badge) {
+          if (res.ok) {
+            badge.className = "badge ok";
+            badge.textContent = `${res.mbps} Mbps (${res.mbs} MB/s)`;
+          } else {
+            badge.className = "badge fail";
+            badge.textContent = res.reason;
+          }
+        }
+      }
+
+      const okList = results.filter((r) => r.ok);
+      if (okList.length > 0) {
+        const maxMbps = Math.max(...okList.map((r) => parseFloat(r.mbps))).toFixed(2);
+        speedSummary.textContent =
+          `「${zoneConfig.label}」完成：${okList.length}/${results.length} 個節點成功（最高約 ${maxMbps} Mbps）`;
+      } else {
+        speedSummary.textContent =
+          `「${zoneConfig.label}」測速失敗（逾時或目標伺服器封鎖跨域請求）`;
+      }
+
+      speedBtn.disabled = false;
+      isSpeedTesting = false;
+    }
+
+    async function runAllChecks() {
+      if (isChecking) return;
+      isChecking = true;
+
+      const btn = document.getElementById("checkBtn");
+      const summaryBox = document.getElementById("summaryBox");
+      const summaryStatus = document.getElementById("summaryStatus");
+      const summarySub = document.getElementById("summarySub");
+      const geoLocation = document.getElementById("geoLocation");
+      const geoMeta = document.getElementById("geoMeta");
+
+      btn.disabled = true;
+      summaryBox.className = "summary-box wait";
+      summaryStatus.textContent = "檢測中...";
+      summarySub.textContent = "正在測試目標節點與出口地點";
+      geoLocation.textContent = "查詢中...";
+      geoMeta.textContent = "-";
+
+      CONFIG.vpnTargets.forEach((_, idx) => {
+        const b = document.getElementById(`vpn-badge-${idx}`);
+        b.className = "badge wait";
+        b.textContent = "測試中...";
+      });
+
+      const vpnPromises = CONFIG.vpnTargets.map(async (target, idx) => {
+        const res = await probeTarget(target.url, CONFIG.timeoutMs);
+        const badge = document.getElementById(`vpn-badge-${idx}`);
+        if (res.ok) {
+          badge.className = "badge ok";
+          badge.textContent = `暢通 · ${res.latency} ms`;
+        } else {
+          badge.className = "badge fail";
+          badge.textContent = "逾時 / 未通";
+        }
+        return res;
+      });
+
+      const [vpnResults, geoInfo] = await Promise.all([
+        Promise.all(vpnPromises),
+        detectVpnLocation()
+      ]);
+
+      if (geoInfo) {
+        const codePart = geoInfo.code ? ` (${geoInfo.code})` : "";
+        const regionPart = geoInfo.region ? ` · ${geoInfo.region}` : "";
+        geoLocation.textContent = `${geoInfo.country || ""}${codePart}${regionPart}`.trim();
+
+        const metaParts = [];
+        if (CONFIG.showPublicIp && geoInfo.ip) metaParts.push(`IP: ${geoInfo.ip}`);
+        metaParts.push(`來源: ${geoInfo.source}`);
+        geoMeta.textContent = metaParts.join(" | ");
+      } else {
+        geoLocation.textContent = "未能取得出口地點";
+        geoMeta.textContent = "接口逾時或遭攔截";
+      }
+
+      const okCount = vpnResults.filter((r) => r.ok).length;
+      const totalVpn = vpnResults.length;
+
+      if (okCount > 0) {
+        const fastest = Math.min(...vpnResults.filter((r) => r.ok).map((r) => r.latency));
+        const locText = geoInfo ? ` · 出口：${geoInfo.country || geoInfo.code}` : "";
+        summaryBox.className = "summary-box ok";
+        summaryStatus.textContent = "VPN 通道暢通";
+        summarySub.textContent = `${okCount}/${totalVpn} 個節點有回應（最快 ${fastest} ms）${locText}`;
+      } else {
+        summaryBox.className = "summary-box fail";
+        summaryStatus.textContent = "VPN 未通 / 逾時";
+        summarySub.textContent = "所有測試節點均無回應，請檢查小地球儀連線狀態";
+      }
+
+      const now = new Date();
+      document.getElementById("lastChecked").textContent =
+        `最後檢測：${now.toLocaleTimeString("zh-HK", { hour12: false })}`;
+
+      btn.disabled = false;
+      isChecking = false;
+    }
+
+    function toggleAutoCheck() {
+      const checked = document.getElementById("autoCheckToggle").checked;
+      if (checked) {
+        runAllChecks();
+        autoTimer = setInterval(runAllChecks, CONFIG.autoCheckIntervalMs);
+      } else {
+        clearInterval(autoTimer);
+        autoTimer = null;
+      }
+    }
+
+    renderInitialRows();
+    runAllChecks();
+  </script>
+</body>
+</html>
