@@ -15,6 +15,8 @@
       --accent-hover: #9f7e40;
       --ok-bg: #eaf7ee;
       --ok-text: #1a7f37;
+      --warn-bg: #fff8c5;
+      --warn-text: #9a6700;
       --fail-bg: #ffebe9;
       --fail-text: #cf222e;
       --wait-bg: #f3f4f6;
@@ -80,6 +82,11 @@
       color: var(--ok-text);
     }
 
+    .summary-box.warn {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+    }
+
     .summary-box.fail {
       background: var(--fail-bg);
       color: var(--fail-text);
@@ -91,14 +98,14 @@
     }
 
     .summary-status {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: 700;
       margin-bottom: 6px;
     }
 
     .summary-sub {
       font-size: 13px;
-      opacity: 0.92;
+      opacity: 0.95;
     }
 
     .location-card {
@@ -174,7 +181,7 @@
       border-radius: 999px;
       font-size: 12px;
       font-weight: 600;
-      min-width: 96px;
+      min-width: 104px;
       text-align: center;
       flex-shrink: 0;
     }
@@ -182,6 +189,11 @@
     .badge.ok {
       background: var(--ok-bg);
       color: var(--ok-text);
+    }
+
+    .badge.warn {
+      background: var(--warn-bg);
+      color: var(--warn-text);
     }
 
     .badge.fail {
@@ -325,18 +337,18 @@
 
     <div class="summary-box wait" id="summaryBox">
       <div class="summary-status" id="summaryStatus">準備檢測...</div>
-      <div class="summary-sub" id="summarySub">無需刷新頁面，直接測試外網通道與出口地點</div>
+      <div class="summary-sub" id="summarySub">以出口地點與目標國家比對為準，避免直連誤判</div>
     </div>
 
     <div class="location-card">
       <div>
-        <div class="location-label">目前 VPN 出口地點</div>
+        <div class="location-label">目前出口地點</div>
         <div class="location-value" id="geoLocation">查詢中...</div>
       </div>
       <div class="location-meta" id="geoMeta">-</div>
     </div>
 
-    <div class="section-label">檢測目標節點</div>
+    <div class="section-label">目標節點回應參考（僅作延遲參考）</div>
     <div class="list" id="vpnList"></div>
 
     <div class="controls">
@@ -370,8 +382,8 @@
       timeoutMs: 6000,             // 通道與地點查詢超時（毫秒）：6000 = 6 秒
       autoCheckIntervalMs: 10000,  // 自動檢測間隔（毫秒）：10000 = 10 秒
       showPublicIp: true,          // 是否同時顯示對外 IP
+      expectedCountryCode: "US",   // 預期 VPN 出口國家代碼（如 "US"；留空 "" 則只檢查是否取得出口資訊）
 
-      // 出口地理位置查詢接口（按順序嘗試，失敗或逾時自動跳下一個）
       geoEndpoints: [
         {
           name: "ipwho.is",
@@ -380,7 +392,7 @@
             if (!data || data.success === false) return null;
             return {
               country: data.country || "",
-              code: data.country_code || "",
+              code: (data.country_code || "").toUpperCase(),
               region: data.region || data.city || "",
               ip: data.ip || ""
             };
@@ -393,7 +405,7 @@
             if (!data || data.error) return null;
             return {
               country: data.country_name || "",
-              code: data.country_code || "",
+              code: (data.country_code || "").toUpperCase(),
               region: data.region || data.city || "",
               ip: data.ip || ""
             };
@@ -406,7 +418,7 @@
             if (!data || !data.country) return null;
             return {
               country: data.country || "",
-              code: data.country_code || "",
+              code: (data.country_code || "").toUpperCase(),
               region: data.region || data.city || "",
               ip: data.ip || ""
             };
@@ -414,7 +426,6 @@
         }
       ],
 
-      // 檢測目標節點（用輕量 favicon.ico 避免載入重型網頁）
       vpnTargets: [
         { name: "YouTube", url: "https://www.youtube.com/favicon.ico" },
         { name: "Facebook", url: "https://www.facebook.com/favicon.ico" },
@@ -423,10 +434,9 @@
         { name: "懶人工具站", url: "https://lazytoolsstation.vercel.app/favicon.ico" }
       ],
 
-      // Speedtest 測速配置（可自行增減測試檔 URL 與實際 sizeBytes）
       speedtest: {
-        defaultZone: "outside", // "outside"（境外）或 "china"（中國境內）
-        timeoutMs: 8000,        // 單次測速超時（毫秒）：8000 = 8 秒
+        defaultZone: "outside",
+        timeoutMs: 8000,
         zones: {
           outside: {
             label: "境外 (Outside China)",
@@ -681,7 +691,7 @@
       btn.disabled = true;
       summaryBox.className = "summary-box wait";
       summaryStatus.textContent = "檢測中...";
-      summarySub.textContent = "正在測試目標節點與出口地點";
+      summarySub.textContent = "正在查詢出口地點與測試目標節點";
       geoLocation.textContent = "查詢中...";
       geoMeta.textContent = "-";
 
@@ -691,21 +701,21 @@
         b.textContent = "測試中...";
       });
 
-      const vpnPromises = CONFIG.vpnTargets.map(async (target, idx) => {
-        const res = await probeTarget(target.url, CONFIG.timeoutMs);
-        const badge = document.getElementById(`vpn-badge-${idx}`);
-        if (res.ok) {
-          badge.className = "badge ok";
-          badge.textContent = `暢通 · ${res.latency} ms`;
-        } else {
-          badge.className = "badge fail";
-          badge.textContent = "逾時 / 未通";
-        }
-        return res;
-      });
-
       const [vpnResults, geoInfo] = await Promise.all([
-        Promise.all(vpnPromises),
+        Promise.all(
+          CONFIG.vpnTargets.map(async (target, idx) => {
+            const res = await probeTarget(target.url, CONFIG.timeoutMs);
+            const badge = document.getElementById(`vpn-badge-${idx}`);
+            if (res.ok) {
+              badge.className = "badge ok";
+              badge.textContent = `有回應 · ${res.latency} ms`;
+            } else {
+              badge.className = "badge fail";
+              badge.textContent = "無回應 / 逾時";
+            }
+            return res;
+          })
+        ),
         detectVpnLocation()
       ]);
 
@@ -720,22 +730,28 @@
         geoMeta.textContent = metaParts.join(" | ");
       } else {
         geoLocation.textContent = "未能取得出口地點";
-        geoMeta.textContent = "接口逾時或遭攔截";
+        geoMeta.textContent = "接口逾時或未連通";
       }
 
-      const okCount = vpnResults.filter((r) => r.ok).length;
+      const expectedCode = (CONFIG.expectedCountryCode || "").trim().toUpperCase();
+      const reachableCount = vpnResults.filter((r) => r.ok).length;
       const totalVpn = vpnResults.length;
 
-      if (okCount > 0) {
-        const fastest = Math.min(...vpnResults.filter((r) => r.ok).map((r) => r.latency));
-        const locText = geoInfo ? ` · 出口：${geoInfo.country || geoInfo.code}` : "";
-        summaryBox.className = "summary-box ok";
-        summaryStatus.textContent = "VPN 通道暢通";
-        summarySub.textContent = `${okCount}/${totalVpn} 個節點有回應（最快 ${fastest} ms）${locText}`;
-      } else {
+      if (!geoInfo) {
         summaryBox.className = "summary-box fail";
-        summaryStatus.textContent = "VPN 未通 / 逾時";
-        summarySub.textContent = "所有測試節點均無回應，請檢查小地球儀連線狀態";
+        summaryStatus.textContent = "未能確認 VPN 出口";
+        summarySub.textContent =
+          `出口查詢無回應（${reachableCount}/${totalVpn} 個節點有回應）；請檢查 VPN／網絡狀態`;
+      } else if (expectedCode && geoInfo.code !== expectedCode) {
+        summaryBox.className = "summary-box warn";
+        summaryStatus.textContent = `未符合目標 VPN（目前：${geoInfo.code || geoInfo.country}）`;
+        summarySub.textContent =
+          `預期出口為 ${expectedCode}，目前為 ${geoInfo.country || geoInfo.code}（可能未開 VPN 或連錯地區）`;
+      } else {
+        summaryBox.className = "summary-box ok";
+        summaryStatus.textContent = `出口已確認：${geoInfo.country || geoInfo.code}`;
+        summarySub.textContent =
+          `${reachableCount}/${totalVpn} 個參考節點有回應（出口：${geoInfo.country || geoInfo.code}）`;
       }
 
       const now = new Date();
