@@ -181,7 +181,6 @@
   .warmup-bar{margin-top:10px;padding:9px 12px;border-radius:12px;background:var(--paper);border:1px dashed var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:#4c5560;line-height:1.5}
   .warmup-text{display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:210px}
   .kbd{display:inline-block;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;font-weight:800;color:var(--ink);background:var(--surface);border:1px solid #d5ccb4;border-bottom-width:2px;border-radius:6px;box-shadow:0 1px 1px rgba(0,0,0,.04)}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
   /* ===== 香檳金增強層 ===== */
   @media (min-width:720px){
@@ -221,7 +220,6 @@
   #tunnelSvg[data-state="ok"] .nodeOut{stroke:var(--amber)}
   #tunnelSvg[data-state="ok"] .wire{stroke:var(--amber);stroke-dasharray:5 9;animation:dash 1s linear infinite}
   #tunnelSvg[data-state="cn"] #pIn{stroke:#8a7a55;stroke-dasharray:5 9;animation:dash 1.2s linear infinite}
-  #tunnelSvg[data-state="cn"] #pOut{stroke:var(--bad);stroke-dasharray:2 8}
   .pkt{fill:var(--amber)}
   #tunnelSvg[data-state="cn"] .pktIn{fill:#e6a0a0}
   .row{flex-wrap:wrap}
@@ -246,10 +244,13 @@
   .banner.ok{background:linear-gradient(120deg,#e7f2df,#f4ebcf);border-color:#cddfb2}
   .sectionTitle span:last-child{color:var(--gold-deep)}
   .factnote{border-left:3px solid var(--gold);background:linear-gradient(90deg,rgba(243,231,200,.62),var(--surface))}
-  .target{padding:14px;border-radius:16px;transition:transform .2s,box-shadow .2s}
-  .target:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(80,62,25,.11)}
-  .target.pending .pill{opacity:.72}
   .tag.control,.badge{background:var(--gold-soft);color:var(--gold-deep)}
+  .spark{display:inline-block;width:64px;height:20px;vertical-align:middle;flex-shrink:0}
+  .sline{stroke:var(--gold-deep)}
+  #targets .card{transition:transform .2s,box-shadow .2s}
+  #targets .card:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(80,62,25,.11)}
+  #speedNodes .snode{transition:transform .2s,box-shadow .2s}
+  #speedNodes .snode:hover{transform:translateY(-1px)}
   .pill.idle{background:#efe8d6;color:#7a6a45}
   .auto input:checked+.track{background:linear-gradient(90deg,var(--gold),var(--gold-deep))}
   .cinput:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
@@ -267,7 +268,7 @@
   .copy-btn.copied{background:var(--gold);border-color:var(--gold);color:#241a08}
   .copy-mini{color:var(--gold-deep);border-color:rgba(179,146,79,.4)}
   .copy-mini:hover{border-color:var(--gold);background:var(--gold-soft)}
-  .copy-mini.copied{background:var(--gold);border-color:var(--gold)}
+  .copy-mini.copied{background:var(--gold);border-color:var(--gold);color:#241a08}
   .step-num{background:linear-gradient(135deg,var(--gold-soft),#e7d5a8);color:var(--gold-deep);border:1px solid rgba(179,146,79,.28)}
   .kbd{border-color:rgba(179,146,79,.45);border-bottom-color:var(--gold-deep);background:linear-gradient(180deg,#fffdf7,#f6efdc)}
   code.inline{background:var(--gold-soft);color:var(--gold-deep);border-color:rgba(179,146,79,.32)}
@@ -275,7 +276,6 @@
   .rescue-warn{border-left:3px solid var(--amber)}
   .warmup-bar{background:linear-gradient(90deg,rgba(243,231,200,.7),var(--paper));border-color:rgba(179,146,79,.45)}
   .method{border-top:2px solid rgba(179,146,79,.35);max-width:680px;margin:0 auto;text-align:center}
-  .save-badge{font-size:11px;font-weight:700;color:var(--ok);margin-top:8px;display:inline-flex;align-items:center;gap:5px}
   @media (max-width:520px){
     .rescue-row{flex-direction:column;align-items:flex-start}
     .rescue-row>.copy-mini{align-self:flex-start}
@@ -287,6 +287,7 @@
     .maintabs{gap:5px;padding:5px}
     .mtab{font-size:11.5px;padding:9px 5px}
   }
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -325,7 +326,7 @@
         <g id="okMark"><circle cx="497" cy="45" r="9" fill="#1c7c46"/><path d="M493 45l3 3 5-6" stroke="#fff" stroke-width="2" fill="none"/></g>
         <g id="badMark"><circle cx="497" cy="45" r="9" fill="#b23434"/><path d="M494 42l6 6M500 42l-6 6" stroke="#fff" stroke-width="2"/></g>
       </svg>
-      <div class="heroline"><span id="heroState">準備檢測…</span><span class="chip" id="heroExit">出口：—</span></div>
+      <div class="heroline"><span id="heroState" aria-live="polite">準備檢測…</span><span class="chip" id="heroExit">出口：—</span></div>
     </div>
     <div class="row top-actions">
       <button type="button" class="gold" id="btnCheck">立即檢測</button>
@@ -348,7 +349,7 @@
   </nav>
 
   <div class="tabpane on" id="pane-detect" role="tabpanel">
-    <div class="banner idle" id="banner">尚未檢測<span>直接顯示實際出口，唔設預設國家</span></div>
+    <div class="banner idle" id="banner" aria-live="polite">尚未檢測<span>直接顯示實際出口，唔設預設國家</span></div>
 
     <section class="card">
       <div class="label">目前出口地點（實測）</div>
@@ -365,7 +366,6 @@
     <section class="card">
       <div id="customs"></div>
       <div class="sub">直接打網址（例如 netflix.com，自動用 HTTPS），會自動記住。「中國被牆」<b>只影響備註、唔影響實測</b>：勾咗而出口喺 CN 又有回應，會提你「可能係污染／劫持」；測中國境內網站就唔好勾。</div>
-      <div class="save-badge" id="customSaveStatus">✓ 已啟用本地自動儲存</div>
     </section>
   </div>
 
@@ -379,7 +379,7 @@
       <button type="button" class="gold" id="btnSpeed" style="width:100%">開始測速</button>
       <div class="sub" id="speedInfo"></div>
       <div id="speedNodes"></div>
-      <div class="result" id="speedResult">尚未執行測速</div>
+      <div class="result" id="speedResult" aria-live="polite">尚未執行測速</div>
       <div class="sub">頁內測速以瀏覽器實際下載計算，僅供參考；官方測速請用 Speedtest.cn 按鈕。</div>
     </section>
   </div>
@@ -515,44 +515,67 @@ curl.exe -v https://api.ip.sb/geoip</pre>
 </div>
 
 <script>
-/* ===== 可配置參數（冇預設出口國家） ===== */
-const CONFIG = {
-  probeTimeoutMs: 6000,
-  imgTimeoutMs: 3500,
-  exitTimeoutMs: 20000,
-  speedTimeoutMs: 30000,
-  autoIntervalMs: 10000,
-  customSlots: 3,
-  storageKey: 'vt_customs',
-  legacyStorageKeys: ['vpn_customs_v1']
-};
+const PROBE_TIMEOUT=6000, IMG_TIMEOUT=3500, EXIT_TIMEOUT=20000;
+
+window.addEventListener('unhandledrejection', e=>{
+  const msg=String((e.reason&&e.reason.message)||e.reason||'');
+  if(/Failed to fetch|NetworkError|Load failed|AbortError/i.test(msg)) e.preventDefault();
+});
+
+async function fetchTimed(url, ms, opts={}){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(), ms);
+  try{
+    return await fetch(url,{...opts,signal:c.signal});
+  }finally{
+    clearTimeout(t);
+  }
+}
 
 const TARGETS=[
-  {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',     cnBlocked:true},
-  {name:'Facebook',   url:'https://www.facebook.com/favicon.ico',    cnBlocked:true},
-  {name:'TradingView',url:'https://www.tradingview.com/favicon.ico', cnBlocked:true},
-  {name:'Google',     url:'https://www.google.com/favicon.ico',      cnBlocked:true},
-  {name:'百度（對照組）',url:'https://www.baidu.com/favicon.ico',    cnBlocked:false},
+  {name:'YouTube',     url:'https://www.youtube.com/favicon.ico',      cnBlocked:true},
+  {name:'Facebook',    url:'https://www.facebook.com/favicon.ico',     cnBlocked:true},
+  {name:'TradingView', url:'https://www.tradingview.com/favicon.ico',  cnBlocked:true},
+  {name:'Google',      url:'https://www.google.com/favicon.ico',       cnBlocked:true},
+  {name:'百度（對照組）',url:'https://www.baidu.com/favicon.ico',       cnBlocked:false}
 ];
+
 const EXIT_APIS=[
-  {url:'https://ipwho.is/',      src:'ipwho.is', map:d=>({ip:d.ip,cc:d.country_code,country:d.country,region:d.region||d.city,ok:d.success!==false})},
-  {url:'https://ipapi.co/json/', src:'ipapi.co', map:d=>({ip:d.ip,cc:d.country_code,country:d.country_name,region:d.region||d.city,ok:!d.error})},
-  {url:'https://api.ip.sb/geoip',src:'ip.sb',    map:d=>({ip:d.ip,cc:d.country_code,country:d.country,region:d.region||d.city,ok:!!d.ip})},
+  {url:'https://api.ip.sb/geoip', src:'ip.sb',
+   map:d=>({ip:d.ip,cc:d.country_code,country:d.country||d.country_code,region:d.region||d.city,ok:!!d.ip})},
+  {url:'https://ipwho.is/', src:'ipwho.is',
+   map:d=>({ip:d.ip,cc:d.country_code,country:d.country||d.country_code,region:d.region||d.city,ok:d.success!==false&&!!d.ip})},
+  {url:'https://ipinfo.io/json', src:'ipinfo.io',
+   map:d=>({ip:d.ip,cc:d.country_code||d.country,country:d.country_name||d.country||d.country_code,region:d.region||d.city,ok:!!d.ip})}
 ];
+
 const SPEED_NODES={
-  out:[{name:'Cloudflare Speed (1MB)',url:'https://speed.cloudflare.com/__down?bytes=1048576'},
-       {name:'Cloudflare Speed (5MB)',url:'https://speed.cloudflare.com/__down?bytes=5242880'}],
-  cn: [{name:'Speedtest.cn 測速網（官方）',url:'https://www.speedtest.cn/',external:true},
-       {name:'npmmirror 淘寶鏡像（約1MB）',url:'https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js'},
-       {name:'360 Baomitu CDN（約1MB）',url:'https://lib.baomitu.com/echarts/5.4.3/echarts.min.js'}]
+  out:[
+    {name:'Cloudflare 1 MB',url:'https://speed.cloudflare.com/__down?bytes=1048576',bytes:1048576},
+    {name:'Cloudflare 5 MB',url:'https://speed.cloudflare.com/__down?bytes=5242880',bytes:5242880}
+  ],
+  cn:[
+    {name:'Speedtest.cn 測速網（官方）',url:'https://www.speedtest.cn/',external:true},
+    {name:'npmmirror 淘寶鏡像（約1MB）',url:'https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js',bytes:1048576},
+    {name:'360 Baomitu CDN（約1MB）',url:'https://lib.baomitu.com/echarts/5.4.3/echarts.min.js',bytes:1048576}
+  ]
 };
 
-/* ===== 工具 ===== */
+function speedTimeout(s){
+  const bytes=s.bytes||1048576;
+  return Math.max(15000, Math.ceil(bytes/125000 * 1000)+5000);
+}
+
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const bust=u=>u+(u.includes('?')?'&':'?')+'_vt='+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-function sig(ms){const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal;}
-function setPill(el,cls,text){el.className='pill '+cls+' pop';el.textContent=text;setTimeout(()=>el.classList.remove('pop'),400);}
+
+function setPill(el,cls,text){
+  if(!el)return;
+  el.className='pill '+cls+' pop';
+  el.textContent=text;
+  setTimeout(()=>el.classList.remove('pop'),400);
+}
 
 function copyText(text,btn){
   const done=()=>{
@@ -562,16 +585,18 @@ function copyText(text,btn){
     btn.classList.add('copied');
     setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1800);
   };
-  const ta=document.createElement('textarea');
-  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
-  document.body.appendChild(ta);ta.select();
-  try{document.execCommand('copy');done();}catch(e){
-    if(navigator.clipboard)navigator.clipboard.writeText(text).then(done).catch(()=>{});
-  }
-  document.body.removeChild(ta);
+  const fallback=()=>{
+    const ta=document.createElement('textarea');
+    ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();
+    try{document.execCommand('copy');}catch(e){}
+    ta.remove();done();
+  };
+  if(navigator.clipboard&&window.isSecureContext){
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  }else fallback();
 }
 
-/* ===== 主分頁切換 ===== */
 function switchMainTab(pane){
   document.querySelectorAll('.mtab').forEach(b=>{
     const on=b.dataset.pane===pane;
@@ -580,12 +605,9 @@ function switchMainTab(pane){
   });
   document.querySelectorAll('.tabpane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+pane));
 }
-document.querySelectorAll('.mtab').forEach(btn=>btn.addEventListener('click',()=>switchMainTab(btn.dataset.pane)));
+document.querySelectorAll('.mtab').forEach(b=>b.addEventListener('click',()=>switchMainTab(b.dataset.pane)));
+document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',()=>copyText(b.dataset.copy,b)));
 
-/* ===== 救亡分頁互動 ===== */
-document.querySelectorAll('[data-copy]').forEach(btn=>{
-  btn.addEventListener('click',()=>copyText(btn.dataset.copy,btn));
-});
 function rescueAndRecheck(){
   switchMainTab('detect');
   runCheck();
@@ -594,84 +616,48 @@ function rescueAndRecheck(){
 $('btnRescueRecheckA').addEventListener('click',rescueAndRecheck);
 $('btnRescueRecheck').addEventListener('click',rescueAndRecheck);
 
-/* ===== 自訂目標（雙向相容 localStorage + window.name 後備儲存） ===== */
-function isValidSlotList(arr){
-  return Array.isArray(arr)&&arr.length===CONFIG.customSlots&&arr.every(x=>x&&typeof x==='object'&&'url' in x);
+let customs;
+try{customs=JSON.parse(localStorage.getItem('vt_customs'));}catch(e){customs=null;}
+if(!Array.isArray(customs)||customs.length!==3){
+  customs=Array.from({length:3},()=>({url:'',blocked:true}));
 }
-function loadCustoms(){
-  const keys=[CONFIG.storageKey,...CONFIG.legacyStorageKeys];
-  for(const k of keys){
-    try{
-      const parsed=JSON.parse(localStorage.getItem(k)||'null');
-      if(isValidSlotList(parsed)){
-        return parsed.map(x=>({url:String(x.url||''),blocked:x.blocked!==false}));
-      }
-    }catch(e){}
-  }
-  try{
-    if(window.name&&window.name.startsWith('VT_CUSTOMS:')){
-      const parsed=JSON.parse(window.name.slice('VT_CUSTOMS:'.length));
-      if(isValidSlotList(parsed)){
-        return parsed.map(x=>({url:String(x.url||''),blocked:x.blocked!==false}));
-      }
-    }
-  }catch(e){}
-  return Array.from({length:CONFIG.customSlots},()=>({url:'',blocked:true}));
-}
-let customs=loadCustoms();
-
-function updateSaveIndicator(ok,mode){
-  const el=$('customSaveStatus');
-  if(!el)return;
-  const t=new Date().toLocaleTimeString('zh-TW',{hour12:false});
-  if(ok){
-    el.style.color='var(--ok)';
-    el.textContent='✓ 已自動儲存至瀏覽器（'+t+'）';
-  }else{
-    el.style.color='var(--warn)';
-    el.textContent='⚠ 瀏覽器限制本機儲存，已切換分頁暫存（'+mode+' · '+t+'）';
-  }
-}
-
-function saveCustoms(){
-  const payload=JSON.stringify(customs);
-  let savedLocal=false;
-  try{
-    localStorage.setItem(CONFIG.storageKey,payload);
-    for(const k of CONFIG.legacyStorageKeys){
-      localStorage.setItem(k,payload);
-    }
-    savedLocal=localStorage.getItem(CONFIG.storageKey)===payload;
-  }catch(e){}
-  try{window.name='VT_CUSTOMS:'+payload;}catch(e){}
-  updateSaveIndicator(savedLocal,'window.name');
-}
-
+function saveCustoms(){try{localStorage.setItem('vt_customs',JSON.stringify(customs));}catch(e){}}
 function normalizeUrl(s){
-  s=(s||'').trim();if(!s)return null;
-  s=s.replace(/^https?:\/\//i,'');
-  try{const u=new URL('https://'+s);if(!u.hostname||!u.hostname.includes('.'))return null;return u.href;}catch(e){return null;}
+  s=(s||'').trim();
+  if(!s)return null;
+  s=/^https?:\/\//i.test(s)?s:('https://'+s);
+  try{
+    const u=new URL(s);
+    if(!u.hostname||!u.hostname.includes('.'))return null;
+    return u.href;
+  }catch(e){return null;}
 }
-const fixedHist=TARGETS.map(()=>[]), customHist=Array.from({length:CONFIG.customSlots},()=>[]);
+
+const fixedHist=TARGETS.map(()=>[]), customHist=[[],[],[]];
+
 function renderSpark(el,arr){
-  const vals=arr.filter(v=>v!=null),max=Math.max(...vals,1),n=arr.length,W=64,H=20;
+  const vals=arr.filter(v=>v!==null);
+  const maxW=Math.max(...vals,1);
+  const n=arr.length,W=64,H=20;
   let d='',pen=false;
   arr.forEach((v,i)=>{
-    const x=n>1?i*(W/(n-1)):W/2;
-    if(v==null){pen=false;return;}
-    const y=H-3-(v/max)*(H-8);
-    d+=(pen?' L':' M')+x.toFixed(1)+' '+y.toFixed(1);pen=true;
+    const x=n>1?(i/(n-1))*W:0;
+    if(v===null){pen=false;return;}
+    const y=H-8-(Math.max(v,0)/maxW)*(H-8);
+    d+=(pen?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+    pen=true;
   });
-  el.innerHTML='<path d="M0 '+(H-2)+' H'+W+'" class="sbase"/><path d="'+d+'" class="sline"/>';
+  el.innerHTML='<path d="M0 '+(H-2)+' H'+W+'" class="sbase"></path><path d="'+d+'" class="sline"></path>';
 }
+
 function buildCustoms(){
   $('customs').innerHTML=customs.map((c,i)=>`
     <div class="cslot">
-      <div class="trow">
+      <div class="row">
         <input class="cinput" id="curl${i}" placeholder="空格 ${i+1}：例如 netflix.com" value="${esc(c.url)}">
-        <button type="button" class="clear" id="cclear${i}" title="清除呢格">✕</button>
+        <button type="button" class="clear" id="cclear${i}" title="清除空格">✕</button>
       </div>
-      <div class="trow cmeta">
+      <div class="row cmeta">
         <label class="cblocked"><input type="checkbox" id="cblk${i}" ${c.blocked?'checked':''}>中國被牆（只加備註）</label>
         <span class="pill idle" id="cpill${i}">${c.url.trim()?'待檢測':'未填寫'}</span>
       </div>
@@ -681,261 +667,330 @@ function buildCustoms(){
         <span class="caveat" id="chint${i}"></span>
       </div>
     </div>`).join('');
+
   customs.forEach((_,i)=>{
     $('curl'+i).addEventListener('input',e=>{
       customs[i].url=e.target.value;saveCustoms();
       setPill($('cpill'+i),'idle',e.target.value.trim()?'待檢測':'未填寫');
-      $('chint'+i).textContent='';
-    });
-    $('curl'+i).addEventListener('change',e=>{
-      customs[i].url=e.target.value;saveCustoms();
     });
     $('cblk'+i).addEventListener('change',e=>{customs[i].blocked=e.target.checked;saveCustoms();});
     $('cclear'+i).addEventListener('click',()=>{
-      customs[i].url='';saveCustoms();$('curl'+i).value='';
-      customHist[i]=[];renderSpark($('cspark'+i),[]);
-      setPill($('cpill'+i),'idle','未填寫');$('chint'+i).textContent='';
+      customs[i].url='';saveCustoms();
+      $('curl'+i).value='';customHist[i]=[];
+      renderSpark($('cspark'+i),customHist[i]);
+      setPill($('cpill'+i),'idle','未填寫');
+      $('chint'+i).textContent='';
     });
-    renderSpark($('cspark'+i),customHist[i]);
   });
+  customs.forEach((_,i)=>renderSpark($('cspark'+i),customHist[i]));
 }
 
-/* ===== 探測（事實層） ===== */
-async function probeFixed(t){
-  const u=bust(t.url),t0=performance.now();
+async function probeFixed(u){
+  const t0=performance.now();
   try{
-    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(CONFIG.probeTimeoutMs)});
-  }catch(e){
-    return{state:'down',ms:Math.round(performance.now()-t0),reason:e.name==='AbortError'?'timeout':'blocked'};
-  }
-  const ms=Math.round(performance.now()-t0);
-  return{state:await verifyImage(u)?'up':'fake',ms};
-}
-async function probeCustom(url){
-  const u=bust(url),t0=performance.now();
-  try{
-    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(CONFIG.probeTimeoutMs)});
-    return{state:'up',ms:Math.round(performance.now()-t0)};
+    await fetchTimed(bust(u),PROBE_TIMEOUT,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer'});
+    return{state:'up',ms:Math.round(performance.now()-t0),reason:'ok'};
   }catch(e){
     return{state:'down',ms:Math.round(performance.now()-t0),reason:e.name==='AbortError'?'timeout':'blocked'};
   }
 }
+async function probeCustom(u){return probeFixed(u);}
+
 function verifyImage(u){
   return new Promise(res=>{
     const img=new Image();let done=false;
-    const end=v=>{if(!done){done=true;clearTimeout(tm);img.src='';res(v);}};
-    const tm=setTimeout(()=>end(false),CONFIG.imgTimeoutMs);
+    const stop=v=>{if(done)return;done=true;clearTimeout(tm);img.src='';res(v);};
+    const tm=setTimeout(()=>stop(null),IMG_TIMEOUT);
     img.referrerPolicy='no-referrer';
-    img.onload=()=>end(img.naturalWidth>0&&img.naturalHeight>0);
-    img.onerror=()=>end(false);
+    img.onload=()=>stop(img.naturalWidth>0&&img.naturalHeight>0);
+    img.onerror=()=>stop(null);
     img.src=u;
   });
 }
-/* 綠／紅＝純事實 */
-function rawPill(r){
-  if(r.state==='down')return{cls:'bad',text:r.reason==='timeout'?'無回應／逾時':'無回應'};
-  return{cls:'ok',text:'有回應 · '+r.ms+' ms'};
-}
-/* 備註＝判讀層 */
-function caveat(t,r,exit){
-  const inCN=exit&&exit.cc==='CN';
+
+function caveatText(t,exit,r){
+  const cn=!!(exit&&exit.cc==='CN');
+  if(!cn)return null;
   if(r.state==='down'){
-    if(inCN&&t.cnBlocked)return{info:true,text:'中國直連預期結果：被牆站冇回應係正常。'};
-    return null;
+    if(t.cnBlocked)return{info:false,text:'中國直連時常見：被防火牆阻斷'};
+    return{info:true,text:'境內對照無回應；唔代表境外可達'};
   }
-  if(inCN&&t.cnBlocked)return{info:false,text:'⚠ 出口喺中國但被牆站有回應：多屬 DNS 污染／劫持／快取殘影，唔代表真正用到。'};
-  if(r.state==='fake')return{info:false,text:'有回應但內容唔係正常圖示（可能 404／劫持）——連線本身係通嘅。'};
-  return null;
+  if(t.cnBlocked)return{info:false,text:'中國直連但有回應：多屬 DNS 污染／劫持／快取'};
+  return{info:false,text:'有回應但內容可能異常（例如 404／驗證頁）；唔代表真正連到境外站'};
 }
 
-/* ===== 出口（只顯示事實） ===== */
 async function getExit(){
   for(const a of EXIT_APIS){
     try{
-      const r=await fetch(a.url,{cache:'no-store',signal:sig(CONFIG.exitTimeoutMs)});
-      const d=a.map(await r.json());
-      if(d.ok&&d.cc)return{...d,src:a.src};
+      const r=await fetchTimed(a.url,EXIT_TIMEOUT,{cache:'no-store'});
+      if(!r.ok)continue;
+      const d=await r.json();
+      const g=a.map(d);
+      if(g.ok&&g.ip)return{...g,src:a.src};
     }catch(e){}
   }
   return null;
 }
+
 let lastExit=null;
-function refreshVerdict(){
-  const e=lastExit;
-  if(!e){setBanner('idle','尚未檢測','直接顯示實際出口，唔設預設國家');return;}
-  if(e.cc==='CN')setBanner('warn','中國直連（出口：CN）','未偵測到 VPN 出口；被牆站理論上連唔到，下面綠燈只係「有回應」事實。');
-  else setBanner('ok','VPN 通道生效（出口：'+e.cc+'）','出口為 '+e.country+(e.region?' · '+e.region:''));
+
+function setBanner(cls,main,sub){
+  $('banner').className='banner '+cls;
+  $('banner').innerHTML=esc(main)+'<span>'+esc(sub)+'</span>';
 }
-function setBanner(cls,main,sub){$('banner').className='banner '+cls;$('banner').innerHTML=esc(main)+'<span>'+esc(sub)+'</span>';}
-function updateHero(exit){
-  const svg=$('tunnelSvg');let st='idle',msg='出口未知 · 未能判定通道';
-  if(exit){
-    $('exitCc').textContent=exit.cc;
-    if(exit.cc==='CN'){st='cn';msg='中國直連 · 未見 VPN 通道';}
-    else{st='ok';msg='VPN 通道生效 · 出口 '+exit.cc;}
-  }else $('exitCc').textContent='?';
-  svg.dataset.state=st;
-  $('heroState').textContent=msg;
-  $('heroExit').textContent='出口：'+(exit?exit.cc:'—');
-  $('liveDot').className='dot '+st;
+function refreshExit(exit){
+  if(exit&&exit.cc==='CN'){
+    setBanner('warn','中國出口（CN）','未見到 VPN 出口；下面只係「有冇回應」，唔好當成境外直連。');
+  }else if(exit){
+    setBanner('ok','VPN 通道生效（'+exit.cc+'）','出口 '+exit.country+(exit.region?' / '+exit.region:'')+'；下面只係「有冇回應」，僅供參考。');
+  }
+}
+function updatefrom(exit){
+  if(!exit){
+    $('tunnelSvg').dataset.state='idle';
+    $('exitGeo').textContent='未知';
+    $('exitCc').textContent='?';
+    $('heroState').textContent='出口未知，未能肯定通道';
+    $('heroExit').textContent='出口：—';
+    $('liveDot').className='dot';
+    return;
+  }
+  $('tunnelSvg').dataset.state=exit.cc==='CN'?'cn':'ok';
+  $('exitCc').textContent=exit.cc||'?';
+  $('heroState').textContent=exit.cc==='CN'?'中國直連 · 未見 VPN 通道':'VPN 通道生效';
+  $('heroExit').textContent='出口：'+(exit.cc||'—');
+  $('liveDot').className='dot '+(exit.cc==='CN'?'cn':'ok');
 }
 
-/* ===== 畫面 ===== */
 function buildTargets(){
   $('targets').innerHTML=TARGETS.map((t,i)=>`
-    <div class="card target">
+    <div class="card">
       <div class="trow">
-        <div class="tname">${t.name}<span class="tag ${t.cnBlocked?'blocked':'control'}">${t.cnBlocked?'被牆站':'對照組'}</span></div>
+        <div>
+          <div class="tname">${esc(t.name)} <span class="tag ${t.cnBlocked?'blocked':'control'}">${t.cnBlocked?'常見被牆':'對照組'}</span></div>
+          <div class="turl">${esc(t.url)}</div>
+        </div>
         <div class="tright">
           <span class="pill idle" id="pill${i}">尚未檢測</span>
           <svg class="spark" id="spark${i}" viewBox="0 0 64 20"></svg>
         </div>
       </div>
-      <div class="turl">${t.url}</div>
-      <div class="tmeta"><span class="badge" id="badge${i}">—</span><span class="caveat" id="hint${i}"></span></div>
+      <div class="tmeta">
+        <span class="badge no" id="badge${i}">待判斷</span>
+        <span class="caveat ${t.cnBlocked?'':'info'}" id="hint${i}">${t.cnBlocked?'中國被牆：待出口確定後判斷':'控制組／境內對照'}</span>
+      </div>
     </div>`).join('');
   TARGETS.forEach((_,i)=>renderSpark($('spark'+i),fixedHist[i]));
 }
 
 let running=false;
 async function runCheck(){
-  if(running)return;running=true;
-  $('btnCheck').disabled=true;$('btnCheck').textContent='檢測中…';
-  TARGETS.forEach((_,i)=>{setPill($('pill'+i),'idle','檢測中…');$('hint'+i).textContent='';$('badge'+i).textContent='—';$('badge'+i).className='badge';});
-  const cJobs=customs.map(c=>{
-    const raw=(c.url||'').trim();
-    if(!raw)return{skip:'empty'};
-    const norm=normalizeUrl(raw);
-    if(!norm)return{skip:'invalid'};
-    return{norm,blocked:c.blocked};
-  });
-  cJobs.forEach((j,i)=>{
-    if(j.skip==='empty'){setPill($('cpill'+i),'idle','未填寫');$('chint'+i).textContent='';}
-    else if(j.skip==='invalid'){setPill($('cpill'+i),'bad','網址無效');$('chint'+i).textContent='請輸入正確網址，例如 netflix.com';$('chint'+i).className='caveat';}
-    else{setPill($('cpill'+i),'idle','檢測中…');$('chint'+i).textContent='';}
-  });
-
-  const exit=await getExit();lastExit=exit;
-  if(exit){
-    $('exitGeo').textContent=exit.country+' ('+exit.cc+') · '+(exit.region||'');
-    $('exitIp').textContent='IP: '+exit.ip+' | 來源: '+exit.src;
-  }else{
-    $('exitGeo').textContent='無法判定';$('exitIp').textContent='出口查詢 API 皆逾時';
+  if(running){
+    const b=$('btnCheck'),t=b.textContent;
+    b.textContent='檢測中，請稍候…';
+    setTimeout(()=>{b.textContent=t;},600);
+    return;
   }
-  refreshVerdict();updateHero(exit);
+  running=true;
+  const btn=$('btnCheck'),old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent='已觸發 ✓';
+  setTimeout(()=>{if(running)btn.textContent='檢測中…';},420);
 
-  const[results,cResults]=await Promise.all([
-    Promise.all(TARGETS.map(t=>probeFixed(t))),
-    Promise.all(cJobs.map(j=>j.norm?probeCustom(j.norm):Promise.resolve(null)))
-  ]);
+  try{
+    $('tunnelSvg').dataset.state='idle';
+    $('heroState').textContent='讀取實際出口中…';
+    $('heroExit').textContent='出口：—';
+    $('liveDot').className='dot';
+    setBanner('idle','讀取實際出口中…','正在向 Geo 端點查詢');
+    $('exitGeo').textContent='讀取中…';
+    $('exitIp').textContent='—';
+    $('probeSummary').textContent='';
+    $('probeNote').style.display='none';
 
-  let okCount=0,total=TARGETS.length;
-  results.forEach((r,i)=>{
-    const p=rawPill(r);if(p.cls==='ok')okCount++;
-    setPill($('pill'+i),p.cls,p.text);
-    const b=$('badge'+i);
-    b.textContent=r.state==='up'?'圖示 ✓':r.state==='fake'?'圖示 ✗':'—';
-    b.className='badge'+(r.state==='fake'?' no':'');
-    const cv=caveat(TARGETS[i],r,exit),h=$('hint'+i);
-    h.textContent=cv?cv.text:'';h.className='caveat'+(cv&&cv.info?' info':'');
-    fixedHist[i].push(r.state==='down'?null:r.ms);if(fixedHist[i].length>14)fixedHist[i].shift();
-    renderSpark($('spark'+i),fixedHist[i]);
-  });
-  cResults.forEach((r,i)=>{
-    const j=cJobs[i];if(!j.norm||!r)return;
-    total++;
-    const p=rawPill(r);if(p.cls==='ok')okCount++;
-    setPill($('cpill'+i),p.cls,p.text);
-    const cv=caveat({cnBlocked:j.blocked},r,exit),h=$('chint'+i);
-    h.textContent=cv?cv.text:'';h.className='caveat'+(cv&&cv.info?' info':'');
-    customHist[i].push(r.state==='down'?null:r.ms);if(customHist[i].length>14)customHist[i].shift();
-    renderSpark($('cspark'+i),customHist[i]);
-  });
-  $('probeSummary').textContent=okCount+'/'+total+' 有回應（實測）';
+    for(let i=0;i<TARGETS.length;i++){
+      setPill($('pill'+i),'idle','待檢測');
+      $('hint'+i).textContent=TARGETS[i].cnBlocked?'中國被牆：待出口確定後判斷':'控制組／境內對照';
+      $('badge'+i).className='badge no';
+      $('badge'+i).textContent='待判斷';
+    }
+    for(let i=0;i<customs.length;i++){
+      const has=!!normalizeUrl($('curl'+i).value);
+      setPill($('cpill'+i),'idle',has?'待檢測':'未填寫');
+      $('chint'+i).textContent='';
+    }
 
-  const note=$('probeNote');
-  if(exit&&exit.cc==='CN'){
-    note.style.display='block';
-    note.textContent='而家出口喺中國（直連）：下面綠燈只代表「有嘢回應」，唔代表用到被牆站（多屬污染／劫持／快取）。已強制排除快取。';
-  }else if(!exit){
-    note.style.display='block';note.textContent='出口未知：節點回應僅供參考，無法排除誤判。';
-  }else note.style.display='none';
+    const ext=await getExit();
+    lastExit=ext;
+    if(ext){
+      $('exitGeo').textContent=(ext.country||'未知')+(ext.region?' · '+ext.region:'')+' ('+(ext.cc||'—')+')';
+      $('exitIp').textContent='IP：'+ext.ip+' · 來源：'+ext.src;
+      updatefrom(ext);refreshExit(ext);
+    }else{
+      $('exitGeo').textContent='無法取得出口';
+      $('exitIp').textContent='Geo 查詢失敗';
+      updatefrom(null);
+      setBanner('warn','出口未知','Geo API 暫時不可用；以下只報告有冇回應。');
+    }
 
-  $('lastCheck').textContent='最後檢測：'+new Date().toLocaleTimeString('zh-TW',{hour12:false});
-  $('btnCheck').disabled=false;$('btnCheck').textContent='立即檢測';
-  running=false;
+    const results=await Promise.all(TARGETS.map(t=>probeFixed(t.url)));
+    let okCount=0;
+    results.forEach((r,i)=>{
+      const up=r.state==='up';
+      if(up)okCount++;
+      fixedHist[i].push(up?r.ms:null);
+      renderSpark($('spark'+i),fixedHist[i]);
+      setPill($('pill'+i),r.state==='timeout'?'bad':(up?'ok':'bad'),r.state==='timeout'?'超時':(up?r.ms+'ms':'無回應'));
+      $('badge'+i).className='badge'+(up?'':' no');
+      $('badge'+i).textContent=up?'有回應':'無回應';
+      const c=caveatText(TARGETS[i],lastExit,r);
+      if(c){$('hint'+i).className='caveat'+(c.info?' info':'');$('hint'+i).textContent=c.text;}
+      else{$('hint'+i).className='caveat info';$('hint'+i).textContent=TARGETS[i].cnBlocked?'境外站（境外出口）':'控制組／境內對照';}
+    });
+
+    const cs=customs.map((c,i)=>({c,i,u:normalizeUrl($('curl'+i).value)})).filter(x=>x.u);
+    const cres=await Promise.all(cs.map(x=>probeCustom(x.u)));
+    cres.forEach((r,k)=>{
+      const {c,i}=cs[k],up=r.state==='up';
+      if(up)okCount++;
+      customHist[i].push(up?r.ms:null);
+      renderSpark($('cspark'+i),customHist[i]);
+      setPill($('cpill'+i),r.state==='timeout'?'bad':(up?'ok':'bad'),r.state==='timeout'?'超時':(up?r.ms+'ms':'無回應'));
+      const note=caveatText({cnBlocked:c.blocked,name:c.url},lastExit,r);
+      $('chint'+i).textContent=note?note.text:(up?'有回應':'無回應');
+    });
+
+    const total=TARGETS.length+cs.length;
+    $('probeSummary').textContent='回應 '+okCount+'/'+total+'（固定 '+TARGETS.length+' + 自訂 '+cs.length+'）';
+
+    const cn=!!(lastExit&&lastExit.cc==='CN'),n=$('probeNote');
+    if(cn){
+      n.style.display='block';
+      n.textContent=TARGETS.some((t,i)=>t.cnBlocked&&results[i].state==='up')
+        ? '⚠️ 出口喺 CN 但被標「中國被牆」嘅站有回應，可能係 DNS 污染／劫持／快取殘影。'
+        : '出口喺 CN：以上只反映中國境內實際連線；境外站無回應屬正常。';
+    }else n.style.display='none';
+
+    $('lastCheck').textContent='更新 '+new Date().toLocaleTimeString('zh-Hant',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+  }catch(err){
+    setBanner('warn','檢測出錯',String((err&&err.message)||err));
+  }finally{
+    btn.textContent=old;
+    btn.disabled=false;
+    running=false;
+  }
 }
 
-/* ===== 控制 ===== */
 let autoTimer=null;
 $('autoChk').addEventListener('change',e=>{
-  clearInterval(autoTimer);
-  if(e.target.checked)autoTimer=setInterval(()=>{if(!document.hidden)runCheck();},CONFIG.autoIntervalMs);
+  clearInterval(autoTimer);autoTimer=null;
+  if(e.target.checked){runCheck();autoTimer=setInterval(runCheck,10000);}
 });
-$('btnCheck').addEventListener('click',runCheck);
-window.addEventListener('pagehide',saveCustoms);
-window.addEventListener('beforeunload',saveCustoms);
 
-/* ===== 測速 ===== */
-let region='out',speedRunning=false;
-function buildSpeedNodes(){
-  $('speedNodes').innerHTML=SPEED_NODES[region].map((n,i)=>`
+let region='out',runningSpeed=false;
+
+function buildLinks(){
+  $('speedInfo').innerHTML='<span>目前區域：'+
+    (region==='out'?'境外 (Outside China)':'中國境內 (China)')+
+    '；頁內測速以瀏覽器實際下載計算，僅供參考；官方測速請用 Speedtest.cn 按鈕。</span>';
+
+  $('speedNodes').innerHTML=SPEED_NODES[region].map((s,i)=>`
     <div class="snode">
       <div class="trow">
-        <div><div class="tname" style="font-size:14px">${n.name}</div><div class="turl">${n.url}</div></div>
-        ${n.external
-          ?'<a class="open" href="'+n.url+'" target="_blank" rel="noopener">開啟測速 ↗</a>'
-          :'<span class="pill idle" id="sp'+i+'">待測速</span>'}
+        <b>${esc(s.name)}</b>
+        <span class="pill idle" id="spill${i}">${s.external?'外部連結':'準備'}</span>
       </div>
-      ${n.external
-        ?'<div class="sub" style="margin-top:6px">新分頁開啟官方測速網，請揀中國境內伺服器；開住 VPN 測嘅係「VPN→中國」路線，熄咗就係直連。</div>'
-        :'<div class="bar" id="sbar'+i+'"><i id="bar'+i+'"></i></div>'}
+      ${s.external
+        ? '<div class="sub">外部連結，不計入頁內平均</div><a class="open" href="'+esc(s.url)+'" target="_blank" rel="noopener">開啟 ↗</a>'
+        : '<div class="bar" id="sbar'+i+'"><i></i></div><div class="sub" id="snote'+i+'">準備中…</div>'}
     </div>`).join('');
-  $('speedInfo').textContent='目前區域：'+(region==='out'?'境外 (Outside China)':'中國境內 (China)')+'（共 '+SPEED_NODES[region].length+' 個測速節點）';
 }
-document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
-  if(speedRunning)return;
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');region=b.dataset.r;buildSpeedNodes();
+
+document.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{
+  region=b.dataset.r;
+  document.querySelectorAll('[data-r]').forEach(x=>x.classList.toggle('on',x===b));
+  buildLinks();
   $('speedResult').textContent='尚未執行測速';
 }));
-async function speedOne(n,onProg){
-  const t0=performance.now();let bytes=0,total=null;
-  try{total=+new URL(n.url).searchParams.get('bytes')||null;}catch(e){}
-  const r=await fetch(bust(n.url),{cache:'reload',referrerPolicy:'no-referrer',signal:sig(CONFIG.speedTimeoutMs)});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const rd=r.body.getReader();
-  for(;;){const{done,value}=await rd.read();if(done)break;bytes+=value.length;onProg(bytes,total);}
-  const sec=(performance.now()-t0)/1000;
-  return bytes*8/1e6/sec;
-}
-$('btnSpeed').addEventListener('click',async()=>{
-  if(speedRunning)return;speedRunning=true;
-  $('btnSpeed').disabled=true;$('btnSpeed').textContent='測速中…';
-  $('speedResult').textContent='測速中…';
-  const mbps=[];
-  for(let i=0;i<SPEED_NODES[region].length;i++){
-    const n=SPEED_NODES[region][i];if(n.external)continue;
-    const bar=$('bar'+i),wrap=$('sbar'+i);
-    setPill($('sp'+i),'idle','測速中…');
-    wrap.className='bar'+(n.url.includes('bytes=')?'':' ind');bar.style.width='0';
-    try{
-      const m=await speedOne(n,(b,t)=>{if(t)bar.style.width=Math.min(100,b/t*100)+'%';});
-      mbps.push(m);
-      wrap.className='bar done';setPill($('sp'+i),'ok',m.toFixed(1)+' Mbps');
-    }catch(e){
-      wrap.className='bar fail';setPill($('sp'+i),'bad','失敗');
-    }
-  }
-  $('speedResult').textContent=mbps.length
-    ?'最快 '+Math.max(...mbps).toFixed(1)+' Mbps（平均 '+(mbps.reduce((a,b)=>a+b,0)/mbps.length).toFixed(1)+' Mbps）'
-    :'頁內節點全部失敗（可能未開 VPN 或 CORS 限制）——中國境內請用 Speedtest.cn 按鈕';
-  $('btnSpeed').disabled=false;$('btnSpeed').textContent='開始測速';
-  speedRunning=false;
-});
 
-/* ===== 初始化 ===== */
-buildTargets();buildCustoms();saveCustoms();buildSpeedNodes();updateHero(null);runCheck();
+async function speedRun(){
+  if(runningSpeed)return;
+  runningSpeed=true;
+  const btn=$('btnSpeed'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='測速中…';
+  $('speedResult').textContent='';
+
+  try{
+    const arr=[];
+    const nodes=SPEED_NODES[region];
+    for(let i=0;i<nodes.length;i++){
+      const s=nodes[i];
+      if(s.external){setPill($('spill'+i),'idle','外部');continue;}
+      const pill=$('spill'+i), bar=$('sbar'+i), note=$('snote'+i);
+      const ms=speedTimeout(s);
+      setPill(pill,'idle','請求中…');
+      note.textContent='讀取中…（最多 '+(ms/1000).toFixed(0)+' 秒）';
+      bar.className='bar';
+      bar.querySelector('i').style.width='0%';
+
+      try{
+        const t0=performance.now();
+        const r=await fetchTimed(bust(s.url),ms,{cache:'reload',referrerPolicy:'no-referrer'});
+        if(!r.ok)throw 0;
+
+        const total=Number(r.headers.get('content-length'))||s.bytes||1048576;
+        let received=0;
+
+        if(r.body&&r.body.getReader){
+          const reader=r.body.getReader();
+          while(true){
+            const {done,value}=await reader.read();
+            if(done)break;
+            received+=value.length;
+            bar.querySelector('i').style.width=Math.min(100,received/total*100).toFixed(0)+'%';
+          }
+        }else{
+          const buf=await r.arrayBuffer();
+          received=buf.byteLength;
+          bar.querySelector('i').style.width='100%';
+        }
+
+        const sec=Math.max((performance.now()-t0)/1000,.05);
+        const mbps=(received*8/sec)/1e6;
+        arr.push(mbps);
+        bar.className='bar done';
+        setPill(pill,'ok',mbps.toFixed(1)+' Mbps');
+        note.textContent=mbps.toFixed(1)+' Mbps · '+sec.toFixed(2)+'s';
+      }catch(e){
+        const isTimeout=e&&e.name==='AbortError';
+        bar.className='bar fail';
+        bar.querySelector('i').style.width='100%';
+        setPill(pill,'bad',isTimeout?'超時':'失敗');
+        note.textContent=isTimeout?('超時（'+(ms/1000).toFixed(0)+'秒）'):'下載失敗（跨域／網絡）';
+      }
+    }
+
+    $('speedResult').textContent=arr.length
+      ? '平均 ≈ '+(arr.reduce((a,b)=>a+b,0)/arr.length).toFixed(1)+' Mbps（'+(region==='cn'?'境內路線':'境外端點')+'，僅供參考）'
+      : '測速失敗，請用官方 Speedtest.cn';
+  }catch(err){
+    $('speedResult').textContent='測速出錯：'+String((err&&err.message)||err);
+  }finally{
+    btn.textContent=old;
+    btn.disabled=false;
+    runningSpeed=false;
+  }
+}
+
+$('btnSpeed').addEventListener('click',speedRun);
+$('btnCheck').addEventListener('click',runCheck);
+
+buildTargets();
+buildCustoms();
+buildLinks();
+updatefrom(null);
+console.info('[vpn] ready · btnCheck + btnSpeed listeners attached');
+runCheck();
 </script>
 </body>
 </html>
