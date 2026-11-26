@@ -10,6 +10,7 @@
   :root{
     --paper:#f5f0e3; --surface:#fffdf7; --ink:#222932; --muted:#6b7684;
     --gold:#b3924f; --gold-deep:#8f6f2c; --line:#e6dfcc;
+    --gold-soft:#f3e7c8; --gold-glow:rgba(179,146,79,.24);
     --tunnel:#19c2d8; --tunnel-deep:#0e7c86; --navy:#10202b;
     --ok:#1c7c46; --ok-bg:#e3f4e8; --bad:#b23434; --bad-bg:#fbe7e7;
     --warn:#8a6d1a; --warn-bg:#fdf3d0; --amber:#d9a441;
@@ -157,8 +158,6 @@
   .method strong{color:#4c5560}
   #targets{display:flex;flex-direction:column;gap:10px}
   #speedNodes{display:flex;flex-direction:column;gap:10px;margin-top:10px}
-
-  /* ===== VPN 救亡／清 DNS 專屬樣式 ===== */
   .term{margin-top:10px;border-radius:13px;background:var(--navy);border:1px solid #243b49;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
   .term-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0b161e;border-bottom:1px solid #1e3340}
   .term-lang{font-size:11px;font-weight:800;letter-spacing:.08em;color:#8fa3ad;display:flex;align-items:center;gap:6px}
@@ -179,13 +178,115 @@
   .rescue-box{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line);font-size:12px;line-height:1.6;color:#3d4650}
   .rescue-warn{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid #ecd9a4;font-size:12px;line-height:1.6;color:var(--warn)}
   .rescue-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
-
-  /* ===== 快速預熱提示條 ===== */
   .warmup-bar{margin-top:10px;padding:9px 12px;border-radius:12px;background:var(--paper);border:1px dashed var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:#4c5560;line-height:1.5}
   .warmup-text{display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:210px}
   .kbd{display:inline-block;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;font-weight:800;color:var(--ink);background:var(--surface);border:1px solid #d5ccb4;border-bottom-width:2px;border-radius:6px;box-shadow:0 1px 1px rgba(0,0,0,.04)}
-
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+  /* ===== 香檳金增強層 ===== */
+  @media (min-width:720px){
+    body{padding:28px 20px 60px}
+    .wrap{max-width:680px;gap:16px}
+  }
+  .card{
+    position:relative;
+    border-radius:20px;
+    padding:18px;
+    border-color:rgba(179,146,79,.28);
+    box-shadow:0 12px 30px rgba(80,62,25,.08), inset 0 1px 0 rgba(255,255,255,.85);
+  }
+  .card::before{
+    content:"";position:absolute;left:18px;right:18px;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(179,146,79,.65),transparent);
+    pointer-events:none;
+  }
+  h1{font-size:20px;letter-spacing:.02em}
+  .kicker{color:var(--gold-deep);display:flex;align-items:center;gap:8px}
+  .kicker::before{content:"";width:18px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .lastbox{background:rgba(243,231,200,.55);border:1px solid rgba(179,146,79,.22);border-radius:999px;padding:5px 9px}
+  .hero{
+    padding:14px 12px 10px;
+    border-radius:16px;
+    background:linear-gradient(135deg,#171914,#20241c 55%,#2c2a1c);
+    border:1px solid rgba(217,164,65,.55);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), 0 10px 24px rgba(32,25,8,.22);
+  }
+  .hero::before{background:radial-gradient(60% 90% at 50% 0%,rgba(217,164,65,.26),transparent 72%)}
+  #heroState{color:#f4e6c2}
+  .chip{color:#3a2a0d;background:linear-gradient(90deg,var(--amber),#f2d79b);box-shadow:0 2px 8px rgba(217,164,65,.28)}
+  .nlabel{fill:#c9b98f}
+  .ncc{fill:#fff4d6}
+  .node{fill:#1b1d16;stroke:#6f6144}
+  .wire{stroke:#7a6a4a}
+  #tunnelSvg[data-state="ok"] .nodeOut{stroke:var(--amber)}
+  #tunnelSvg[data-state="ok"] .wire{stroke:var(--amber);stroke-dasharray:5 9;animation:dash 1s linear infinite}
+  #tunnelSvg[data-state="cn"] #pIn{stroke:#8a7a55;stroke-dasharray:5 9;animation:dash 1.2s linear infinite}
+  #tunnelSvg[data-state="cn"] #pOut{stroke:var(--bad);stroke-dasharray:2 8}
+  .pkt{fill:var(--amber)}
+  #tunnelSvg[data-state="cn"] .pktIn{fill:#e6a0a0}
+  .row{flex-wrap:wrap}
+  button.gold,button.teal{
+    background:linear-gradient(120deg,#a8853d,var(--gold-deep));
+    box-shadow:0 4px 12px rgba(143,111,44,.28);
+  }
+  button.gold:hover,button.teal:hover{box-shadow:0 6px 18px rgba(143,111,44,.38)}
+  .maintabs{
+    position:sticky;top:8px;z-index:5;
+    padding:6px;border-radius:18px;
+    background:rgba(245,240,227,.88);
+    border:1px solid rgba(179,146,79,.24);
+    box-shadow:0 8px 22px rgba(80,62,25,.08);
+    backdrop-filter:blur(8px);
+  }
+  .mtab.on{
+    background:linear-gradient(120deg,#a8853d,var(--gold-deep));
+    box-shadow:0 4px 12px rgba(143,111,44,.28);
+  }
+  .banner.idle{background:linear-gradient(120deg,#efe7d2,#f5f0e3);color:#6b5a35;border-color:rgba(179,146,79,.35)}
+  .banner.ok{background:linear-gradient(120deg,#e7f2df,#f4ebcf);border-color:#cddfb2}
+  .sectionTitle span:last-child{color:var(--gold-deep)}
+  .factnote{border-left:3px solid var(--gold);background:linear-gradient(90deg,rgba(243,231,200,.62),var(--surface))}
+  .target{padding:14px;border-radius:16px;transition:transform .2s,box-shadow .2s}
+  .target:hover{transform:translateY(-1px);box-shadow:0 14px 32px rgba(80,62,25,.11)}
+  .target.pending .pill{opacity:.72}
+  .tag.control,.badge{background:var(--gold-soft);color:var(--gold-deep)}
+  .pill.idle{background:#efe8d6;color:#7a6a45}
+  .auto input:checked+.track{background:linear-gradient(90deg,var(--gold),var(--gold-deep))}
+  .cinput:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+  .clear:hover{border-color:var(--gold-deep);color:var(--gold-deep)}
+  .bar i{background:linear-gradient(90deg,var(--gold),var(--amber))}
+  .result{color:var(--gold-deep)}
+  .open{background:linear-gradient(120deg,#a8853d,var(--gold-deep));box-shadow:0 2px 8px rgba(143,111,44,.22)}
+  .term{border-color:rgba(217,164,65,.28)}
+  .term-head{background:#1b1a14;border-bottom-color:rgba(217,164,65,.22)}
+  .term-lang{color:#cbb98d}
+  .term-code{color:#f0d49a}
+  .term-code::selection{background:rgba(217,164,65,.3)}
+  .copy-btn{border-color:rgba(217,164,65,.5);background:rgba(217,164,65,.14);color:#fff1cf}
+  .copy-btn:hover{background:rgba(217,164,65,.26);border-color:var(--amber)}
+  .copy-btn.copied{background:var(--gold);border-color:var(--gold);color:#241a08}
+  .copy-mini{color:var(--gold-deep);border-color:rgba(179,146,79,.4)}
+  .copy-mini:hover{border-color:var(--gold);background:var(--gold-soft)}
+  .copy-mini.copied{background:var(--gold);border-color:var(--gold)}
+  .step-num{background:linear-gradient(135deg,var(--gold-soft),#e7d5a8);color:var(--gold-deep);border:1px solid rgba(179,146,79,.28)}
+  .kbd{border-color:rgba(179,146,79,.45);border-bottom-color:var(--gold-deep);background:linear-gradient(180deg,#fffdf7,#f6efdc)}
+  code.inline{background:var(--gold-soft);color:var(--gold-deep);border-color:rgba(179,146,79,.32)}
+  .rescue-box{border-left:3px solid var(--gold)}
+  .rescue-warn{border-left:3px solid var(--amber)}
+  .warmup-bar{background:linear-gradient(90deg,rgba(243,231,200,.7),var(--paper));border-color:rgba(179,146,79,.45)}
+  .method{border-top:2px solid rgba(179,146,79,.35);max-width:680px;margin:0 auto;text-align:center}
+  .save-badge{font-size:11px;font-weight:700;color:var(--ok);margin-top:8px;display:inline-flex;align-items:center;gap:5px}
+  @media (max-width:520px){
+    .rescue-row{flex-direction:column;align-items:flex-start}
+    .rescue-row>.copy-mini{align-self:flex-start}
+  }
+  @media (max-width:420px){
+    .row{flex-direction:column}
+    .auto{justify-content:center}
+    button.gold{min-height:46px}
+    .maintabs{gap:5px;padding:5px}
+    .mtab{font-size:11.5px;padding:9px 5px}
+  }
 </style>
 </head>
 <body>
@@ -264,6 +365,7 @@
     <section class="card">
       <div id="customs"></div>
       <div class="sub">直接打網址（例如 netflix.com，自動用 HTTPS），會自動記住。「中國被牆」<b>只影響備註、唔影響實測</b>：勾咗而出口喺 CN 又有回應，會提你「可能係污染／劫持」；測中國境內網站就唔好勾。</div>
+      <div class="save-badge" id="customSaveStatus">✓ 已啟用本地自動儲存</div>
     </section>
   </div>
 
@@ -285,7 +387,6 @@
   <div class="tabpane" id="pane-rescue" role="tabpanel">
     <div class="banner warn">開咗 VPN 仲連唔到／出唔到街？<span>按「情況 A（虛擬網卡甩線）」或「情況 B（舊 DNS 污染快取）」對症處理即可。</span></div>
 
-    <!-- Card 0: 情況 A — 連到 VPN 但出唔到街（虛擬網卡甩線／改完網卡設定後） -->
     <section class="card">
       <div class="trow">
         <div class="tname">情況 A：VPN 顯示已連線但完全出唔到街<span class="tag urgent">虛擬網卡甩線 · 最常見</span></div>
@@ -323,7 +424,6 @@ ipconfig /renew</pre>
       </div>
     </section>
 
-    <!-- Card 1: 情況 B — Windows 一鍵清 DNS ＋ 預熱連線 -->
     <section class="card">
       <div class="trow">
         <div class="tname">情況 B：通道暢通但仲食緊舊中國直連快取<span class="tag admin">清 DNS · 需 Admin</span></div>
@@ -357,7 +457,6 @@ curl.exe -v https://api.ip.sb/geoip</pre>
       </div>
     </section>
 
-    <!-- Card 2: 其他平台清 DNS（Mac / 手機） -->
     <section class="card">
       <h2>其他平台清 DNS（Mac / iPhone / Android）</h2>
       <div class="rescue-box" style="margin-top:0">
@@ -374,7 +473,6 @@ curl.exe -v https://api.ip.sb/geoip</pre>
       </div>
     </section>
 
-    <!-- Card 3: 瀏覽器層面急救 -->
     <section class="card">
       <h2>瀏覽器層面急救（Chrome / Edge）</h2>
       <div class="sub">有時 Windows 清咗，但 Chrome / Edge 自己仲留住舊 DNS 同 Socket 連線池：</div>
@@ -417,8 +515,17 @@ curl.exe -v https://api.ip.sb/geoip</pre>
 </div>
 
 <script>
-/* ===== 設定（冇預設出口國家） ===== */
-const PROBE_TIMEOUT=6000, IMG_TIMEOUT=3500, EXIT_TIMEOUT=20000;
+/* ===== 可配置參數（冇預設出口國家） ===== */
+const CONFIG = {
+  probeTimeoutMs: 6000,
+  imgTimeoutMs: 3500,
+  exitTimeoutMs: 20000,
+  speedTimeoutMs: 30000,
+  autoIntervalMs: 10000,
+  customSlots: 3,
+  storageKey: 'vt_customs',
+  legacyStorageKeys: ['vpn_customs_v1']
+};
 
 const TARGETS=[
   {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',     cnBlocked:true},
@@ -487,17 +594,65 @@ function rescueAndRecheck(){
 $('btnRescueRecheckA').addEventListener('click',rescueAndRecheck);
 $('btnRescueRecheck').addEventListener('click',rescueAndRecheck);
 
-/* ===== 自訂目標 ===== */
-let customs;
-try{customs=JSON.parse(localStorage.getItem('vt_customs'));}catch(e){customs=null;}
-if(!Array.isArray(customs)||customs.length!==3)customs=Array.from({length:3},()=>({url:'',blocked:true}));
-function saveCustoms(){try{localStorage.setItem('vt_customs',JSON.stringify(customs));}catch(e){}}
+/* ===== 自訂目標（雙向相容 localStorage + window.name 後備儲存） ===== */
+function isValidSlotList(arr){
+  return Array.isArray(arr)&&arr.length===CONFIG.customSlots&&arr.every(x=>x&&typeof x==='object'&&'url' in x);
+}
+function loadCustoms(){
+  const keys=[CONFIG.storageKey,...CONFIG.legacyStorageKeys];
+  for(const k of keys){
+    try{
+      const parsed=JSON.parse(localStorage.getItem(k)||'null');
+      if(isValidSlotList(parsed)){
+        return parsed.map(x=>({url:String(x.url||''),blocked:x.blocked!==false}));
+      }
+    }catch(e){}
+  }
+  try{
+    if(window.name&&window.name.startsWith('VT_CUSTOMS:')){
+      const parsed=JSON.parse(window.name.slice('VT_CUSTOMS:'.length));
+      if(isValidSlotList(parsed)){
+        return parsed.map(x=>({url:String(x.url||''),blocked:x.blocked!==false}));
+      }
+    }
+  }catch(e){}
+  return Array.from({length:CONFIG.customSlots},()=>({url:'',blocked:true}));
+}
+let customs=loadCustoms();
+
+function updateSaveIndicator(ok,mode){
+  const el=$('customSaveStatus');
+  if(!el)return;
+  const t=new Date().toLocaleTimeString('zh-TW',{hour12:false});
+  if(ok){
+    el.style.color='var(--ok)';
+    el.textContent='✓ 已自動儲存至瀏覽器（'+t+'）';
+  }else{
+    el.style.color='var(--warn)';
+    el.textContent='⚠ 瀏覽器限制本機儲存，已切換分頁暫存（'+mode+' · '+t+'）';
+  }
+}
+
+function saveCustoms(){
+  const payload=JSON.stringify(customs);
+  let savedLocal=false;
+  try{
+    localStorage.setItem(CONFIG.storageKey,payload);
+    for(const k of CONFIG.legacyStorageKeys){
+      localStorage.setItem(k,payload);
+    }
+    savedLocal=localStorage.getItem(CONFIG.storageKey)===payload;
+  }catch(e){}
+  try{window.name='VT_CUSTOMS:'+payload;}catch(e){}
+  updateSaveIndicator(savedLocal,'window.name');
+}
+
 function normalizeUrl(s){
   s=(s||'').trim();if(!s)return null;
   s=s.replace(/^https?:\/\//i,'');
   try{const u=new URL('https://'+s);if(!u.hostname||!u.hostname.includes('.'))return null;return u.href;}catch(e){return null;}
 }
-const fixedHist=TARGETS.map(()=>[]), customHist=[[],[],[]];
+const fixedHist=TARGETS.map(()=>[]), customHist=Array.from({length:CONFIG.customSlots},()=>[]);
 function renderSpark(el,arr){
   const vals=arr.filter(v=>v!=null),max=Math.max(...vals,1),n=arr.length,W=64,H=20;
   let d='',pen=false;
@@ -521,7 +676,7 @@ function buildCustoms(){
         <span class="pill idle" id="cpill${i}">${c.url.trim()?'待檢測':'未填寫'}</span>
       </div>
       <div class="tmeta">
-        <span class="badge">只測連線</span>
+        <span class="badge">只影響備註</span>
         <svg class="spark" id="cspark${i}" viewBox="0 0 64 20"></svg>
         <span class="caveat" id="chint${i}"></span>
       </div>
@@ -531,6 +686,9 @@ function buildCustoms(){
       customs[i].url=e.target.value;saveCustoms();
       setPill($('cpill'+i),'idle',e.target.value.trim()?'待檢測':'未填寫');
       $('chint'+i).textContent='';
+    });
+    $('curl'+i).addEventListener('change',e=>{
+      customs[i].url=e.target.value;saveCustoms();
     });
     $('cblk'+i).addEventListener('change',e=>{customs[i].blocked=e.target.checked;saveCustoms();});
     $('cclear'+i).addEventListener('click',()=>{
@@ -546,7 +704,7 @@ function buildCustoms(){
 async function probeFixed(t){
   const u=bust(t.url),t0=performance.now();
   try{
-    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(PROBE_TIMEOUT)});
+    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(CONFIG.probeTimeoutMs)});
   }catch(e){
     return{state:'down',ms:Math.round(performance.now()-t0),reason:e.name==='AbortError'?'timeout':'blocked'};
   }
@@ -556,7 +714,7 @@ async function probeFixed(t){
 async function probeCustom(url){
   const u=bust(url),t0=performance.now();
   try{
-    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(PROBE_TIMEOUT)});
+    await fetch(u,{mode:'no-cors',cache:'reload',credentials:'include',referrerPolicy:'no-referrer',signal:sig(CONFIG.probeTimeoutMs)});
     return{state:'up',ms:Math.round(performance.now()-t0)};
   }catch(e){
     return{state:'down',ms:Math.round(performance.now()-t0),reason:e.name==='AbortError'?'timeout':'blocked'};
@@ -566,7 +724,7 @@ function verifyImage(u){
   return new Promise(res=>{
     const img=new Image();let done=false;
     const end=v=>{if(!done){done=true;clearTimeout(tm);img.src='';res(v);}};
-    const tm=setTimeout(()=>end(false),IMG_TIMEOUT);
+    const tm=setTimeout(()=>end(false),CONFIG.imgTimeoutMs);
     img.referrerPolicy='no-referrer';
     img.onload=()=>end(img.naturalWidth>0&&img.naturalHeight>0);
     img.onerror=()=>end(false);
@@ -594,7 +752,7 @@ function caveat(t,r,exit){
 async function getExit(){
   for(const a of EXIT_APIS){
     try{
-      const r=await fetch(a.url,{cache:'no-store',signal:sig(EXIT_TIMEOUT)});
+      const r=await fetch(a.url,{cache:'no-store',signal:sig(CONFIG.exitTimeoutMs)});
       const d=a.map(await r.json());
       if(d.ok&&d.cc)return{...d,src:a.src};
     }catch(e){}
@@ -625,7 +783,7 @@ function updateHero(exit){
 /* ===== 畫面 ===== */
 function buildTargets(){
   $('targets').innerHTML=TARGETS.map((t,i)=>`
-    <div class="card">
+    <div class="card target">
       <div class="trow">
         <div class="tname">${t.name}<span class="tag ${t.cnBlocked?'blocked':'control'}">${t.cnBlocked?'被牆站':'對照組'}</span></div>
         <div class="tright">
@@ -712,9 +870,11 @@ async function runCheck(){
 let autoTimer=null;
 $('autoChk').addEventListener('change',e=>{
   clearInterval(autoTimer);
-  if(e.target.checked)autoTimer=setInterval(()=>{if(!document.hidden)runCheck();},10000);
+  if(e.target.checked)autoTimer=setInterval(()=>{if(!document.hidden)runCheck();},CONFIG.autoIntervalMs);
 });
 $('btnCheck').addEventListener('click',runCheck);
+window.addEventListener('pagehide',saveCustoms);
+window.addEventListener('beforeunload',saveCustoms);
 
 /* ===== 測速 ===== */
 let region='out',speedRunning=false;
@@ -742,7 +902,7 @@ document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
 async function speedOne(n,onProg){
   const t0=performance.now();let bytes=0,total=null;
   try{total=+new URL(n.url).searchParams.get('bytes')||null;}catch(e){}
-  const r=await fetch(bust(n.url),{cache:'reload',referrerPolicy:'no-referrer',signal:sig(30000)});
+  const r=await fetch(bust(n.url),{cache:'reload',referrerPolicy:'no-referrer',signal:sig(CONFIG.speedTimeoutMs)});
   if(!r.ok)throw new Error('HTTP '+r.status);
   const rd=r.body.getReader();
   for(;;){const{done,value}=await rd.read();if(done)break;bytes+=value.length;onProg(bytes,total);}
@@ -775,7 +935,7 @@ $('btnSpeed').addEventListener('click',async()=>{
 });
 
 /* ===== 初始化 ===== */
-buildTargets();buildCustoms();buildSpeedNodes();updateHero(null);runCheck();
+buildTargets();buildCustoms();saveCustoms();buildSpeedNodes();updateHero(null);runCheck();
 </script>
 </body>
 </html>
