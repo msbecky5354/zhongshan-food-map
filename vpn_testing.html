@@ -99,6 +99,7 @@
   .tag.blocked{background:var(--bad-bg);color:var(--bad)}
   .tag.control{background:#dff3f5;color:var(--tunnel-deep)}
   .tag.admin{background:var(--warn-bg);color:var(--warn);border:1px solid #ecd9a4}
+  .tag.urgent{background:var(--bad-bg);color:var(--bad);border:1px solid #f2bcbc}
   .turl{font-size:11px;color:var(--muted);word-break:break-all;margin-top:3px}
   .tright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
   .pill{font-size:12px;font-weight:800;border-radius:999px;padding:6px 11px;white-space:nowrap;transition:transform .25s,background .3s,color .3s}
@@ -176,6 +177,7 @@
   .step-num{width:20px;height:20px;border-radius:50%;background:#dff3f5;color:var(--tunnel-deep);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
   code.inline{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.5px 6px;color:#0e5a63;word-break:break-all}
   .rescue-box{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line);font-size:12px;line-height:1.6;color:#3d4650}
+  .rescue-warn{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--warn-bg);border:1px solid #ecd9a4;font-size:12px;line-height:1.6;color:var(--warn)}
   .rescue-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
 
   /* ===== 快速預熱提示條 ===== */
@@ -225,16 +227,16 @@
       <div class="heroline"><span id="heroState">準備檢測…</span><span class="chip" id="heroExit">出口：—</span></div>
     </div>
     <div class="row top-actions">
-      <button class="gold" id="btnCheck">立即檢測</button>
+      <button type="button" class="gold" id="btnCheck">立即檢測</button>
       <label class="auto"><input type="checkbox" id="autoChk"><span class="track"></span>每 10 秒自動測</label>
     </div>
     <div class="warmup-bar">
       <div class="warmup-text">
         <span>⚡ <b>預熱：</b>連上 VPN 後，開普通（免 Admin）PowerShell 打</span>
-        <code class="inline">curl.exe -s https://api.ip.sb/geoip</code>
+        <code class="inline">curl.exe -v https://api.ip.sb/geoip</code>
         <span>，見到出 IP 就搞掂。</span>
       </div>
-      <button type="button" class="copy-mini" data-copy="curl.exe -s https://api.ip.sb/geoip">複製</button>
+      <button type="button" class="copy-mini" data-copy="curl.exe -v https://api.ip.sb/geoip">複製</button>
     </div>
   </header>
 
@@ -281,17 +283,55 @@
   </div>
 
   <div class="tabpane" id="pane-rescue" role="tabpanel">
-    <div class="banner warn">開咗 VPN 仲顯示中國直連／連唔到？<span>多數係系統或瀏覽器留住舊嘅 DNS 污染快取，跟下面步驟清一清即刻救返。</span></div>
+    <div class="banner warn">開咗 VPN 仲連唔到／出唔到街？<span>按「情況 A（虛擬網卡甩線）」或「情況 B（舊 DNS 污染快取）」對症處理即可。</span></div>
 
-    <!-- Card 1: Windows 一鍵清 DNS ＋ 預熱連線 -->
+    <!-- Card 0: 情況 A — 連到 VPN 但出唔到街（虛擬網卡甩線／改完網卡設定後） -->
     <section class="card">
       <div class="trow">
-        <div class="tname">Windows 一鍵清 DNS ＋ 預熱連線<span class="tag admin">最有效 · 需 Admin</span></div>
+        <div class="tname">情況 A：VPN 顯示已連線但完全出唔到街<span class="tag urgent">虛擬網卡甩線 · 最常見</span></div>
       </div>
       <div class="sub">
-        最好用 <b>「以管理員身分執行」</b> 嘅 PowerShell (Admin)：<br>
-        1. <code class="inline">ipconfig /flushdns</code>：<b>必須用 Admin</b>（清除系統級 DNS 快取，普通權限會出 <i>Request requires elevation</i>）。<br>
-        2. <code class="inline">curl.exe -s https://api.ip.sb/geoip</code>：<b>唔需要 Admin</b>，用來強制經 VPN 通道發送一次外部請求「預熱連線」。
+        當實體網卡短暫斷線重連、切換網絡或剛改完網卡設定後，VPN 虛擬網卡（TUN / TAP）會死抱住舊網絡接口，導致流量送唔出街。
+      </div>
+
+      <div class="rescue-warn">
+        ⚠️ <b>點解單靠 <code>ipconfig /flushdns</code> ＋ <code>curl.exe</code> 救唔到？</b><br>
+        <code>flushdns</code> 只係清「域名翻譯簿（DNS 快取）」，<code>curl.exe</code> 只係「敲門測試」；兩者都<b>唔會重新綁定虛擬網卡或重置 IP 路由表</b>，所以必須先徹底重開 VPN 客戶端再刷新 IP。
+      </div>
+
+      <div class="step-list">
+        <div class="step-item"><span class="step-num">1</span><div><b>徹底退出 VPN 客戶端：</b>先喺 VPN 軟件按斷開連線，再喺 Windows 右下角系統托盤（時間旁邊向上箭嘴）搵到 VPN 圖示，右鍵揀 <b>Exit / 退出</b>，確保背景進程完全結束（唔好只按右上角 X 縮小）。</div></div>
+        <div class="step-item"><span class="step-num">2</span><div><b>刷新本地網卡 IP 同 DNS 路由：</b>按 <kbd class="kbd">Win</kbd> + <kbd class="kbd">R</kbd> 輸入 <code class="inline">cmd</code> 開命令提示字元，執行下面兩句：</div></div>
+      </div>
+
+      <div class="term">
+        <div class="term-head">
+          <span class="term-lang"><span class="term-dots"><i></i><i></i><i></i></span>CMD / POWERSHELL</span>
+          <button type="button" class="copy-btn" data-copy="ipconfig /flushdns&#10;ipconfig /renew">一鍵複製指令</button>
+        </div>
+        <pre class="term-code">ipconfig /flushdns
+ipconfig /renew</pre>
+      </div>
+
+      <div class="step-list">
+        <div class="step-item"><span class="step-num">3</span><div><b>重開 VPN 並切換一次節點／模式：</b>重新啟動 VPN 客戶端，先揀另一個可用節點（或切換一次「系統代理 System Proxy」／「TUN 虛擬網卡模式」），再按連線。</div></div>
+        <div class="step-item"><span class="step-num">4</span><div><b>驗證外網通道恢復：</b>執行 <code class="inline">curl.exe -v https://api.ip.sb/geoip</code> 見到出境外 IP JSON，再按下面掣重新檢測。</div></div>
+      </div>
+
+      <div style="margin-top:12px">
+        <button type="button" class="teal" id="btnRescueRecheckA">我已重開 VPN 並刷新 IP · 立即切換並重新檢測 ↻</button>
+      </div>
+    </section>
+
+    <!-- Card 1: 情況 B — Windows 一鍵清 DNS ＋ 預熱連線 -->
+    <section class="card">
+      <div class="trow">
+        <div class="tname">情況 B：通道暢通但仲食緊舊中國直連快取<span class="tag admin">清 DNS · 需 Admin</span></div>
+      </div>
+      <div class="sub">
+        適合「剛連上 VPN，但網頁仲顯示中國直連或連唔到境外站」嘅情況（需用 <b>「以管理員身分執行」</b> 嘅 PowerShell）：<br>
+        1. <code class="inline">ipconfig /flushdns</code>：<b>必須用 Admin</b>（清除系統級 DNS 污染快取，普通權限會出 <i>Request requires elevation</i>）。<br>
+        2. <code class="inline">curl.exe -v https://api.ip.sb/geoip</code>：<b>唔需要 Admin</b>，用來強制經 VPN 通道發送一次外部請求「預熱連線」。
       </div>
 
       <div class="step-list">
@@ -302,10 +342,10 @@
       <div class="term">
         <div class="term-head">
           <span class="term-lang"><span class="term-dots"><i></i><i></i><i></i></span>POWERSHELL (ADMIN)</span>
-          <button type="button" class="copy-btn" data-copy="ipconfig /flushdns&#10;curl.exe -s https://api.ip.sb/geoip">一鍵複製指令</button>
+          <button type="button" class="copy-btn" data-copy="ipconfig /flushdns&#10;curl.exe -v https://api.ip.sb/geoip">一鍵複製指令</button>
         </div>
         <pre class="term-code">ipconfig /flushdns
-curl.exe -s https://api.ip.sb/geoip</pre>
+curl.exe -v https://api.ip.sb/geoip</pre>
       </div>
 
       <div class="rescue-box">
@@ -396,7 +436,7 @@ const SPEED_NODES={
   out:[{name:'Cloudflare Speed (1MB)',url:'https://speed.cloudflare.com/__down?bytes=1048576'},
        {name:'Cloudflare Speed (5MB)',url:'https://speed.cloudflare.com/__down?bytes=5242880'}],
   cn: [{name:'Speedtest.cn 測速網（官方）',url:'https://www.speedtest.cn/',external:true},
-       {name:'Staticfile CDN（約1MB）',url:'https://cdn.staticfile.org/echarts/5.4.3/echarts.min.js'},
+       {name:'npmmirror 淘寶鏡像（約1MB）',url:'https://registry.npmmirror.com/echarts/5.4.3/files/dist/echarts.min.js'},
        {name:'360 Baomitu CDN（約1MB）',url:'https://lib.baomitu.com/echarts/5.4.3/echarts.min.js'}]
 };
 
@@ -439,11 +479,13 @@ document.querySelectorAll('.mtab').forEach(btn=>btn.addEventListener('click',()=
 document.querySelectorAll('[data-copy]').forEach(btn=>{
   btn.addEventListener('click',()=>copyText(btn.dataset.copy,btn));
 });
-$('btnRescueRecheck').addEventListener('click',()=>{
+function rescueAndRecheck(){
   switchMainTab('detect');
   runCheck();
   window.scrollTo({top:0,behavior:'smooth'});
-});
+}
+$('btnRescueRecheckA').addEventListener('click',rescueAndRecheck);
+$('btnRescueRecheck').addEventListener('click',rescueAndRecheck);
 
 /* ===== 自訂目標 ===== */
 let customs;
