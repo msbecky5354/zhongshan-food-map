@@ -76,9 +76,10 @@
   #tunnelSvg[data-state="cn"] #wall,#tunnelSvg[data-state="cn"] #badMark{opacity:1}
   #tunnelSvg[data-state="ok"] #okMark{opacity:1}
   .top-actions{margin-top:12px}
-  .maintabs{display:flex;gap:8px}
-  .mtab{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:11px 12px;font-size:13.5px;font-weight:800;cursor:pointer;color:#4c5560;box-shadow:0 2px 8px rgba(34,41,50,.05);transition:all .2s}
+  .maintabs{display:flex;gap:6px}
+  .mtab{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 8px;font-size:12.5px;font-weight:800;cursor:pointer;color:#4c5560;box-shadow:0 2px 8px rgba(34,41,50,.05);transition:all .2s;text-align:center;line-height:1.3}
   .mtab.on{background:linear-gradient(120deg,var(--tunnel-deep),#0a5f68);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(14,124,134,.25)}
+  @media (min-width:460px){.maintabs{gap:8px}.mtab{padding:11px 12px;font-size:13.5px}}
   .tabpane{display:none;flex-direction:column;gap:13px}
   .tabpane.on{display:flex}
   .banner{border-radius:18px;padding:16px;text-align:center;font-weight:800;font-size:17px;border:1px solid transparent;transition:background .4s}
@@ -97,6 +98,7 @@
   .tag{font-size:9.5px;font-weight:800;border-radius:999px;padding:2.5px 7px;letter-spacing:.05em}
   .tag.blocked{background:var(--bad-bg);color:var(--bad)}
   .tag.control{background:#dff3f5;color:var(--tunnel-deep)}
+  .tag.admin{background:var(--warn-bg);color:var(--warn);border:1px solid #ecd9a4}
   .turl{font-size:11px;color:var(--muted);word-break:break-all;margin-top:3px}
   .tright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
   .pill{font-size:12px;font-weight:800;border-radius:999px;padding:6px 11px;white-space:nowrap;transition:transform .25s,background .3s,color .3s}
@@ -119,6 +121,9 @@
   button.gold:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(143,111,44,.38)}
   button.gold:active{transform:translateY(0)}
   button.gold:disabled{opacity:.55;transform:none}
+  button.teal{background:linear-gradient(120deg,var(--tunnel-deep),#0a5f68);color:#fff;border:0;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:800;cursor:pointer;width:100%;box-shadow:0 3px 10px rgba(14,124,134,.25);transition:transform .15s,box-shadow .15s}
+  button.teal:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(14,124,134,.32)}
+  button.teal:active{transform:translateY(0)}
   .auto{font-size:13px;font-weight:700;display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;user-select:none}
   .auto input{display:none}
   .track{width:36px;height:20px;border-radius:999px;background:#d8d2c0;position:relative;transition:background .25s;flex-shrink:0}
@@ -151,6 +156,33 @@
   .method strong{color:#4c5560}
   #targets{display:flex;flex-direction:column;gap:10px}
   #speedNodes{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+
+  /* ===== VPN 救亡／清 DNS 專屬樣式 ===== */
+  .term{margin-top:10px;border-radius:13px;background:var(--navy);border:1px solid #243b49;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+  .term-head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:#0b161e;border-bottom:1px solid #1e3340}
+  .term-lang{font-size:11px;font-weight:800;letter-spacing:.08em;color:#8fa3ad;display:flex;align-items:center;gap:6px}
+  .term-dots{display:inline-flex;gap:4px}
+  .term-dots i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .term-dots i:nth-child(1){background:#e06c75}.term-dots i:nth-child(2){background:#e5c07b}.term-dots i:nth-child(3){background:#98c379}
+  .term-code{padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;font-size:13px;line-height:1.65;color:#7fe0ec;overflow-x:auto;white-space:pre;user-select:all}
+  .copy-btn{border:1px solid rgba(25,194,216,.38);background:rgba(25,194,216,.12);color:#dff3f5;border-radius:8px;padding:4px 10px;font-size:11.5px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .copy-btn:hover{background:rgba(25,194,216,.24);border-color:var(--tunnel)}
+  .copy-btn.copied{background:var(--ok);border-color:var(--ok);color:#fff}
+  .copy-mini{border:1px solid var(--line);background:var(--paper);color:var(--tunnel-deep);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:800;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+  .copy-mini:hover{border-color:var(--tunnel-deep);background:#dff3f5}
+  .copy-mini.copied{background:var(--ok);border-color:var(--ok);color:#fff}
+  .step-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .step-item{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;line-height:1.6;color:var(--ink)}
+  .step-num{width:20px;height:20px;border-radius:50%;background:#dff3f5;color:var(--tunnel-deep);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  code.inline{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1.5px 6px;color:#0e5a63;word-break:break-all}
+  .rescue-box{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--paper);border:1px solid var(--line);font-size:12px;line-height:1.6;color:#3d4650}
+  .rescue-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+
+  /* ===== 快速預熱提示條 ===== */
+  .warmup-bar{margin-top:10px;padding:9px 12px;border-radius:12px;background:var(--paper);border:1px dashed var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:11.5px;color:#4c5560;line-height:1.5}
+  .warmup-text{display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:210px}
+  .kbd{display:inline-block;padding:1px 6px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;font-weight:800;color:var(--ink);background:var(--surface);border:1px solid #d5ccb4;border-bottom-width:2px;border-radius:6px;box-shadow:0 1px 1px rgba(0,0,0,.04)}
+
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -196,11 +228,20 @@
       <button class="gold" id="btnCheck">立即檢測</button>
       <label class="auto"><input type="checkbox" id="autoChk"><span class="track"></span>每 10 秒自動測</label>
     </div>
+    <div class="warmup-bar">
+      <div class="warmup-text">
+        <span>⚡ <b>預熱：</b>連上 VPN 後，開普通（免 Admin）PowerShell 打</span>
+        <code class="inline">curl.exe -s https://api.ip.sb/geoip</code>
+        <span>，見到出 IP 就搞掂。</span>
+      </div>
+      <button type="button" class="copy-mini" data-copy="curl.exe -s https://api.ip.sb/geoip">複製</button>
+    </div>
   </header>
 
   <nav class="maintabs" role="tablist" aria-label="功能分頁">
     <button type="button" class="mtab on" role="tab" aria-selected="true" data-pane="detect">通道與出口檢測</button>
     <button type="button" class="mtab" role="tab" aria-selected="false" data-pane="speed">頻寬測速（Speedtest）</button>
+    <button type="button" class="mtab" role="tab" aria-selected="false" data-pane="rescue">VPN 救亡／清 DNS</button>
   </nav>
 
   <div class="tabpane on" id="pane-detect" role="tabpanel">
@@ -239,6 +280,97 @@
     </section>
   </div>
 
+  <div class="tabpane" id="pane-rescue" role="tabpanel">
+    <div class="banner warn">開咗 VPN 仲顯示中國直連／連唔到？<span>多數係系統或瀏覽器留住舊嘅 DNS 污染快取，跟下面步驟清一清即刻救返。</span></div>
+
+    <!-- Card 1: Windows 一鍵清 DNS ＋ 預熱連線 -->
+    <section class="card">
+      <div class="trow">
+        <div class="tname">Windows 一鍵清 DNS ＋ 預熱連線<span class="tag admin">最有效 · 需 Admin</span></div>
+      </div>
+      <div class="sub">
+        最好用 <b>「以管理員身分執行」</b> 嘅 PowerShell (Admin)：<br>
+        1. <code class="inline">ipconfig /flushdns</code>：<b>必須用 Admin</b>（清除系統級 DNS 快取，普通權限會出 <i>Request requires elevation</i>）。<br>
+        2. <code class="inline">curl.exe -s https://api.ip.sb/geoip</code>：<b>唔需要 Admin</b>，用來強制經 VPN 通道發送一次外部請求「預熱連線」。
+      </div>
+
+      <div class="step-list">
+        <div class="step-item"><span class="step-num">1</span><div><b>最快開法：</b>直接按鍵盤 <kbd class="kbd">Win</kbd> + <kbd class="kbd">X</kbd>，喺彈出選單揀 <b>「終端機 (系統管理員)」</b> 或 <b>「Windows PowerShell (系統管理員)」</b>（亦可喺搜尋欄打 <code class="inline">PowerShell</code> 右鍵揀以管理員身分執行）。</div></div>
+        <div class="step-item"><span class="step-num">2</span><div>複製下面兩句指令貼入去按 Enter 執行：</div></div>
+      </div>
+
+      <div class="term">
+        <div class="term-head">
+          <span class="term-lang"><span class="term-dots"><i></i><i></i><i></i></span>POWERSHELL (ADMIN)</span>
+          <button type="button" class="copy-btn" data-copy="ipconfig /flushdns&#10;curl.exe -s https://api.ip.sb/geoip">一鍵複製指令</button>
+        </div>
+        <pre class="term-code">ipconfig /flushdns
+curl.exe -s https://api.ip.sb/geoip</pre>
+      </div>
+
+      <div class="rescue-box">
+        💡 <b>點樣知成功？</b>如果 <code class="inline">curl.exe</code> 吐出一堆 JSON 數據（例如 <code class="inline">{"ip":"...","country_code":"..."}</code>），代表系統已經成功經 VPN 預熱連線；等 <b>10 秒左右</b>再按下面掣重新檢測就得啦。
+      </div>
+
+      <div style="margin-top:12px">
+        <button type="button" class="teal" id="btnRescueRecheck">我已清好 DNS · 立即切換並重新檢測 ↻</button>
+      </div>
+    </section>
+
+    <!-- Card 2: 其他平台清 DNS（Mac / 手機） -->
+    <section class="card">
+      <h2>其他平台清 DNS（Mac / iPhone / Android）</h2>
+      <div class="rescue-box" style="margin-top:0">
+        <b>macOS（終端機 Terminal）：</b>
+        <div class="rescue-row">
+          <code class="inline">sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder</code>
+          <button type="button" class="copy-mini" data-copy="sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder">複製</button>
+        </div>
+        <div class="sub" style="margin-top:4px">輸入 Mac 登入密碼時畫面唔會顯示字元，直接打完按 Enter 即可。</div>
+      </div>
+      <div class="rescue-box">
+        <b>iPhone / Android 手機：</b>
+        <div class="sub" style="margin-top:3px">先開 VPN，然後開啟手機 <b>「飛航模式 (Airplane Mode)」等 5–10 秒再熄返</b>，強制手機中斷並重建網絡介面與系統 DNS 快取。</div>
+      </div>
+    </section>
+
+    <!-- Card 3: 瀏覽器層面急救 -->
+    <section class="card">
+      <h2>瀏覽器層面急救（Chrome / Edge）</h2>
+      <div class="sub">有時 Windows 清咗，但 Chrome / Edge 自己仲留住舊 DNS 同 Socket 連線池：</div>
+      <div class="step-list">
+        <div class="step-item">
+          <span class="step-num">1</span>
+          <div><b>開無痕視窗測試：</b>按 <code class="inline">Ctrl + Shift + N</code>（Mac：<code class="inline">Cmd + Shift + N</code>）開無痕模式再打開本頁，完全避開舊快取。</div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">2</span>
+          <div style="flex:1">
+            <b>清瀏覽器 DNS 快取：</b>複製下面網址貼去網址列，入面按 <b>「Clear host cache」</b>：
+            <div class="rescue-row">
+              <code class="inline">chrome://net-internals/#dns</code>
+              <button type="button" class="copy-mini" data-copy="chrome://net-internals/#dns">複製網址</button>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">3</span>
+          <div style="flex:1">
+            <b>清瀏覽器 Socket 連線池：</b>再貼下面網址，入面按 <b>「Flush socket pools」</b>：
+            <div class="rescue-row">
+              <code class="inline">chrome://net-internals/#sockets</code>
+              <button type="button" class="copy-mini" data-copy="chrome://net-internals/#sockets">複製網址</button>
+            </div>
+          </div>
+        </div>
+        <div class="step-item">
+          <span class="step-num">4</span>
+          <div><b>檢查代理模式與安全 DNS：</b>確認 VPN 客戶端已開啟系統代理／TUN 模式（或試切「全局模式 Global」）；若瀏覽器設定開啟咗「使用安全 DNS (DoH)」，可暫時關閉以免查詢繞過 VPN。</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <footer class="method">
     <strong>點樣解讀：</strong>瀏覽器基於安全限制，只量到「有冇回應／幾快」，證明唔到「真正用到個網站」。出口 CN＝中國直連；出口非 CN＝VPN 通道生效。綠燈＝連線事實；出口喺中國時，被牆站就算有回應都多屬 DNS 污染／劫持／快取殘影。
   </footer>
@@ -246,7 +378,7 @@
 
 <script>
 /* ===== 設定（冇預設出口國家） ===== */
-const PROBE_TIMEOUT=6000, IMG_TIMEOUT=3500, EXIT_TIMEOUT=6000;
+const PROBE_TIMEOUT=6000, IMG_TIMEOUT=3500, EXIT_TIMEOUT=20000;
 
 const TARGETS=[
   {name:'YouTube',    url:'https://www.youtube.com/favicon.ico',     cnBlocked:true},
@@ -275,16 +407,43 @@ const bust=u=>u+(u.includes('?')?'&':'?')+'_vt='+Date.now().toString(36)+Math.ra
 function sig(ms){const c=new AbortController();setTimeout(()=>c.abort(),ms);return c.signal;}
 function setPill(el,cls,text){el.className='pill '+cls+' pop';el.textContent=text;setTimeout(()=>el.classList.remove('pop'),400);}
 
+function copyText(text,btn){
+  const done=()=>{
+    const orig=btn.dataset.orig||btn.textContent;
+    btn.dataset.orig=orig;
+    btn.textContent='已複製 ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1800);
+  };
+  const ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');done();}catch(e){
+    if(navigator.clipboard)navigator.clipboard.writeText(text).then(done).catch(()=>{});
+  }
+  document.body.removeChild(ta);
+}
+
 /* ===== 主分頁切換 ===== */
-document.querySelectorAll('.mtab').forEach(btn=>btn.addEventListener('click',()=>{
-  const pane=btn.dataset.pane;
+function switchMainTab(pane){
   document.querySelectorAll('.mtab').forEach(b=>{
-    const on=b===btn;
+    const on=b.dataset.pane===pane;
     b.classList.toggle('on',on);
     b.setAttribute('aria-selected',on?'true':'false');
   });
   document.querySelectorAll('.tabpane').forEach(p=>p.classList.toggle('on',p.id==='pane-'+pane));
-}));
+}
+document.querySelectorAll('.mtab').forEach(btn=>btn.addEventListener('click',()=>switchMainTab(btn.dataset.pane)));
+
+/* ===== 救亡分頁互動 ===== */
+document.querySelectorAll('[data-copy]').forEach(btn=>{
+  btn.addEventListener('click',()=>copyText(btn.dataset.copy,btn));
+});
+$('btnRescueRecheck').addEventListener('click',()=>{
+  switchMainTab('detect');
+  runCheck();
+  window.scrollTo({top:0,behavior:'smooth'});
+});
 
 /* ===== 自訂目標 ===== */
 let customs;
